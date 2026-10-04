@@ -33,17 +33,18 @@ body {
 
 .header {
     width: 100%;
-    min-height: 104px;
+    height: 92px !important;
+    min-height: 92px !important;
 
     background: #e7e8e9;
+
+    position: relative;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    padding: 6px 16px 4px;
-
-    position: relative;
+    padding: 0 16px;
 }
 
 
@@ -51,18 +52,21 @@ body {
    MATRÁZ - EXTREMO IZQUIERDO
    ========================================= */
 
-.brand-icon {
-    position: absolute;
+.header .brand-icon {
+    position: absolute !important;
 
-    left: 16px;
-    top: 50%;
+    left: 16px !important;
+    right: auto !important;
 
-    transform: translateY(-50%);
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
 
     width: 42px;
     height: 42px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -70,31 +74,33 @@ body {
 
     font-size: 29px;
 
-    z-index: 2;
+    z-index: 10;
 }
 
 
 /* =========================================
-   TEXTO CENTRADO
+   TEXTO - CENTRO ABSOLUTO
    ========================================= */
 
-.brand-text {
-    position: absolute;
+.header .brand-text {
+    position: absolute !important;
 
-    left: 50%;
-    top: 50%;
+    left: 50% !important;
+    right: auto !important;
 
-    transform: translate(-50%, -50%);
+    top: 50% !important;
+
+    transform: translate(-50%, -50%) !important;
 
     text-align: center;
 
     white-space: nowrap;
 
-    z-index: 1;
+    z-index: 5;
 }
 
 
-.brand-text h1 {
+.header .brand-text h1 {
     font-size: 25px;
 
     line-height: 1.1;
@@ -105,12 +111,12 @@ body {
 }
 
 
-.brand-text h1 span {
+.header .brand-text h1 span {
     color: #145da0;
 }
 
 
-.brand-text p {
+.header .brand-text p {
     margin-top: 5px;
 
     font-size: 13px;
@@ -123,13 +129,15 @@ body {
    USUARIO - EXTREMO DERECHO
    ========================================= */
 
-.profile-button {
-    position: absolute;
+.header .profile-button {
+    position: absolute !important;
 
-    right: 16px;
-    top: 50%;
+    left: auto !important;
+    right: 16px !important;
 
-    transform: translateY(-50%);
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
 
     width: 42px;
     height: 42px;
@@ -139,6 +147,7 @@ body {
     border-radius: 50%;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -148,7 +157,7 @@ body {
 
     flex-shrink: 0;
 
-    z-index: 2;
+    z-index: 10;
 }
 
 
@@ -165,7 +174,7 @@ body {
 
     border-radius: 5px;
 
-    margin: 0 auto 14px;
+    margin: 0 auto 12px;
 }
 
 
@@ -474,8 +483,6 @@ body {
 }
 
 
-/* Título */
-
 .section-title {
     display: flex;
 
@@ -648,8 +655,6 @@ body {
 }
 
 
-/* Flecha */
-
 .arrow {
     position: absolute;
 
@@ -707,10 +712,6 @@ body {
 }
 
 
-/* =========================================
-   ELEMENTOS DE NAVEGACIÓN
-   ========================================= */
-
 .nav-item {
     flex: 1;
 
@@ -734,8 +735,6 @@ body {
 }
 
 
-/* ÍCONOS GRANDES */
-
 .nav-item i {
     font-size: 25px;
 
@@ -747,8 +746,6 @@ body {
 }
 
 
-/* TEXTO */
-
 .nav-item span {
     font-size: 10px;
 
@@ -757,7 +754,7 @@ body {
 
 
 /* =========================================
-   COLORES DE LA BARRA
+   COLORES BARRA INFERIOR
    ========================================= */
 
 .nav-red i {
@@ -785,10 +782,6 @@ body {
 }
 
 
-/* =========================================
-   ELEMENTO ACTIVO
-   ========================================= */
-
 .nav-item.active {
     font-weight: 700;
 }
@@ -814,72 +807,78 @@ body {
 
 
 /* =========================================
-   AJUSTE GENERAL PARA CELULAR
+   SEGURIDAD EXTRA PARA CELULARES
    ========================================= */
 
 @media (max-width: 600px) {
 
     .header {
-        min-height: 104px;
+        height: 92px !important;
+        min-height: 92px !important;
 
-        padding: 6px 16px 4px;
+        padding: 0 16px !important;
     }
 
 
-    /* Matraz */
+    /* MATRÁZ */
 
-    .brand-icon {
-        left: 16px;
+    .header .brand-icon {
+        position: absolute !important;
 
-        width: 42px;
-        height: 42px;
+        left: 16px !important;
+        right: auto !important;
 
-        font-size: 29px;
+        top: 50% !important;
+
+        transform: translateY(-50%) !important;
     }
 
 
-    /* Título */
+    /* TÍTULO */
 
-    .brand-text {
-        left: 50%;
-        top: 50%;
+    .header .brand-text {
+        position: absolute !important;
+
+        left: 50% !important;
+        right: auto !important;
+
+        top: 50% !important;
+
+        transform: translate(-50%, -50%) !important;
     }
 
 
-    .brand-text h1 {
-        font-size: 25px;
+    /* USUARIO */
+
+    .header .profile-button {
+        position: absolute !important;
+
+        left: auto !important;
+        right: 16px !important;
+
+        top: 50% !important;
+
+        transform: translateY(-50%) !important;
     }
 
 
-    .brand-text p {
-        font-size: 13px;
-
-        white-space: nowrap;
-    }
-
-
-    /* Usuario */
-
-    .profile-button {
-        right: 16px;
-
-        top: 50%;
-
-        width: 42px;
-        height: 42px;
-
-        font-size: 17px;
-    }
-
-
-    /* Línea */
+    /* LÍNEA */
 
     .blue-line {
-        width: 92%;
+        width: 92% !important;
 
         height: 4px;
 
-        margin-bottom: 14px;
+        margin-top: 0 !important;
+
+        margin-bottom: 12px !important;
+    }
+
+
+    /* CONTENIDO */
+
+    .main-content {
+        padding: 0 12px;
     }
 
 }
