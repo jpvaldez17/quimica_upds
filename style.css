@@ -33,7 +33,7 @@ body {
 
 .header {
     width: 100%;
-    min-height: 105px;
+    min-height: 122px;
 
     background: #e7e8e9;
 
@@ -41,30 +41,35 @@ body {
     align-items: center;
     justify-content: center;
 
-    padding: 14px 20px 9px;
+    padding: 10px 20px;
 
     position: relative;
 }
 
 
-/* Marca centrada */
+/* =========================================
+   MARCA CENTRADA
+   ========================================= */
 
 .brand {
     display: flex;
+
+    flex-direction: column;
+
     align-items: center;
     justify-content: center;
 
-    gap: 10px;
+    gap: 2px;
 
-    text-align: left;
+    text-align: center;
 }
 
 
 /* Icono de química */
 
 .brand-icon {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 34px;
 
     display: flex;
     align-items: center;
@@ -72,14 +77,19 @@ body {
 
     color: #1686e8;
 
-    font-size: 34px;
+    font-size: 29px;
 }
 
 
 /* Texto */
 
+.brand-text {
+    text-align: center;
+}
+
 .brand-text h1 {
     font-size: 29px;
+
     line-height: 1.1;
 
     font-weight: 800;
@@ -100,7 +110,9 @@ body {
 }
 
 
-/* Usuario */
+/* =========================================
+   USUARIO
+   ========================================= */
 
 .profile-button {
     position: absolute;
@@ -187,8 +199,6 @@ body {
 }
 
 
-/* Lupa */
-
 .search-icon {
     font-size: 21px;
 
@@ -197,8 +207,6 @@ body {
     margin-right: 13px;
 }
 
-
-/* Campo */
 
 .search-box input {
     flex: 1;
@@ -221,8 +229,6 @@ body {
 }
 
 
-/* Filtros */
-
 .search-settings {
     border: none;
 
@@ -239,7 +245,7 @@ body {
 
 
 /* =========================================
-   TARJETAS GENERALES
+   TARJETAS
    ========================================= */
 
 .card {
@@ -295,6 +301,7 @@ body {
     border-radius: 50%;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -352,8 +359,6 @@ body {
 }
 
 
-/* Botón rojo */
-
 .outline-red {
     display: inline-flex;
 
@@ -406,8 +411,6 @@ body {
     color: #151515;
 }
 
-
-/* Botones */
 
 .answer-buttons {
     display: grid;
@@ -469,9 +472,9 @@ body {
 
     gap: 10px;
 
-    padding: 0 4px 8px;
+    padding: 0 4px 7px;
 
-    margin-bottom: 14px;
+    margin-bottom: 13px;
 
     border-bottom: 1px solid #ffffff;
 }
@@ -485,8 +488,6 @@ body {
     color: #222222;
 }
 
-
-/* Icono */
 
 .grid-icon {
     width: 30px;
@@ -502,7 +503,7 @@ body {
 
 
 /* =========================================
-   CUADRÍCULA 2 × 2
+   CUADRÍCULA
    ========================================= */
 
 .shortcut-grid {
@@ -564,9 +565,11 @@ body {
 
     min-width: 62px;
 
+    flex-shrink: 0;
+
     border-radius: 50%;
 
-    display: flex;
+    display: flex !important;
 
     align-items: center;
     justify-content: center;
@@ -574,34 +577,38 @@ body {
     font-size: 25px;
 
     color: #ffffff;
+
+    opacity: 1;
+
+    visibility: visible;
 }
 
 
 /* Naranja - ENLACES */
 
 .shortcut-icon.orange {
-    background: #e67e00;
+    background: #e67e00 !important;
 }
 
 
 /* Azul - TABLA */
 
 .shortcut-icon.cyan {
-    background: #1686c9;
+    background: #1686c9 !important;
 }
 
 
 /* Verde - REACCIONES */
 
 .shortcut-icon.green {
-    background: #15965a;
+    background: #15965a !important;
 }
 
 
 /* Café - COMPUESTOS */
 
 .shortcut-icon.brown {
-    background: #8b5e3c;
+    background: #8b5e3c !important;
 }
 
 
@@ -652,7 +659,7 @@ body {
 
 
 /* =========================================
-   DESARROLLO
+   CRÉDITO
    ========================================= */
 
 .developer {
@@ -679,8 +686,6 @@ body {
     width: 100%;
 
     height: 78px;
-
-    /* MISMO GRIS DEL FONDO */
 
     background: #dfe2e5;
 
@@ -712,13 +717,11 @@ body {
 
     align-items: center;
 
-    justify-content: center;
+    justify-content: flex-start;
 
-    /* Un poco más abajo */
+    padding-top: 13px;
 
-    padding-top: 5px;
-
-    gap: 3px;
+    gap: 5px;
 
     color: #333333;
 
@@ -728,18 +731,20 @@ body {
 }
 
 
-/* ICONOS MÁS GRANDES */
+/* ÍCONOS GRANDES */
 
 .nav-item i {
-    font-size: 25px;
+    font-size: 26px;
 
     line-height: 1;
 
-    margin-bottom: 3px;
+    display: block;
+
+    margin-bottom: 2px;
 }
 
 
-/* TEXTO: SE CONSERVA PEQUEÑO */
+/* TEXTO */
 
 .nav-item span {
     font-size: 11px;
@@ -752,35 +757,25 @@ body {
    COLORES DE LA BARRA
    ========================================= */
 
-/* Inicio - rojo */
-
 .nav-red i {
     color: #d4144e;
 }
 
-
-/* Tabla - azul */
 
 .nav-blue i {
     color: #1686c9;
 }
 
 
-/* Enlaces - naranja */
-
 .nav-orange i {
     color: #e67e00;
 }
 
 
-/* Reacciones - verde */
-
 .nav-green i {
     color: #15965a;
 }
 
-
-/* Compuestos - café */
 
 .nav-brown i {
     color: #8b5e3c;
@@ -796,7 +791,7 @@ body {
 }
 
 
-/* Línea activa roja */
+/* Línea activa */
 
 .nav-red.active::after {
     content: "";
@@ -829,22 +824,22 @@ body {
        ===================================== */
 
     .header {
-        min-height: 104px;
+        min-height: 124px;
 
-        padding: 14px 16px 9px;
+        padding: 9px 16px 8px;
     }
 
 
     .brand {
-        gap: 8px;
+        gap: 1px;
     }
 
 
     .brand-icon {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 31px;
 
-        font-size: 29px;
+        font-size: 28px;
     }
 
 
@@ -1045,16 +1040,23 @@ body {
     }
 
 
-    /* Iconos grandes */
+    .nav-item {
+        padding-top: 11px;
 
-    .nav-item i {
-        font-size: 24px;
-
-        margin-bottom: 3px;
+        gap: 5px;
     }
 
 
-    /* Texto conserva tamaño */
+    /* ÍCONOS GRANDES */
+
+    .nav-item i {
+        font-size: 25px;
+
+        margin-bottom: 2px;
+    }
+
+
+    /* TEXTO CONSERVA SU TAMAÑO */
 
     .nav-item span {
         font-size: 10px;
