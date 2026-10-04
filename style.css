@@ -32,15 +32,15 @@ body {
 
 .header {
     width: 100%;
-    min-height: 105px;
+    min-height: 88px;
 
     background: #e7e8e9;
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
-    padding: 14px 20px 9px;
+    padding: 6px 20px 2px;
 
     position: relative;
 }
@@ -51,6 +51,13 @@ body {
    ========================================= */
 
 .brand-icon {
+    position: absolute;
+
+    left: 20px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
     width: 48px;
     height: 48px;
 
@@ -61,10 +68,7 @@ body {
     color: #1686e8;
 
     font-size: 34px;
-
-    flex-shrink: 0;
 }
-
 
 /* =========================================
    TEXTO CENTRADO
@@ -139,21 +143,23 @@ body {
 
 @media (max-width: 600px) {
 
-    .header {
-        min-height: 104px;
+.header {
+    min-height: 88px;
 
-        padding: 14px 16px 9px;
-    }
+    padding: 6px 16px 2px;
+}
 
 
     /* Matraz izquierdo */
 
-    .brand-icon {
-        width: 42px;
-        height: 42px;
+.brand-icon {
+    left: 16px;
 
-        font-size: 29px;
-    }
+    width: 42px;
+    height: 42px;
+
+    font-size: 29px;
+}
 
 
     /* Texto centrado */
@@ -194,7 +200,7 @@ body {
 
     border-radius: 5px;
 
-    margin: 0 auto 20px;
+    margin: 0 auto 16px;
 }
 
 
