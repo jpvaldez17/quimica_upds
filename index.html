@@ -7,15 +7,21 @@
 
     <title>Química UPDS</title>
 
-    <!-- Iconos -->
+    <!-- =========================
+         ICONOS
+    ========================== -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- Estilos -->
+    <!-- =========================
+         ESTILOS
+    ========================== -->
     <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body>
+
 
     <!-- =========================
          ENCABEZADO
@@ -25,10 +31,12 @@
 
         <div class="brand">
 
+            <!-- Icono de química -->
             <div class="brand-icon">
                 <i class="fa-solid fa-flask"></i>
             </div>
 
+            <!-- Nombre -->
             <div class="brand-text">
 
                 <h1>
@@ -43,6 +51,9 @@
 
         </div>
 
+
+        <!-- Usuario -->
+
         <div class="profile-button">
             <i class="fa-solid fa-user"></i>
         </div>
@@ -55,6 +66,10 @@
     <div class="blue-line"></div>
 
 
+
+    <!-- =========================
+         CONTENIDO PRINCIPAL
+    ========================== -->
 
     <main class="main-content">
 
@@ -72,7 +87,9 @@
                 placeholder="Buscar elemento, compuesto, reacción..."
             >
 
-            <i class="fa-solid fa-sliders search-settings"></i>
+            <button class="search-settings" aria-label="Filtros">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
 
         </section>
 
@@ -84,13 +101,20 @@
 
         <section class="card daily-card">
 
-            <div class="card-icon red-icon">
-                <i class="fa-regular fa-lightbulb"></i>
+            <div class="card-header">
+
+                <div class="card-icon red-icon">
+                    <i class="fa-regular fa-lightbulb"></i>
+                </div>
+
+                <h2>
+                    DATO DEL DÍA
+                </h2>
+
             </div>
 
-            <div class="card-content">
 
-                <h2>Dato del día</h2>
+            <div class="card-content">
 
                 <h3>
                     Gasolina (Isooctano - C₈H₁₈)
@@ -112,22 +136,30 @@
 
 
         <!-- =========================
-             DESAFÍO
+             DESAFÍO RÁPIDO
         ========================== -->
 
         <section class="card challenge-card">
 
-            <div class="card-icon blue-icon">
-                <i class="fa-solid fa-bolt"></i>
+            <div class="card-header">
+
+                <div class="card-icon blue-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+
+                <h2>
+                    DESAFÍO RÁPIDO DEL DÍA
+                </h2>
+
             </div>
 
-            <div class="card-content">
 
-                <h2>Desafío rápido del día</h2>
+            <div class="card-content">
 
                 <h3 class="question">
                     ¿El ion NO⁺ es diamagnético o paramagnético?
                 </h3>
+
 
                 <div class="answer-buttons">
 
@@ -153,6 +185,9 @@
 
         <section class="shortcuts">
 
+
+            <!-- Título -->
+
             <div class="section-title">
 
                 <div class="grid-icon">
@@ -160,16 +195,21 @@
                 </div>
 
                 <h2>
-                    Accesos directos
+                    ACCESOS DIRECTOS
                 </h2>
 
             </div>
 
 
+
+            <!-- =========================
+                 TARJETAS
+            ========================== -->
+
             <div class="shortcut-grid">
 
 
-                <!-- Calculadora -->
+                <!-- CALCULADORA -->
 
                 <div class="shortcut-card">
 
@@ -195,7 +235,7 @@
 
 
 
-                <!-- Tabla periódica -->
+                <!-- TABLA PERIÓDICA -->
 
                 <div class="shortcut-card">
 
@@ -221,7 +261,7 @@
 
 
 
-                <!-- Reacciones -->
+                <!-- REACCIONES -->
 
                 <div class="shortcut-card">
 
@@ -247,7 +287,7 @@
 
 
 
-                <!-- Catálogo -->
+                <!-- CATÁLOGO -->
 
                 <div class="shortcut-card">
 
@@ -278,13 +318,11 @@
 
 
         <!-- =========================
-             DESARROLLO
+             CRÉDITO
         ========================== -->
 
         <div class="developer">
-
             Developed by J. Poma · 2026
-
         </div>
 
 
@@ -297,6 +335,7 @@
     ========================== -->
 
     <nav class="bottom-nav">
+
 
         <div class="nav-item active">
 
@@ -352,8 +391,10 @@
 
         </div>
 
-</nav>
+
+    </nav>
 
 
 </body>
+
 </html>
