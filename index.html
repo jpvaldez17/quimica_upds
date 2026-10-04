@@ -7,39 +7,30 @@
 
     <title>Química UPDS</title>
 
-    <!-- =========================
-         ICONOS
-    ========================== -->
+    <!-- ICONOS -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- =========================
-         ESTILOS
-         v=3 evita cargar una versión antigua
-    ========================== -->
-    <link rel="stylesheet" href="style.css?v=3">
+    <!-- ESTILOS - versión actualizada -->
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 
 
 <body>
 
-<!-- =========================
+<!-- =========================================
      ENCABEZADO
-========================== -->
+     ========================================= -->
 
 <header class="header">
 
-    <!-- Matraz a la izquierda -->
-
+    <!-- MATRÁZ - EXTREMO IZQUIERDO -->
     <div class="brand-icon">
-
         <i class="fa-solid fa-flask"></i>
-
     </div>
 
 
-    <!-- Nombre centrado -->
-
+    <!-- TÍTULO - CENTRO -->
     <div class="brand-text">
 
         <h1>
@@ -53,8 +44,7 @@
     </div>
 
 
-    <!-- Usuario a la derecha -->
-
+    <!-- USUARIO - EXTREMO DERECHO -->
     <div class="profile-button">
 
         <i class="fa-solid fa-user"></i>
@@ -64,371 +54,321 @@
 </header>
 
 
-    <!-- Línea azul -->
-
-    <div class="blue-line"></div>
-
+<!-- LÍNEA AZUL -->
+<div class="blue-line"></div>
 
 
-    <!-- =========================
-         CONTENIDO PRINCIPAL
-    ========================== -->
+<!-- =========================================
+     CONTENIDO PRINCIPAL
+     ========================================= -->
 
-    <main class="main-content">
+<main class="main-content">
 
 
-        <!-- =========================
-             BUSCADOR
-        ========================== -->
+    <!-- BUSCADOR -->
 
-        <section class="search-box">
+    <section class="search-box">
 
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-            <input
-                type="text"
-                placeholder="Buscar elemento, compuesto, reacción..."
-            >
+        <input
+            type="text"
+            placeholder="Buscar elemento, compuesto, reacción..."
+        >
 
-            <button
-                class="search-settings"
-                aria-label="Filtros">
+        <button
+            class="search-settings"
+            aria-label="Filtros">
 
-                <i class="fa-solid fa-sliders"></i>
+            <i class="fa-solid fa-sliders"></i>
+
+        </button>
+
+    </section>
+
+
+    <!-- =====================================
+         DATO DEL DÍA
+         ===================================== -->
+
+    <section class="card daily-card">
+
+        <div class="card-header">
+
+            <div class="card-icon red-icon">
+                <i class="fa-regular fa-lightbulb"></i>
+            </div>
+
+            <h2>
+                DATO DEL DÍA
+            </h2>
+
+        </div>
+
+
+        <div class="card-content">
+
+            <h3>
+                Gasolina (Isooctano - C₈H₁₈)
+            </h3>
+
+            <p>
+                Mezcla de hidrocarburos no polares utilizada como combustible.
+            </p>
+
+            <button class="outline-red">
+
+                Ver ficha en el catálogo
+
+                <i class="fa-solid fa-arrow-right"></i>
 
             </button>
 
-        </section>
+        </div>
+
+    </section>
 
 
+    <!-- =====================================
+         DESAFÍO RÁPIDO
+         ===================================== -->
 
-        <!-- =========================
-             DATO DEL DÍA
-        ========================== -->
+    <section class="card challenge-card">
 
-        <section class="card daily-card">
+        <div class="card-header">
 
-            <div class="card-header">
-
-                <div class="card-icon red-icon">
-
-                    <i class="fa-regular fa-lightbulb"></i>
-
-                </div>
-
-                <h2>
-                    DATO DEL DÍA
-                </h2>
-
+            <div class="card-icon blue-icon">
+                <i class="fa-solid fa-bolt"></i>
             </div>
 
+            <h2>
+                DESAFÍO RÁPIDO DEL DÍA
+            </h2>
 
-            <div class="card-content">
+        </div>
 
-                <h3>
-                    Gasolina (Isooctano - C₈H₁₈)
-                </h3>
 
-                <p>
-                    Mezcla de hidrocarburos no polares utilizada como combustible.
-                </p>
+        <div class="card-content">
 
-                <button class="outline-red">
+            <h3 class="question">
+                ¿El ion NO⁺ es diamagnético o paramagnético?
+            </h3>
 
-                    Ver ficha en el catálogo
 
-                    <i class="fa-solid fa-arrow-right"></i>
+            <div class="answer-buttons">
 
+                <button>
+                    Diamagnético (10 e⁻)
+                </button>
+
+                <button>
+                    Paramagnético
                 </button>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
+    <!-- =====================================
+         ACCESOS DIRECTOS
+         ===================================== -->
 
-        <!-- =========================
-             DESAFÍO RÁPIDO
-        ========================== -->
+    <section class="shortcuts">
 
-        <section class="card challenge-card">
+        <div class="section-title">
 
-            <div class="card-header">
+            <div class="grid-icon">
+                <i class="fa-solid fa-grip"></i>
+            </div>
 
-                <div class="card-icon blue-icon">
+            <h2>
+                ACCESOS DIRECTOS
+            </h2>
 
-                    <i class="fa-solid fa-bolt"></i>
+        </div>
+
+
+        <div class="shortcut-grid">
+
+
+            <!-- ENLACES -->
+
+            <div class="shortcut-card">
+
+                <div class="shortcut-icon orange">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+
+                <div class="shortcut-text">
+
+                    <h3>
+                        ENLACES
+                    </h3>
+
+                    <p>
+                        Estructura molecular
+                    </p>
 
                 </div>
 
-                <h2>
-                    DESAFÍO RÁPIDO DEL DÍA
-                </h2>
+                <i class="fa-solid fa-chevron-right arrow"></i>
 
             </div>
 
 
-            <div class="card-content">
+            <!-- TABLA PERIÓDICA -->
 
-                <h3 class="question">
-                    ¿El ion NO⁺ es diamagnético o paramagnético?
-                </h3>
+            <div class="shortcut-card">
 
+                <div class="shortcut-icon cyan">
+                    <i class="fa-solid fa-table-cells"></i>
+                </div>
 
-                <div class="answer-buttons">
+                <div class="shortcut-text">
 
-                    <button>
-                        Diamagnético (10 e⁻)
-                    </button>
+                    <h3>
+                        TABLA PERIÓDICA
+                    </h3>
 
-                    <button>
-                        Paramagnético
-                    </button>
+                    <p>
+                        Elementos y propiedades
+                    </p>
 
                 </div>
 
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             ACCESOS DIRECTOS
-        ========================== -->
-
-        <section class="shortcuts">
-
-
-            <div class="section-title">
-
-                <div class="grid-icon">
-                    <i class="fa-solid fa-grip"></i>
-                </div>
-
-                <h2>
-                    ACCESOS DIRECTOS
-                </h2>
+                <i class="fa-solid fa-chevron-right arrow"></i>
 
             </div>
 
 
+            <!-- REACCIONES -->
 
-            <div class="shortcut-grid">
+            <div class="shortcut-card">
 
+                <div class="shortcut-icon green">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
 
-                <!-- =========================
-                     ENLACES
-                ========================== -->
+                <div class="shortcut-text">
 
-                <div class="shortcut-card">
+                    <h3>
+                        REACCIONES
+                    </h3>
 
-                    <div class="shortcut-icon orange">
-
-                        <i class="fa-solid fa-atom"></i>
-
-                    </div>
-
-                    <div class="shortcut-text">
-
-                        <h3>
-                            ENLACES
-                        </h3>
-
-                        <p>
-                            Estructura molecular
-                        </p>
-
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right arrow"></i>
+                    <p>
+                        Tipos y mecanismos
+                    </p>
 
                 </div>
 
-
-
-                <!-- =========================
-                     TABLA PERIÓDICA
-                ========================== -->
-
-                <div class="shortcut-card">
-
-                    <div class="shortcut-icon cyan">
-
-                        <i class="fa-solid fa-table-cells"></i>
-
-                    </div>
-
-                    <div class="shortcut-text">
-
-                        <h3>
-                            TABLA PERIÓDICA
-                        </h3>
-
-                        <p>
-                            Elementos y propiedades
-                        </p>
-
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right arrow"></i>
-
-                </div>
-
-
-
-                <!-- =========================
-                     REACCIONES
-                ========================== -->
-
-                <div class="shortcut-card">
-
-                    <div class="shortcut-icon green">
-
-                        <i class="fa-solid fa-flask"></i>
-
-                    </div>
-
-                    <div class="shortcut-text">
-
-                        <h3>
-                            REACCIONES
-                        </h3>
-
-                        <p>
-                            Tipos y mecanismos
-                        </p>
-
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right arrow"></i>
-
-                </div>
-
-
-
-                <!-- =========================
-                     COMPUESTOS
-                ========================== -->
-
-                <div class="shortcut-card">
-
-                    <div class="shortcut-icon brown">
-
-                        <i class="fa-solid fa-book"></i>
-
-                    </div>
-
-                    <div class="shortcut-text">
-
-                        <h3>
-                            COMPUESTOS
-                        </h3>
-
-                        <p>
-                            Características y usos
-                        </p>
-
-                    </div>
-
-                    <i class="fa-solid fa-chevron-right arrow"></i>
-
-                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
 
             </div>
 
-        </section>
 
+            <!-- COMPUESTOS -->
 
+            <div class="shortcut-card">
 
-        <!-- =========================
-             CRÉDITO
-        ========================== -->
+                <div class="shortcut-icon brown">
+                    <i class="fa-solid fa-book"></i>
+                </div>
 
-        <div class="developer">
-            Developed by J. Poma · 2026
-        </div>
+                <div class="shortcut-text">
 
+                    <h3>
+                        COMPUESTOS
+                    </h3>
 
-    </main>
+                    <p>
+                        Características y usos
+                    </p>
 
+                </div>
 
+                <i class="fa-solid fa-chevron-right arrow"></i>
 
-    <!-- =========================
-         BARRA INFERIOR
-    ========================== -->
-
-    <nav class="bottom-nav">
-
-
-        <!-- INICIO -->
-
-        <div class="nav-item nav-red active">
-
-            <i class="fa-solid fa-house"></i>
-
-            <span>
-                Inicio
-            </span>
+            </div>
 
         </div>
 
-
-        <!-- TABLA -->
-
-        <div class="nav-item nav-blue">
-
-            <i class="fa-solid fa-chart-column"></i>
-
-            <span>
-                Tabla
-            </span>
-
-        </div>
+    </section>
 
 
-        <!-- ENLACES -->
+    <!-- CRÉDITO -->
 
-        <div class="nav-item nav-orange">
+    <div class="developer">
+        Developed by J. Poma · 2026
+    </div>
 
-            <i class="fa-solid fa-atom"></i>
-
-            <span>
-                Enlaces
-            </span>
-
-        </div>
+</main>
 
 
-        <!-- REACCIONES -->
+<!-- =========================================
+     BARRA INFERIOR
+     ========================================= -->
 
-        <div class="nav-item nav-green">
+<nav class="bottom-nav">
 
-            <i class="fa-solid fa-flask"></i>
+    <div class="nav-item nav-red active">
 
-            <span>
-                Reacc.
-            </span>
+        <i class="fa-solid fa-house"></i>
 
-        </div>
+        <span>
+            Inicio
+        </span>
 
-
-        <!-- COMPUESTOS -->
-
-        <div class="nav-item nav-brown">
-
-            <i class="fa-solid fa-book"></i>
-
-            <span>
-                Compuestos
-            </span>
-
-        </div>
+    </div>
 
 
-    </nav>
+    <div class="nav-item nav-blue">
+
+        <i class="fa-solid fa-chart-column"></i>
+
+        <span>
+            Tabla
+        </span>
+
+    </div>
+
+
+    <div class="nav-item nav-orange">
+
+        <i class="fa-solid fa-atom"></i>
+
+        <span>
+            Enlaces
+        </span>
+
+    </div>
+
+
+    <div class="nav-item nav-green">
+
+        <i class="fa-solid fa-flask"></i>
+
+        <span>
+            Reacc.
+        </span>
+
+    </div>
+
+
+    <div class="nav-item nav-brown">
+
+        <i class="fa-solid fa-book"></i>
+
+        <span>
+            Compuestos
+        </span>
+
+    </div>
+
+</nav>
 
 
 </body>
-
 </html>
