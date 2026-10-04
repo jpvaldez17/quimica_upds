@@ -21,11 +21,8 @@ html {
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-
     background: #dfe2e5;
-
     color: #171717;
-
     padding-bottom: 88px;
 }
 
@@ -36,52 +33,57 @@ body {
 
 .header {
     width: 100%;
-
     background: #e7e8e9;
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
     padding: 18px 24px 10px;
+
+    position: relative;
 }
 
 
-/* Marca */
+/* Marca centrada */
 
 .brand {
     display: flex;
     align-items: center;
+    justify-content: center;
 
-    gap: 15px;
+    width: 100%;
 }
 
 
 /* Icono de química */
 
 .brand-icon {
-    width: 58px;
-    height: 58px;
+    width: 45px;
+    height: 45px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     color: #1686e8;
+    font-size: 34px;
 
-    font-size: 42px;
+    position: absolute;
+    left: 20px;
 }
 
 
 /* Texto */
 
+.brand-text {
+    text-align: center;
+}
+
 .brand-text h1 {
     font-size: 30px;
-
     line-height: 1.1;
-
     font-weight: 800;
-
     color: #111111;
 }
 
@@ -91,9 +93,7 @@ body {
 
 .brand-text p {
     margin-top: 6px;
-
     font-size: 15px;
-
     color: #444444;
 }
 
@@ -105,7 +105,6 @@ body {
     height: 48px;
 
     border: 2px solid #333333;
-
     border-radius: 50%;
 
     display: flex;
@@ -113,8 +112,10 @@ body {
     justify-content: center;
 
     color: #333333;
-
     font-size: 20px;
+
+    position: absolute;
+    right: 24px;
 }
 
 
@@ -124,11 +125,9 @@ body {
 
 .blue-line {
     width: 92%;
-
     height: 4px;
 
     background: #1686e8;
-
     border-radius: 5px;
 
     margin: 0 auto 16px;
@@ -141,11 +140,9 @@ body {
 
 .main-content {
     width: 100%;
-
     max-width: 900px;
 
     margin: 0 auto;
-
     padding: 0 18px;
 }
 
@@ -156,21 +153,17 @@ body {
 
 .search-box {
     width: 100%;
-
     min-height: 58px;
 
     background: #ffffff;
 
     border: 2px solid #222222;
-
     border-radius: 32px;
 
     display: flex;
-
     align-items: center;
 
     padding: 0 16px;
-
     margin-bottom: 20px;
 
     box-shadow:
@@ -178,45 +171,34 @@ body {
 }
 
 
-/* Lupa */
-
 .search-icon {
     font-size: 21px;
-
     color: #555555;
-
     margin-right: 13px;
 }
 
 
-/* Campo */
-
 .search-box input {
     flex: 1;
-
     min-width: 0;
 
     border: none;
-
     outline: none;
 
     background: transparent;
 
     font-size: 16px;
-
     color: #222222;
 }
+
 
 .search-box input::placeholder {
     color: #777777;
 }
 
 
-/* Filtros */
-
 .search-settings {
     border: none;
-
     background: transparent;
 
     color: #333333;
@@ -224,7 +206,6 @@ body {
     font-size: 20px;
 
     cursor: pointer;
-
     padding: 5px;
 }
 
@@ -241,7 +222,6 @@ body {
     border-radius: 17px;
 
     padding: 18px 20px;
-
     margin-bottom: 18px;
 
     box-shadow:
@@ -249,26 +229,18 @@ body {
 }
 
 
-/* =========================================
-   ENCABEZADO DE TARJETA
-   ========================================= */
-
 .card-header {
     display: flex;
-
     align-items: center;
 
     gap: 14px;
-
     margin-bottom: 12px;
 }
 
 
 .card-header h2 {
     font-size: 19px;
-
     font-weight: 800;
-
     color: #222222;
 }
 
@@ -290,19 +262,14 @@ body {
     justify-content: center;
 
     color: #ffffff;
-
     font-size: 22px;
 }
 
-
-/* Rojo */
 
 .red-icon {
     background: #c51f45;
 }
 
-
-/* Azul */
 
 .blue-icon {
     background: #1677d2;
@@ -325,7 +292,6 @@ body {
 
 .daily-card h3 {
     font-size: 22px;
-
     color: #151515;
 
     margin-bottom: 9px;
@@ -342,8 +308,6 @@ body {
     margin-bottom: 14px;
 }
 
-
-/* Botón rojo */
 
 .outline-red {
     display: inline-flex;
@@ -363,15 +327,14 @@ body {
     color: #a51d35;
 
     font-size: 14px;
-
     font-weight: 700;
 
     cursor: pointer;
 }
 
+
 .outline-red:hover {
     background: #b51e3d;
-
     color: #ffffff;
 }
 
@@ -398,8 +361,6 @@ body {
 }
 
 
-/* Botones de respuesta */
-
 .answer-buttons {
     display: grid;
 
@@ -421,7 +382,6 @@ body {
     color: #222222;
 
     font-size: 14px;
-
     font-weight: 600;
 
     cursor: pointer;
@@ -446,30 +406,27 @@ body {
     width: 100%;
 
     margin-top: 6px;
-
     margin-bottom: 10px;
 }
 
-
-/* Título */
 
 .section-title {
     display: flex;
 
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 
-    padding: 0 4px 10px;
+    padding: 0 4px 8px;
 
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 
     border-bottom: 1px solid #ffffff;
 }
 
 
 .section-title h2 {
-    font-size: 19px;
+    font-size: 18px;
 
     font-weight: 800;
 
@@ -477,17 +434,14 @@ body {
 }
 
 
-/* Icono de cuadrícula */
-
 .grid-icon {
-    width: 32px;
+    width: 30px;
 
-    color: #166fc1;
+    color: #1686c9;
 
-    font-size: 25px;
+    font-size: 23px;
 
     display: flex;
-
     justify-content: center;
 }
 
@@ -499,7 +453,8 @@ body {
 .shortcut-grid {
     display: grid;
 
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
 
     gap: 14px;
 }
@@ -568,31 +523,31 @@ body {
 }
 
 
-/* Morado */
+/* Naranja - Enlaces */
 
-.shortcut-icon.purple {
-    background: #7b2cbf;
+.shortcut-icon.orange {
+    background: #e58a00;
 }
 
 
-/* Azul */
+/* Azul - Tabla */
 
-.shortcut-icon.cyan {
+.shortcut-icon.blue {
     background: #1686c9;
 }
 
 
-/* Verde */
+/* Verde - Reacciones */
 
 .shortcut-icon.green {
     background: #15965a;
 }
 
 
-/* Amarillo */
+/* Café - Compuestos */
 
-.shortcut-icon.yellow {
-    background: #d59b00;
+.shortcut-icon.brown {
+    background: #795548;
 }
 
 
@@ -602,7 +557,6 @@ body {
 
 .shortcut-text {
     min-width: 0;
-
     padding-right: 20px;
 }
 
@@ -667,11 +621,11 @@ body {
 
     width: 100%;
 
-    height: 74px;
+    height: 78px;
 
-    background: #ffffff;
+    background: #dfe2e5;
 
-    border-top: 1px solid #d1d4d7;
+    border-top: 1px solid #c9cdd0;
 
     box-shadow:
         0 -3px 12px rgba(0, 0, 0, 0.10);
@@ -699,36 +653,96 @@ body {
 
     justify-content: center;
 
-    gap: 4px;
+    gap: 3px;
 
-    color: #333333;
+    color: #222222;
 
     font-size: 11px;
 
     position: relative;
+
+    padding-top: 3px;
 }
 
+
+/* ICONOS MÁS GRANDES */
 
 .nav-item i {
-    font-size: 19px;
+    font-size: 25px;
+
+    line-height: 1;
+
+    margin-bottom: 4px;
 }
 
+
+/* Texto */
 
 .nav-item span {
     font-size: 11px;
+
+    line-height: 1;
+
+    margin-top: 2px;
 }
 
 
-/* Elemento activo */
+/* =========================================
+   COLORES DE NAVEGACIÓN
+   ========================================= */
+
+.nav-item.red i {
+    color: #c51f45;
+}
+
+.nav-item.blue i {
+    color: #1686c9;
+}
+
+.nav-item.orange i {
+    color: #e58a00;
+}
+
+.nav-item.green i {
+    color: #15965a;
+}
+
+.nav-item.brown i {
+    color: #795548;
+}
+
+
+/* =========================================
+   ELEMENTO ACTIVO
+   ========================================= */
 
 .nav-item.active {
-    color: #146fc1;
-
     font-weight: 700;
 }
 
 
-/* Línea inferior activa */
+/* Línea inferior según color */
+
+.nav-item.red.active::after {
+    background: #c51f45;
+}
+
+.nav-item.blue.active::after {
+    background: #1686c9;
+}
+
+.nav-item.orange.active::after {
+    background: #e58a00;
+}
+
+.nav-item.green.active::after {
+    background: #15965a;
+}
+
+.nav-item.brown.active::after {
+    background: #795548;
+}
+
 
 .nav-item.active::after {
     content: "";
@@ -743,8 +757,6 @@ body {
 
     height: 4px;
 
-    background: #1686e8;
-
     border-radius: 5px 5px 0 0;
 }
 
@@ -755,8 +767,7 @@ body {
 
 @media (max-width: 600px) {
 
-
-    /* Encabezado */
+    /* ---------- ENCABEZADO ---------- */
 
     .header {
         padding: 15px 16px 9px;
@@ -764,7 +775,7 @@ body {
 
 
     .brand {
-        gap: 10px;
+        justify-content: center;
     }
 
 
@@ -773,6 +784,8 @@ body {
         height: 42px;
 
         font-size: 30px;
+
+        left: 16px;
     }
 
 
@@ -793,10 +806,12 @@ body {
         height: 38px;
 
         font-size: 16px;
+
+        right: 16px;
     }
 
 
-    /* Línea */
+    /* ---------- LÍNEA ---------- */
 
     .blue-line {
         width: 88%;
@@ -805,14 +820,14 @@ body {
     }
 
 
-    /* Contenido */
+    /* ---------- CONTENIDO ---------- */
 
     .main-content {
         padding: 0 12px;
     }
 
 
-    /* Buscador */
+    /* ---------- BUSCADOR ---------- */
 
     .search-box {
         min-height: 57px;
@@ -828,7 +843,7 @@ body {
     }
 
 
-    /* Tarjetas */
+    /* ---------- TARJETAS ---------- */
 
     .card {
         padding: 16px;
@@ -867,10 +882,11 @@ body {
     }
 
 
-    /* Respuestas */
+    /* ---------- RESPUESTAS ---------- */
 
     .answer-buttons {
         grid-template-columns: 1fr;
+
         gap: 9px;
     }
 
@@ -880,10 +896,23 @@ body {
     }
 
 
-    /* Accesos */
+    /* ---------- ACCESOS ---------- */
+
+    .section-title {
+        padding-bottom: 7px;
+
+        margin-bottom: 13px;
+    }
+
+
+    .section-title h2 {
+        font-size: 18px;
+    }
+
 
     .shortcut-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
 
         gap: 10px;
     }
@@ -925,20 +954,28 @@ body {
     }
 
 
-    /* Barra */
+    /* ---------- BARRA INFERIOR ---------- */
 
     .bottom-nav {
-        height: 70px;
+        height: 74px;
     }
 
+
+    /* Iconos grandes */
 
     .nav-item i {
-        font-size: 17px;
+        font-size: 24px;
+
+        margin-bottom: 5px;
     }
 
+
+    /* Texto conserva tamaño */
 
     .nav-item span {
         font-size: 10px;
+
+        margin-top: 3px;
     }
 
 }
