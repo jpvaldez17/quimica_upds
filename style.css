@@ -23,7 +23,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background: #dfe2e5;
     color: #171717;
-    padding-bottom: 88px;
+    padding-bottom: 82px;
 }
 
 
@@ -33,13 +33,15 @@ body {
 
 .header {
     width: 100%;
+    min-height: 105px;
+
     background: #e7e8e9;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    padding: 18px 24px 10px;
+    padding: 14px 20px 9px;
 
     position: relative;
 }
@@ -52,38 +54,36 @@ body {
     align-items: center;
     justify-content: center;
 
-    width: 100%;
+    gap: 10px;
+
+    text-align: left;
 }
 
 
 /* Icono de química */
 
 .brand-icon {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     color: #1686e8;
-    font-size: 34px;
 
-    position: absolute;
-    left: 20px;
+    font-size: 34px;
 }
 
 
 /* Texto */
 
-.brand-text {
-    text-align: center;
-}
-
 .brand-text h1 {
-    font-size: 30px;
+    font-size: 29px;
     line-height: 1.1;
+
     font-weight: 800;
+
     color: #111111;
 }
 
@@ -92,8 +92,10 @@ body {
 }
 
 .brand-text p {
-    margin-top: 6px;
+    margin-top: 5px;
+
     font-size: 15px;
+
     color: #444444;
 }
 
@@ -101,10 +103,18 @@ body {
 /* Usuario */
 
 .profile-button {
+    position: absolute;
+
+    right: 20px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
     width: 48px;
     height: 48px;
 
     border: 2px solid #333333;
+
     border-radius: 50%;
 
     display: flex;
@@ -112,10 +122,8 @@ body {
     justify-content: center;
 
     color: #333333;
-    font-size: 20px;
 
-    position: absolute;
-    right: 24px;
+    font-size: 20px;
 }
 
 
@@ -125,12 +133,14 @@ body {
 
 .blue-line {
     width: 92%;
+
     height: 4px;
 
     background: #1686e8;
+
     border-radius: 5px;
 
-    margin: 0 auto 16px;
+    margin: 0 auto 20px;
 }
 
 
@@ -140,9 +150,11 @@ body {
 
 .main-content {
     width: 100%;
+
     max-width: 900px;
 
     margin: 0 auto;
+
     padding: 0 18px;
 }
 
@@ -153,17 +165,21 @@ body {
 
 .search-box {
     width: 100%;
+
     min-height: 58px;
 
     background: #ffffff;
 
     border: 2px solid #222222;
+
     border-radius: 32px;
 
     display: flex;
+
     align-items: center;
 
     padding: 0 16px;
+
     margin-bottom: 20px;
 
     box-shadow:
@@ -171,34 +187,45 @@ body {
 }
 
 
+/* Lupa */
+
 .search-icon {
     font-size: 21px;
+
     color: #555555;
+
     margin-right: 13px;
 }
 
 
+/* Campo */
+
 .search-box input {
     flex: 1;
+
     min-width: 0;
 
     border: none;
+
     outline: none;
 
     background: transparent;
 
     font-size: 16px;
+
     color: #222222;
 }
-
 
 .search-box input::placeholder {
     color: #777777;
 }
 
 
+/* Filtros */
+
 .search-settings {
     border: none;
+
     background: transparent;
 
     color: #333333;
@@ -206,12 +233,13 @@ body {
     font-size: 20px;
 
     cursor: pointer;
+
     padding: 5px;
 }
 
 
 /* =========================================
-   TARJETAS
+   TARJETAS GENERALES
    ========================================= */
 
 .card {
@@ -222,6 +250,7 @@ body {
     border-radius: 17px;
 
     padding: 18px 20px;
+
     margin-bottom: 18px;
 
     box-shadow:
@@ -229,18 +258,26 @@ body {
 }
 
 
+/* =========================================
+   ENCABEZADO DE TARJETAS
+   ========================================= */
+
 .card-header {
     display: flex;
+
     align-items: center;
 
     gap: 14px;
+
     margin-bottom: 12px;
 }
 
 
 .card-header h2 {
     font-size: 19px;
+
     font-weight: 800;
+
     color: #222222;
 }
 
@@ -262,17 +299,22 @@ body {
     justify-content: center;
 
     color: #ffffff;
+
     font-size: 22px;
 }
 
 
+/* Rojo */
+
 .red-icon {
-    background: #c51f45;
+    background: #d4144e;
 }
 
 
+/* Azul */
+
 .blue-icon {
-    background: #1677d2;
+    background: #1686d9;
 }
 
 
@@ -281,7 +323,7 @@ body {
    ========================================= */
 
 .daily-card {
-    border-left: 6px solid #c51f45;
+    border-left: 6px solid #d4144e;
 }
 
 
@@ -292,6 +334,7 @@ body {
 
 .daily-card h3 {
     font-size: 22px;
+
     color: #151515;
 
     margin-bottom: 9px;
@@ -308,6 +351,8 @@ body {
     margin-bottom: 14px;
 }
 
+
+/* Botón rojo */
 
 .outline-red {
     display: inline-flex;
@@ -327,14 +372,15 @@ body {
     color: #a51d35;
 
     font-size: 14px;
+
     font-weight: 700;
 
     cursor: pointer;
 }
 
-
 .outline-red:hover {
     background: #b51e3d;
+
     color: #ffffff;
 }
 
@@ -361,6 +407,8 @@ body {
 }
 
 
+/* Botones */
+
 .answer-buttons {
     display: grid;
 
@@ -382,6 +430,7 @@ body {
     color: #222222;
 
     font-size: 14px;
+
     font-weight: 600;
 
     cursor: pointer;
@@ -405,10 +454,13 @@ body {
 .shortcuts {
     width: 100%;
 
-    margin-top: 6px;
+    margin-top: 5px;
+
     margin-bottom: 10px;
 }
 
+
+/* Título */
 
 .section-title {
     display: flex;
@@ -434,6 +486,8 @@ body {
 }
 
 
+/* Icono */
+
 .grid-icon {
     width: 30px;
 
@@ -442,6 +496,7 @@ body {
     font-size: 23px;
 
     display: flex;
+
     justify-content: center;
 }
 
@@ -453,8 +508,7 @@ body {
 .shortcut-grid {
     display: grid;
 
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
     gap: 14px;
 }
@@ -523,31 +577,31 @@ body {
 }
 
 
-/* Naranja - Enlaces */
+/* Naranja - ENLACES */
 
 .shortcut-icon.orange {
-    background: #e58a00;
+    background: #e67e00;
 }
 
 
-/* Azul - Tabla */
+/* Azul - TABLA */
 
-.shortcut-icon.blue {
+.shortcut-icon.cyan {
     background: #1686c9;
 }
 
 
-/* Verde - Reacciones */
+/* Verde - REACCIONES */
 
 .shortcut-icon.green {
     background: #15965a;
 }
 
 
-/* Café - Compuestos */
+/* Café - COMPUESTOS */
 
 .shortcut-icon.brown {
-    background: #795548;
+    background: #8b5e3c;
 }
 
 
@@ -557,6 +611,7 @@ body {
 
 .shortcut-text {
     min-width: 0;
+
     padding-right: 20px;
 }
 
@@ -569,6 +624,8 @@ body {
     margin-bottom: 5px;
 
     line-height: 1.2;
+
+    font-weight: 800;
 }
 
 
@@ -623,6 +680,8 @@ body {
 
     height: 78px;
 
+    /* MISMO GRIS DEL FONDO */
+
     background: #dfe2e5;
 
     border-top: 1px solid #c9cdd0;
@@ -640,7 +699,9 @@ body {
 }
 
 
-/* Elementos */
+/* =========================================
+   ELEMENTOS DE NAVEGACIÓN
+   ========================================= */
 
 .nav-item {
     flex: 1;
@@ -653,15 +714,17 @@ body {
 
     justify-content: center;
 
+    /* Un poco más abajo */
+
+    padding-top: 5px;
+
     gap: 3px;
 
-    color: #222222;
+    color: #333333;
 
     font-size: 11px;
 
     position: relative;
-
-    padding-top: 3px;
 }
 
 
@@ -672,43 +735,55 @@ body {
 
     line-height: 1;
 
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 
-/* Texto */
+/* TEXTO: SE CONSERVA PEQUEÑO */
 
 .nav-item span {
     font-size: 11px;
 
-    line-height: 1;
-
-    margin-top: 2px;
+    line-height: 1.1;
 }
 
 
 /* =========================================
-   COLORES DE NAVEGACIÓN
+   COLORES DE LA BARRA
    ========================================= */
 
-.nav-item.red i {
-    color: #c51f45;
+/* Inicio - rojo */
+
+.nav-red i {
+    color: #d4144e;
 }
 
-.nav-item.blue i {
+
+/* Tabla - azul */
+
+.nav-blue i {
     color: #1686c9;
 }
 
-.nav-item.orange i {
-    color: #e58a00;
+
+/* Enlaces - naranja */
+
+.nav-orange i {
+    color: #e67e00;
 }
 
-.nav-item.green i {
+
+/* Reacciones - verde */
+
+.nav-green i {
     color: #15965a;
 }
 
-.nav-item.brown i {
-    color: #795548;
+
+/* Compuestos - café */
+
+.nav-brown i {
+    color: #8b5e3c;
 }
 
 
@@ -721,30 +796,9 @@ body {
 }
 
 
-/* Línea inferior según color */
+/* Línea activa roja */
 
-.nav-item.red.active::after {
-    background: #c51f45;
-}
-
-.nav-item.blue.active::after {
-    background: #1686c9;
-}
-
-.nav-item.orange.active::after {
-    background: #e58a00;
-}
-
-.nav-item.green.active::after {
-    background: #15965a;
-}
-
-.nav-item.brown.active::after {
-    background: #795548;
-}
-
-
-.nav-item.active::after {
+.nav-red.active::after {
     content: "";
 
     position: absolute;
@@ -757,6 +811,8 @@ body {
 
     height: 4px;
 
+    background: #d4144e;
+
     border-radius: 5px 5px 0 0;
 }
 
@@ -767,15 +823,20 @@ body {
 
 @media (max-width: 600px) {
 
-    /* ---------- ENCABEZADO ---------- */
+
+    /* =====================================
+       ENCABEZADO
+       ===================================== */
 
     .header {
-        padding: 15px 16px 9px;
+        min-height: 104px;
+
+        padding: 14px 16px 9px;
     }
 
 
     .brand {
-        justify-content: center;
+        gap: 8px;
     }
 
 
@@ -783,9 +844,7 @@ body {
         width: 42px;
         height: 42px;
 
-        font-size: 30px;
-
-        left: 16px;
+        font-size: 29px;
     }
 
 
@@ -802,32 +861,38 @@ body {
 
 
     .profile-button {
-        width: 38px;
-        height: 38px;
-
-        font-size: 16px;
-
         right: 16px;
+
+        width: 42px;
+        height: 42px;
+
+        font-size: 17px;
     }
 
 
-    /* ---------- LÍNEA ---------- */
+    /* =====================================
+       LÍNEA
+       ===================================== */
 
     .blue-line {
         width: 88%;
 
-        margin-bottom: 14px;
+        margin-bottom: 18px;
     }
 
 
-    /* ---------- CONTENIDO ---------- */
+    /* =====================================
+       CONTENIDO
+       ===================================== */
 
     .main-content {
         padding: 0 12px;
     }
 
 
-    /* ---------- BUSCADOR ---------- */
+    /* =====================================
+       BUSCADOR
+       ===================================== */
 
     .search-box {
         min-height: 57px;
@@ -843,7 +908,9 @@ body {
     }
 
 
-    /* ---------- TARJETAS ---------- */
+    /* =====================================
+       TARJETAS
+       ===================================== */
 
     .card {
         padding: 16px;
@@ -859,6 +926,11 @@ body {
         min-width: 43px;
 
         font-size: 19px;
+    }
+
+
+    .card-header {
+        gap: 12px;
     }
 
 
@@ -882,7 +954,9 @@ body {
     }
 
 
-    /* ---------- RESPUESTAS ---------- */
+    /* =====================================
+       RESPUESTAS
+       ===================================== */
 
     .answer-buttons {
         grid-template-columns: 1fr;
@@ -896,12 +970,14 @@ body {
     }
 
 
-    /* ---------- ACCESOS ---------- */
+    /* =====================================
+       ACCESOS
+       ===================================== */
 
     .section-title {
         padding-bottom: 7px;
 
-        margin-bottom: 13px;
+        margin-bottom: 12px;
     }
 
 
@@ -910,9 +986,13 @@ body {
     }
 
 
+    .grid-icon {
+        font-size: 22px;
+    }
+
+
     .shortcut-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
 
         gap: 10px;
     }
@@ -954,10 +1034,14 @@ body {
     }
 
 
-    /* ---------- BARRA INFERIOR ---------- */
+    /* =====================================
+       BARRA INFERIOR
+       ===================================== */
 
     .bottom-nav {
         height: 74px;
+
+        background: #dfe2e5;
     }
 
 
@@ -966,7 +1050,7 @@ body {
     .nav-item i {
         font-size: 24px;
 
-        margin-bottom: 5px;
+        margin-bottom: 3px;
     }
 
 
@@ -974,8 +1058,17 @@ body {
 
     .nav-item span {
         font-size: 10px;
+    }
 
-        margin-top: 3px;
+
+    /* Línea activa */
+
+    .nav-red.active::after {
+        height: 4px;
+
+        left: 20%;
+
+        width: 60%;
     }
 
 }
