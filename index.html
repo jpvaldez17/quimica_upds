@@ -6,91 +6,278 @@
 
     <title>Química UPDS</title>
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <!-- ENCABEZADO -->
-    <header>
-        <h1>Química <span>UPDS</span></h1>
-        <p>Facultad de Ingeniería y Ciencias Exactas</p>
+    <header class="header">
+
+        <div class="brand">
+
+            <!-- Logo químico -->
+            <div class="logo-quimica">
+                ⚗
+            </div>
+
+            <div class="brand-text">
+                <h1>
+                    Química <span>UPDS</span>
+                </h1>
+
+                <p>
+                    Facultad de Ingeniería y Ciencias Exactas
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Usuario -->
+        <button class="user-button">
+            👤
+        </button>
+
     </header>
 
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main>
+    <!-- LINEA AZUL -->
+    <div class="blue-line"></div>
+
+
+    <main class="container">
+
 
         <!-- BUSCADOR -->
-        <section>
-            <h2>🔍 Buscar</h2>
+        <section class="search-box">
+
+            <span class="search-icon">⌕</span>
 
             <input
                 type="text"
                 placeholder="Buscar elemento, compuesto, reacción..."
             >
+
+            <button class="filter-button">
+                ☷
+            </button>
+
         </section>
+
 
 
         <!-- DATO DEL DÍA -->
-        <section>
-            <h2>💡 DATO DEL DÍA</h2>
+        <section class="card daily-card">
 
-            <h3>Gasolina (Isooctano - C₈H₁₈)</h3>
+            <div class="card-content">
 
-            <p>
-                Mezcla de hidrocarburos no polares
-                utilizada como combustible.
-            </p>
+                <div class="section-title red-title">
+                    <div class="round-icon red-icon">💡</div>
+                    <span>DATO DEL DÍA</span>
+                </div>
 
-            <button>Ver ficha en el catálogo →</button>
+                <h2>
+                    Gasolina (Isooctano - C₈H₁₈)
+                </h2>
+
+                <p>
+                    Mezcla de hidrocarburos no polares utilizada
+                    como combustible.
+                </p>
+
+                <button class="outline-button red-button">
+                    Ver ficha en el catálogo
+                    <span>→</span>
+                </button>
+
+            </div>
+
+            <div class="molecule-decoration">
+                ⬡
+            </div>
+
         </section>
+
 
 
         <!-- DESAFÍO -->
-        <section>
-            <h2>⚡ DESAFÍO RÁPIDO DEL DÍA</h2>
+        <section class="card challenge-card">
 
-            <p>
+            <div class="section-title blue-title">
+
+                <div class="round-icon blue-icon">
+                    ⚡
+                </div>
+
+                <span>
+                    DESAFÍO RÁPIDO DEL DÍA
+                </span>
+
+            </div>
+
+            <div class="challenge-question">
                 ¿El ion NO⁺ es diamagnético o paramagnético?
-            </p>
+            </div>
 
-            <button>Diamagnético (10 e⁻)</button>
-            <button>Paramagnético</button>
+            <div class="answers">
+
+                <button class="answer">
+                    Diamagnético (10 e⁻)
+                </button>
+
+                <button class="answer">
+                    Paramagnético
+                </button>
+
+            </div>
+
+            <div class="atom-decoration">
+                ⚛
+            </div>
+
         </section>
 
 
+
         <!-- ACCESOS DIRECTOS -->
-        <section>
-            <h2>▦ ACCESOS DIRECTOS</h2>
+        <section class="quick-section">
 
-            <button>⚛️ Calculadora TOM</button>
+            <div class="quick-title">
 
-            <button>▦ Tabla Periódica</button>
+                <span class="grid-icon">
+                    ▦
+                </span>
 
-            <button>🧪 Reacciones</button>
+                <h2>
+                    ACCESOS DIRECTOS
+                </h2>
 
-            <button>🛢️ Catálogo Cotidiano</button>
+            </div>
+
+
+            <div class="quick-grid">
+
+
+                <!-- CALCULADORA -->
+                <button class="quick-card">
+
+                    <div class="quick-icon purple">
+                        🧮
+                    </div>
+
+                    <div class="quick-text">
+                        <strong>Calculadora TOM</strong>
+                        <small>Consulta y calcula</small>
+                    </div>
+
+                    <span class="arrow">›</span>
+
+                </button>
+
+
+
+                <!-- TABLA -->
+                <button class="quick-card">
+
+                    <div class="quick-icon cyan">
+                        ▦
+                    </div>
+
+                    <div class="quick-text">
+                        <strong>Tabla Periódica</strong>
+                        <small>Elementos y propiedades</small>
+                    </div>
+
+                    <span class="arrow">›</span>
+
+                </button>
+
+
+
+                <!-- REACCIONES -->
+                <button class="quick-card">
+
+                    <div class="quick-icon green">
+                        ⚛
+                    </div>
+
+                    <div class="quick-text">
+                        <strong>Reacciones</strong>
+                        <small>Tipos y mecanismos</small>
+                    </div>
+
+                    <span class="arrow">›</span>
+
+                </button>
+
+
+
+                <!-- CATÁLOGO -->
+                <button class="quick-card">
+
+                    <div class="quick-icon yellow">
+                        ▱
+                    </div>
+
+                    <div class="quick-text">
+                        <strong>Catálogo Cotidiano</strong>
+                        <small>Compuestos y usos</small>
+                    </div>
+
+                    <span class="arrow">›</span>
+
+                </button>
+
+            </div>
+
         </section>
 
     </main>
 
 
-    <!-- NAVEGACIÓN INFERIOR -->
-    <nav>
-        <button>🏠<br>Inicio</button>
-        <button>📊<br>Elem</button>
-        <button>⚛️<br>Enlaces</button>
-        <button>🧪<br>Reacc</button>
-        <button>🛢️<br>Cat</button>
-        <button>📝<br>Eval</button>
+
+    <!-- BARRA INFERIOR -->
+    <nav class="bottom-nav">
+
+        <button class="nav-item active">
+            <span>⌂</span>
+            <small>Inicio</small>
+        </button>
+
+        <button class="nav-item">
+            <span>▥</span>
+            <small>Elem</small>
+        </button>
+
+        <button class="nav-item">
+            <span>⚛</span>
+            <small>Enlaces</small>
+        </button>
+
+        <button class="nav-item">
+            <span>⚗</span>
+            <small>Reacc</small>
+        </button>
+
+        <button class="nav-item">
+            <span>▤</span>
+            <small>Cat</small>
+        </button>
+
+        <button class="nav-item">
+            <span>▥</span>
+            <small>Eval</small>
+        </button>
+
     </nav>
 
 
-    <!-- CRÉDITO -->
+
+    <!-- PIE -->
     <footer>
         Developed by J. Poma · 2026
     </footer>
+
 
 </body>
 </html>
