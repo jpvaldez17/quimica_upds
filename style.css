@@ -783,13 +783,12 @@ body {
     color: #8b5e3c;
 }
 
-
 /* =========================================
    ELEMENTO ACTIVO
    ========================================= */
 
 .nav-item.active {
-    font-weight: 700;
+    font-weight: 700 !important;
 }
 
 
@@ -798,9 +797,12 @@ body {
    ========================================= */
 
 .nav-red.active {
-    color: #d4144e;
+    color: #d4144e !important;
 }
 
+.nav-red.active i {
+    color: #d4144e !important;
+}
 
 .nav-red.active::after {
     content: "";
@@ -826,9 +828,12 @@ body {
    ========================================= */
 
 .nav-blue.active {
-    color: #1686c9;
+    color: #1686c9 !important;
 }
 
+.nav-blue.active i {
+    color: #1686c9 !important;
+}
 
 .nav-blue.active::after {
     content: "";
@@ -854,9 +859,12 @@ body {
    ========================================= */
 
 .nav-orange.active {
-    color: #e67e00;
+    color: #e67e00 !important;
 }
 
+.nav-orange.active i {
+    color: #e67e00 !important;
+}
 
 .nav-orange.active::after {
     content: "";
@@ -882,9 +890,12 @@ body {
    ========================================= */
 
 .nav-green.active {
-    color: #15965a;
+    color: #15965a !important;
 }
 
+.nav-green.active i {
+    color: #15965a !important;
+}
 
 .nav-green.active::after {
     content: "";
@@ -910,9 +921,12 @@ body {
    ========================================= */
 
 .nav-brown.active {
-    color: #8b5e3c;
+    color: #8b5e3c !important;
 }
 
+.nav-brown.active i {
+    color: #8b5e3c !important;
+}
 
 .nav-brown.active::after {
     content: "";
@@ -931,6 +945,7 @@ body {
 
     border-radius: 5px 5px 0 0;
 }
+
 
 
 /* =========================================
