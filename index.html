@@ -11,7 +11,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- ESTILOS - versión actualizada -->
+    <!-- ESTILOS -->
     <link rel="stylesheet" href="style.css?v=5">
 </head>
 
@@ -24,13 +24,11 @@
 
 <header class="header">
 
-    <!-- MATRÁZ - EXTREMO IZQUIERDO -->
     <div class="brand-icon">
         <i class="fa-solid fa-flask"></i>
     </div>
 
 
-    <!-- TÍTULO - CENTRO -->
     <div class="brand-text">
 
         <h1>
@@ -44,7 +42,6 @@
     </div>
 
 
-    <!-- USUARIO - EXTREMO DERECHO -->
     <div class="profile-button">
 
         <i class="fa-solid fa-user"></i>
@@ -55,6 +52,7 @@
 
 
 <!-- LÍNEA AZUL -->
+
 <div class="blue-line"></div>
 
 
@@ -65,246 +63,536 @@
 <main class="main-content">
 
 
-    <!-- BUSCADOR -->
+    <!-- =================================================
+         PÁGINA: INICIO
+         ================================================= -->
 
-    <section class="search-box">
-
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
-        <input
-            type="text"
-            placeholder="Buscar elemento, compuesto, reacción..."
-        >
-
-        <button
-            class="search-settings"
-            aria-label="Filtros">
-
-            <i class="fa-solid fa-sliders"></i>
-
-        </button>
-
-    </section>
+    <section id="inicio" class="app-page">
 
 
-    <!-- =====================================
-         DATO DEL DÍA
-         ===================================== -->
+        <!-- BUSCADOR -->
 
-    <section class="card daily-card">
+        <section class="search-box">
 
-        <div class="card-header">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-            <div class="card-icon red-icon">
-                <i class="fa-regular fa-lightbulb"></i>
-            </div>
+            <input
+                type="text"
+                placeholder="Buscar elemento, compuesto, reacción..."
+            >
 
-            <h2>
-                DATO DEL DÍA
-            </h2>
+            <button
+                class="search-settings"
+                aria-label="Filtros">
 
-        </div>
-
-
-        <div class="card-content">
-
-            <h3>
-                Gasolina (Isooctano - C₈H₁₈)
-            </h3>
-
-            <p>
-                Mezcla de hidrocarburos no polares utilizada como combustible.
-            </p>
-
-            <button class="outline-red">
-
-                Ver ficha en el catálogo
-
-                <i class="fa-solid fa-arrow-right"></i>
+                <i class="fa-solid fa-sliders"></i>
 
             </button>
 
+        </section>
+
+
+        <!-- DATO DEL DÍA -->
+
+        <section class="card daily-card">
+
+            <div class="card-header">
+
+                <div class="card-icon red-icon">
+
+                    <i class="fa-regular fa-lightbulb"></i>
+
+                </div>
+
+                <h2>
+                    DATO DEL DÍA
+                </h2>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h3>
+                    Gasolina (Isooctano - C₈H₁₈)
+                </h3>
+
+                <p>
+                    Mezcla de hidrocarburos no polares utilizada como combustible.
+                </p>
+
+                <button class="outline-red">
+
+                    Ver ficha en el catálogo
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- DESAFÍO RÁPIDO -->
+
+        <section class="card challenge-card">
+
+            <div class="card-header">
+
+                <div class="card-icon blue-icon">
+
+                    <i class="fa-solid fa-bolt"></i>
+
+                </div>
+
+                <h2>
+                    DESAFÍO RÁPIDO DEL DÍA
+                </h2>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h3 class="question">
+                    ¿El ion NO⁺ es diamagnético o paramagnético?
+                </h3>
+
+
+                <div class="answer-buttons">
+
+                    <button>
+                        Diamagnético (10 e⁻)
+                    </button>
+
+                    <button>
+                        Paramagnético
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACCESOS DIRECTOS -->
+
+        <section class="shortcuts">
+
+            <div class="section-title">
+
+                <div class="grid-icon">
+                    <i class="fa-solid fa-grip"></i>
+                </div>
+
+                <h2>
+                    ACCESOS DIRECTOS
+                </h2>
+
+            </div>
+
+
+            <div class="shortcut-grid">
+
+
+                <!-- ENLACES -->
+
+                <div
+                    class="shortcut-card"
+                    data-page="enlaces"
+                    onclick="mostrarPagina('enlaces')">
+
+                    <div class="shortcut-icon orange">
+
+                        <i class="fa-solid fa-atom"></i>
+
+                    </div>
+
+                    <div class="shortcut-text">
+
+                        <h3>
+                            ENLACES
+                        </h3>
+
+                        <p>
+                            Estructura molecular
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+
+                </div>
+
+
+                <!-- TABLA PERIÓDICA -->
+
+                <div
+                    class="shortcut-card"
+                    data-page="tabla"
+                    onclick="mostrarPagina('tabla')">
+
+                    <div class="shortcut-icon cyan">
+
+                        <i class="fa-solid fa-table-cells"></i>
+
+                    </div>
+
+                    <div class="shortcut-text">
+
+                        <h3>
+                            TABLA PERIÓDICA
+                        </h3>
+
+                        <p>
+                            Elementos y propiedades
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+
+                </div>
+
+
+                <!-- REACCIONES -->
+
+                <div
+                    class="shortcut-card"
+                    data-page="reacciones"
+                    onclick="mostrarPagina('reacciones')">
+
+                    <div class="shortcut-icon green">
+
+                        <i class="fa-solid fa-flask"></i>
+
+                    </div>
+
+                    <div class="shortcut-text">
+
+                        <h3>
+                            REACCIONES
+                        </h3>
+
+                        <p>
+                            Tipos y mecanismos
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+
+                </div>
+
+
+                <!-- COMPUESTOS -->
+
+                <div
+                    class="shortcut-card"
+                    data-page="compuestos"
+                    onclick="mostrarPagina('compuestos')">
+
+                    <div class="shortcut-icon brown">
+
+                        <i class="fa-solid fa-book"></i>
+
+                    </div>
+
+                    <div class="shortcut-text">
+
+                        <h3>
+                            COMPUESTOS
+                        </h3>
+
+                        <p>
+                            Características y usos
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right arrow"></i>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- CRÉDITO -->
+
+        <div class="developer">
+            Developed by J. Poma · 2026
         </div>
 
     </section>
 
 
-    <!-- =====================================
-         DESAFÍO RÁPIDO
-         ===================================== -->
 
-    <section class="card challenge-card">
+    <!-- =================================================
+         PÁGINA: TABLA
+         ================================================= -->
 
-        <div class="card-header">
-
-            <div class="card-icon blue-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-
-            <h2>
-                DESAFÍO RÁPIDO DEL DÍA
-            </h2>
-
-        </div>
+    <section
+        id="tabla"
+        class="app-page"
+        style="display: none;">
 
 
-        <div class="card-content">
+        <section class="card">
 
-            <h3 class="question">
-                ¿El ion NO⁺ es diamagnético o paramagnético?
-            </h3>
+            <div class="card-header">
 
+                <div class="card-icon blue-icon">
 
-            <div class="answer-buttons">
-
-                <button>
-                    Diamagnético (10 e⁻)
-                </button>
-
-                <button>
-                    Paramagnético
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================
-         ACCESOS DIRECTOS
-         ===================================== -->
-
-    <section class="shortcuts">
-
-        <div class="section-title">
-
-            <div class="grid-icon">
-                <i class="fa-solid fa-grip"></i>
-            </div>
-
-            <h2>
-                ACCESOS DIRECTOS
-            </h2>
-
-        </div>
-
-
-        <div class="shortcut-grid">
-
-
-            <!-- ENLACES -->
-
-            <div class="shortcut-card">
-
-                <div class="shortcut-icon orange">
-                    <i class="fa-solid fa-atom"></i>
-                </div>
-
-                <div class="shortcut-text">
-
-                    <h3>
-                        ENLACES
-                    </h3>
-
-                    <p>
-                        Estructura molecular
-                    </p>
-
-                </div>
-
-                <i class="fa-solid fa-chevron-right arrow"></i>
-
-            </div>
-
-
-            <!-- TABLA PERIÓDICA -->
-
-            <div class="shortcut-card">
-
-                <div class="shortcut-icon cyan">
                     <i class="fa-solid fa-table-cells"></i>
-                </div>
-
-                <div class="shortcut-text">
-
-                    <h3>
-                        TABLA PERIÓDICA
-                    </h3>
-
-                    <p>
-                        Elementos y propiedades
-                    </p>
 
                 </div>
 
-                <i class="fa-solid fa-chevron-right arrow"></i>
+                <h2>
+                    TABLA PERIÓDICA
+                </h2>
 
             </div>
 
 
-            <!-- REACCIONES -->
+            <div class="card-content">
 
-            <div class="shortcut-card">
+                <h3>
+                    Elementos químicos
+                </h3>
 
-                <div class="shortcut-icon green">
-                    <i class="fa-solid fa-flask"></i>
-                </div>
-
-                <div class="shortcut-text">
-
-                    <h3>
-                        REACCIONES
-                    </h3>
-
-                    <p>
-                        Tipos y mecanismos
-                    </p>
-
-                </div>
-
-                <i class="fa-solid fa-chevron-right arrow"></i>
+                <p>
+                    Aquí construiremos la tabla periódica interactiva
+                    de Química UPDS.
+                </p>
 
             </div>
 
+        </section>
 
-            <!-- COMPUESTOS -->
 
-            <div class="shortcut-card">
+        <section class="card">
 
-                <div class="shortcut-icon brown">
-                    <i class="fa-solid fa-book"></i>
-                </div>
+            <div class="card-content">
 
-                <div class="shortcut-text">
+                <h3>
+                    Próximamente
+                </h3>
 
-                    <h3>
-                        COMPUESTOS
-                    </h3>
-
-                    <p>
-                        Características y usos
-                    </p>
-
-                </div>
-
-                <i class="fa-solid fa-chevron-right arrow"></i>
+                <p>
+                    Tendremos información de cada elemento,
+                    número atómico, símbolo, masa y propiedades.
+                </p>
 
             </div>
 
-        </div>
+        </section>
+
 
     </section>
 
 
-    <!-- CRÉDITO -->
 
-    <div class="developer">
-        Developed by J. Poma · 2026
-    </div>
+    <!-- =================================================
+         PÁGINA: ENLACES
+         ================================================= -->
+
+    <section
+        id="enlaces"
+        class="app-page"
+        style="display: none;">
+
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon red-icon">
+
+                    <i class="fa-solid fa-atom"></i>
+
+                </div>
+
+                <h2>
+                    ENLACES QUÍMICOS
+                </h2>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h3>
+                    Estructura molecular
+                </h3>
+
+                <p>
+                    Aquí desarrollaremos los diferentes tipos
+                    de enlaces químicos y sus características.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <div class="card-content">
+
+                <h3>
+                    Próximamente
+                </h3>
+
+                <p>
+                    Enlace iónico, covalente, metálico,
+                    polaridad y más.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         PÁGINA: REACCIONES
+         ================================================= -->
+
+    <section
+        id="reacciones"
+        class="app-page"
+        style="display: none;">
+
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon blue-icon">
+
+                    <i class="fa-solid fa-flask"></i>
+
+                </div>
+
+                <h2>
+                    REACCIONES QUÍMICAS
+                </h2>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h3>
+                    Tipos y mecanismos
+                </h3>
+
+                <p>
+                    Aquí desarrollaremos los diferentes tipos
+                    de reacciones químicas.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <div class="card-content">
+
+                <h3>
+                    Próximamente
+                </h3>
+
+                <p>
+                    Síntesis, descomposición, sustitución,
+                    doble sustitución y otras herramientas.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         PÁGINA: COMPUESTOS
+         ================================================= -->
+
+    <section
+        id="compuestos"
+        class="app-page"
+        style="display: none;">
+
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon red-icon">
+
+                    <i class="fa-solid fa-book"></i>
+
+                </div>
+
+                <h2>
+                    COMPUESTOS QUÍMICOS
+                </h2>
+
+            </div>
+
+
+            <div class="card-content">
+
+                <h3>
+                    Características y usos
+                </h3>
+
+                <p>
+                    Aquí construiremos el catálogo de compuestos
+                    químicos de la aplicación.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <div class="card-content">
+
+                <h3>
+                    Próximamente
+                </h3>
+
+                <p>
+                    Fórmula, nombre, propiedades, clasificación
+                    y aplicaciones de los compuestos.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </section>
+
 
 </main>
+
 
 
 <!-- =========================================
@@ -313,7 +601,13 @@
 
 <nav class="bottom-nav">
 
-    <div class="nav-item nav-red active">
+
+    <!-- INICIO -->
+
+    <div
+        class="nav-item nav-red active"
+        data-page="inicio"
+        onclick="mostrarPagina('inicio')">
 
         <i class="fa-solid fa-house"></i>
 
@@ -324,7 +618,12 @@
     </div>
 
 
-    <div class="nav-item nav-blue">
+    <!-- TABLA -->
+
+    <div
+        class="nav-item nav-blue"
+        data-page="tabla"
+        onclick="mostrarPagina('tabla')">
 
         <i class="fa-solid fa-chart-column"></i>
 
@@ -335,7 +634,12 @@
     </div>
 
 
-    <div class="nav-item nav-orange">
+    <!-- ENLACES -->
+
+    <div
+        class="nav-item nav-orange"
+        data-page="enlaces"
+        onclick="mostrarPagina('enlaces')">
 
         <i class="fa-solid fa-atom"></i>
 
@@ -346,7 +650,12 @@
     </div>
 
 
-    <div class="nav-item nav-green">
+    <!-- REACCIONES -->
+
+    <div
+        class="nav-item nav-green"
+        data-page="reacciones"
+        onclick="mostrarPagina('reacciones')">
 
         <i class="fa-solid fa-flask"></i>
 
@@ -357,7 +666,12 @@
     </div>
 
 
-    <div class="nav-item nav-brown">
+    <!-- COMPUESTOS -->
+
+    <div
+        class="nav-item nav-brown"
+        data-page="compuestos"
+        onclick="mostrarPagina('compuestos')">
 
         <i class="fa-solid fa-book"></i>
 
@@ -367,8 +681,17 @@
 
     </div>
 
+
 </nav>
 
 
+
+<!-- =========================================
+     JAVASCRIPT
+     ========================================= -->
+
+<script src="app.js"></script>
+
 </body>
+
 </html>
