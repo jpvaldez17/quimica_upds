@@ -732,6 +732,8 @@ body {
     font-size: 11px;
 
     position: relative;
+
+    cursor: pointer;
 }
 
 
@@ -754,7 +756,7 @@ body {
 
 
 /* =========================================
-   COLORES BARRA INFERIOR
+   COLORES DE LOS ICONOS
    ========================================= */
 
 .nav-red i {
@@ -782,8 +784,21 @@ body {
 }
 
 
+/* =========================================
+   ELEMENTO ACTIVO
+   ========================================= */
+
 .nav-item.active {
     font-weight: 700;
+}
+
+
+/* =========================================
+   INICIO - ACTIVO ROJO
+   ========================================= */
+
+.nav-red.active {
+    color: #d4144e;
 }
 
 
@@ -801,6 +816,118 @@ body {
     height: 4px;
 
     background: #d4144e;
+
+    border-radius: 5px 5px 0 0;
+}
+
+
+/* =========================================
+   TABLA - ACTIVO AZUL
+   ========================================= */
+
+.nav-blue.active {
+    color: #1686c9;
+}
+
+
+.nav-blue.active::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 20%;
+
+    width: 60%;
+
+    height: 4px;
+
+    background: #1686c9;
+
+    border-radius: 5px 5px 0 0;
+}
+
+
+/* =========================================
+   ENLACES - ACTIVO NARANJA
+   ========================================= */
+
+.nav-orange.active {
+    color: #e67e00;
+}
+
+
+.nav-orange.active::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 20%;
+
+    width: 60%;
+
+    height: 4px;
+
+    background: #e67e00;
+
+    border-radius: 5px 5px 0 0;
+}
+
+
+/* =========================================
+   REACCIONES - ACTIVO VERDE
+   ========================================= */
+
+.nav-green.active {
+    color: #15965a;
+}
+
+
+.nav-green.active::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 20%;
+
+    width: 60%;
+
+    height: 4px;
+
+    background: #15965a;
+
+    border-radius: 5px 5px 0 0;
+}
+
+
+/* =========================================
+   COMPUESTOS - ACTIVO CAFÉ
+   ========================================= */
+
+.nav-brown.active {
+    color: #8b5e3c;
+}
+
+
+.nav-brown.active::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 20%;
+
+    width: 60%;
+
+    height: 4px;
+
+    background: #8b5e3c;
 
     border-radius: 5px 5px 0 0;
 }
