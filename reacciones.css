@@ -1,0 +1,409 @@
+/* =============================================================================
+   reacciones.css — Estilos exclusivos de la pestaña Reacciones · Fase 1
+   Todos los selectores empiezan por #reacciones, así no afectan a otras
+   pestañas ni a style.css. Colores y detalles son PROVISIONALES.
+   ========================================================================== */
+
+/* ---- Variables provisionales (solo dentro de Reacciones) ------------------ */
+#reacciones .rxn-root {
+  --rxn-fondo: #f5f6f8;
+  --rxn-superficie: #ffffff;
+  --rxn-borde: #d6dbe2;
+  --rxn-borde-suave: #e6e9ee;
+  --rxn-texto: #1f2933;
+  --rxn-texto-suave: #5f6b7a;
+  --rxn-primario: #3b6a8f;
+  --rxn-primario-oscuro: #2f5675;
+  --rxn-primario-fondo: #e8f0f6;
+  --rxn-inactivo-fondo: #eceff3;
+  --rxn-inactivo-texto: #9aa4b1;
+  --rxn-error-fondo: #fbefed;
+  --rxn-error-borde: #e2b4ac;
+  --rxn-error-texto: #8a2f22;
+  --rxn-info-fondo: #eef2f6;
+  --rxn-info-borde: #cfd8e1;
+  --rxn-aviso-fondo: #fbf6e8;
+  --rxn-aviso-borde: #e6d9ab;
+  --rxn-aviso-texto: #6d5a14;
+  --rxn-radio: 8px;
+
+  box-sizing: border-box;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 4px 0 16px;
+  color: var(--rxn-texto);
+  line-height: 1.4;
+}
+
+#reacciones .rxn-root *,
+#reacciones .rxn-root *::before,
+#reacciones .rxn-root *::after {
+  box-sizing: border-box;
+}
+
+/* ---- Encabezado ----------------------------------------------------------- */
+#reacciones .rxn-encabezado { margin: 0 0 12px; }
+
+#reacciones .rxn-titulo {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rxn-texto);
+}
+
+#reacciones .rxn-aviso {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  color: var(--rxn-aviso-texto);
+  background: var(--rxn-aviso-fondo);
+  border: 1px solid var(--rxn-aviso-borde);
+  border-radius: var(--rxn-radio);
+}
+
+/* ---- Secciones ------------------------------------------------------------ */
+#reacciones .rxn-seccion {
+  margin: 0 0 12px;
+  padding: 12px;
+  background: var(--rxn-superficie);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+
+#reacciones .rxn-seccion-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+#reacciones .rxn-seccion-titulo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rxn-texto);
+}
+
+#reacciones .rxn-contador {
+  font-size: 0.8rem;
+  color: var(--rxn-texto-suave);
+  white-space: nowrap;
+}
+
+/* ---- Buscador ------------------------------------------------------------- */
+#reacciones .rxn-buscador {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+#reacciones .rxn-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--rxn-texto);
+  background: var(--rxn-superficie);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+
+#reacciones .rxn-input:focus {
+  outline: 2px solid var(--rxn-primario);
+  outline-offset: 1px;
+  border-color: var(--rxn-primario);
+}
+
+#reacciones .rxn-resultados {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--rxn-superficie);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+
+#reacciones .rxn-resultados[hidden] { display: none; }
+
+#reacciones .rxn-resultado {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--rxn-texto);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#reacciones .rxn-resultado:hover,
+#reacciones .rxn-resultado:focus-visible {
+  background: var(--rxn-primario-fondo);
+  outline: none;
+}
+
+#reacciones .rxn-resultado-formula { font-weight: 700; min-width: 3.5em; }
+#reacciones .rxn-resultado-nombre { flex: 1 1 auto; font-size: 0.9rem; }
+#reacciones .rxn-resultado-tipo { font-size: 0.72rem; color: var(--rxn-texto-suave); }
+#reacciones .rxn-resultado-vacio { padding: 8px; font-size: 0.85rem; color: var(--rxn-texto-suave); }
+
+/* ---- Botones -------------------------------------------------------------- */
+#reacciones .rxn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--rxn-radio);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+#reacciones .rxn-btn:focus-visible {
+  outline: 2px solid var(--rxn-primario);
+  outline-offset: 2px;
+}
+
+#reacciones .rxn-btn--primario {
+  color: #ffffff;
+  background: var(--rxn-primario);
+  border-color: var(--rxn-primario);
+}
+#reacciones .rxn-btn--primario:hover:not(:disabled) { background: var(--rxn-primario-oscuro); }
+
+#reacciones .rxn-btn--secundario {
+  color: var(--rxn-primario);
+  background: var(--rxn-superficie);
+  border-color: var(--rxn-primario);
+}
+#reacciones .rxn-btn--secundario:hover:not(:disabled) { background: var(--rxn-primario-fondo); }
+
+#reacciones .rxn-btn:disabled {
+  color: var(--rxn-inactivo-texto);
+  background: var(--rxn-inactivo-fondo);
+  border-color: var(--rxn-borde-suave);
+  cursor: not-allowed;
+}
+
+#reacciones .rxn-btn--ancho { width: 100%; margin-top: 10px; }
+
+/* ---- Mensajes y estados vacíos -------------------------------------------- */
+#reacciones .rxn-msg {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  border-radius: var(--rxn-radio);
+  border: 1px solid var(--rxn-info-borde);
+  background: var(--rxn-info-fondo);
+}
+#reacciones .rxn-msg[hidden] { display: none; }
+#reacciones .rxn-msg--error {
+  color: var(--rxn-error-texto);
+  background: var(--rxn-error-fondo);
+  border-color: var(--rxn-error-borde);
+}
+#reacciones .rxn-msg--aviso {
+  color: var(--rxn-aviso-texto);
+  background: var(--rxn-aviso-fondo);
+  border-color: var(--rxn-aviso-borde);
+}
+
+#reacciones .rxn-vacio {
+  margin: 0;
+  padding: 14px 10px;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--rxn-texto-suave);
+  background: var(--rxn-fondo);
+  border: 1px dashed var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+#reacciones .rxn-vacio[hidden] { display: none; }
+
+/* ---- Cuadrícula y fichas cuadradas ---------------------------------------- */
+#reacciones .rxn-fichas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* móvil: 3 por fila */
+  gap: 8px;
+}
+#reacciones .rxn-fichas:empty { display: none; }
+
+#reacciones .rxn-ficha {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  aspect-ratio: 1 / 1;
+  padding: 18px 6px 6px;
+  overflow: hidden;
+  text-align: center;
+  background: var(--rxn-fondo);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+
+#reacciones .rxn-ficha--elemento { background: #f1f4f1; }
+#reacciones .rxn-ficha--ion { background: #f4f1f6; }
+
+#reacciones .rxn-ficha-formula {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--rxn-texto);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#reacciones .rxn-ficha-nombre {
+  font-size: 0.68rem;
+  line-height: 1.15;
+  color: var(--rxn-texto);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+#reacciones .rxn-ficha-info {
+  font-size: 0.62rem;
+  line-height: 1.1;
+  color: var(--rxn-texto-suave);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#reacciones .rxn-ficha-prueba {
+  font-size: 0.55rem;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--rxn-aviso-texto);
+  background: var(--rxn-aviso-fondo);
+  border: 1px solid var(--rxn-aviso-borde);
+  border-radius: 4px;
+}
+
+#reacciones .rxn-ficha-quitar {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--rxn-texto-suave);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#reacciones .rxn-ficha-quitar:hover { color: var(--rxn-error-texto); background: var(--rxn-error-fondo); }
+#reacciones .rxn-ficha-quitar:focus-visible { outline: 2px solid var(--rxn-primario); }
+
+/* ---- Ecuación -------------------------------------------------------------- */
+#reacciones .rxn-ecuacion {
+  min-height: 56px;
+  margin: 0 0 8px;
+  padding: 12px;
+  font-size: 1.15rem;
+  text-align: center;
+  overflow-x: auto;
+  background: var(--rxn-fondo);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+#reacciones .rxn-ecuacion-vacia {
+  font-size: 0.85rem;
+  color: var(--rxn-texto-suave);
+  border-style: dashed;
+}
+#reacciones .rxn-ecuacion-flecha { margin: 0 8px; color: var(--rxn-texto-suave); }
+#reacciones .rxn-ecuacion-signo  { margin: 0 6px; color: var(--rxn-texto-suave); }
+#reacciones .rxn-ecuacion-coef   { font-weight: 700; margin-right: 2px; color: var(--rxn-primario); }
+
+/* ---- Tarjetas desplegables -------------------------------------------------- */
+#reacciones .rxn-tarjeta {
+  margin: 0 0 8px;
+  background: var(--rxn-superficie);
+  border: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio);
+}
+
+#reacciones .rxn-tarjeta > summary {
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--rxn-texto);
+  list-style-position: inside;
+}
+#reacciones .rxn-tarjeta > summary:focus-visible {
+  outline: 2px solid var(--rxn-primario);
+  outline-offset: -2px;
+}
+#reacciones .rxn-tarjeta[open] > summary {
+  background: var(--rxn-primario-fondo);
+  border-bottom: 1px solid var(--rxn-borde);
+  border-radius: var(--rxn-radio) var(--rxn-radio) 0 0;
+}
+
+#reacciones .rxn-tarjeta-cuerpo {
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+#reacciones .rxn-tarjeta-cuerpo p { margin: 0 0 6px; }
+#reacciones .rxn-tarjeta-cuerpo p:last-child { margin-bottom: 0; }
+#reacciones .rxn-pendiente { color: var(--rxn-texto-suave); }
+#reacciones .rxn-dato-sub { color: var(--rxn-texto-suave); font-size: 0.8rem; }
+
+/* ---- Utilidad ---------------------------------------------------------------- */
+#reacciones .rxn-solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Pantallas medianas y grandes -------------------------------------------- */
+@media (min-width: 600px) {
+  #reacciones .rxn-fichas {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  #reacciones .rxn-ficha-formula { font-size: 1.45rem; }
+  #reacciones .rxn-ficha-nombre  { font-size: 0.75rem; }
+  #reacciones .rxn-ficha-info    { font-size: 0.68rem; }
+  #reacciones .rxn-btn--ancho    { width: auto; min-width: 220px; }
+  #reacciones .rxn-seccion       { padding: 16px; }
+}
