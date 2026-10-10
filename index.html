@@ -14,7 +14,7 @@
 
     <!-- ESTILOS -->
     <link rel="stylesheet" href="style.css?v=5">
-    <link rel="stylesheet" href="tabla.css?v=4">
+    <link rel="stylesheet" href="tabla.css?v=5">
     <link rel="stylesheet" href="compuestos.css?v=3">
     <link rel="stylesheet" href="enlaces.css?v=1">
 
@@ -282,61 +282,78 @@ PÁGINA: TABLA PERIÓDICA INTERACTIVA
         class="app-page"
         style="display: none;">
 
-        <!-- BUSCADOR + BOTÓN DE FILTRO -->
-        <section class="search-box">
-
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
-            <input
-                type="text"
-                id="tp-buscador"
-                placeholder="Buscar elemento por nombre, símbolo o número atómico (Z)..."
-                autocomplete="off"
-            >
-
-            <button
-                type="button"
-                id="tp-filtro-btn"
-                class="search-settings"
-                aria-label="Filtrar por categoría"
-                aria-expanded="false"
-                aria-controls="tp-filtros">
-
-                <i class="fa-solid fa-sliders"></i>
-
-            </button>
-
-        </section>
-
-        <div id="tp-mensaje" class="tp-mensaje" role="status"></div>
-
-        <!-- PANEL DE FILTROS (OCULTO POR DEFECTO) -->
-        <section id="tp-filtros" class="tp-filtros" hidden>
-
-            <h3 class="tp-filtros-titulo">Filtrar por categoría química</h3>
-
-            <div id="tp-chips" class="tp-chips"></div>
-
-            <p id="tp-filtro-estado" class="tp-filtro-estado"></p>
-
-        </section>
-
         <!-- TABLA PERIÓDICA -->
         <section class="card tp-tarjeta">
 
-            <div class="card-header">
+            <!-- ENCABEZADO: TÍTULO + BUSCADOR PEQUEÑO + ZOOM -->
+            <div class="tp-cab">
 
-                <div class="card-icon blue-icon">
+                <div class="tp-cab-icono">
                     <i class="fa-solid fa-table-cells"></i>
                 </div>
 
-                <h2>
-Tabla periódica interactiva
+                <h2 class="tp-cab-titulo">
+Tabla periódica
                 </h2>
+
+                <div class="tp-busca">
+
+                    <input
+                        type="text"
+                        id="tp-buscador"
+                        placeholder="Buscar..."
+                        aria-label="Buscar elemento por nombre, símbolo o número atómico (Z)"
+                        autocomplete="off"
+                    >
+
+                    <button
+                        type="button"
+                        id="tp-filtro-btn"
+                        class="tp-filtro-mini"
+                        aria-label="Filtrar por categoría"
+                        aria-expanded="false"
+                        aria-controls="tp-filtros">
+
+                        <i class="fa-solid fa-sliders"></i>
+
+                    </button>
+
+                </div>
+
+                <div class="tp-zoom">
+
+                    <button
+                        type="button"
+                        id="tp-zoom-mas"
+                        aria-label="Agrandar la tabla">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        id="tp-zoom-menos"
+                        aria-label="Reducir la tabla">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+
+                </div>
 
             </div>
 
-            <div class="tp-scroll">
+            <div id="tp-mensaje" class="tp-mensaje" role="status"></div>
+
+            <!-- PANEL DE FILTROS (OCULTO POR DEFECTO) -->
+            <section id="tp-filtros" class="tp-filtros" hidden>
+
+                <h3 class="tp-filtros-titulo">Filtrar por categoría química</h3>
+
+                <div id="tp-chips" class="tp-chips"></div>
+
+                <p id="tp-filtro-estado" class="tp-filtro-estado"></p>
+
+            </section>
+
+            <div class="tp-scroll" id="tp-scroll">
                 <div id="tp-grid" class="tp-grid"></div>
             </div>
 
@@ -623,7 +640,7 @@ JAVASCRIPT
 
 <script src="app.js?v=2"></script>
 <script src="datos.js?v=1"></script>
-<script src="tabla.js?v=4"></script>
+<script src="tabla.js?v=5"></script>
 <script src="compuestos.js?v=3"></script>
 <script src="enlaces.js?v=1"></script>
 
