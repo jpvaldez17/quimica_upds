@@ -239,7 +239,7 @@ Developed by J. Poma · 2026
 }
 
 .tp-grid {
-    --tp-z: 1;
+    --tp-z: 0.8;
     font-size: calc(16px * var(--tp-z));
     display: grid;
     grid-template-columns: calc(24px * var(--tp-z)) repeat(18, calc(50px * var(--tp-z)));
@@ -297,7 +297,7 @@ Developed by J. Poma · 2026
     z-index: 3;
     overflow: visible;
     transform: scale(1.1);
-    box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--tp-azul), 0 6px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 5px #000, 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 
 .tp-dim {
@@ -371,6 +371,7 @@ Developed by J. Poma · 2026
 /* ---------- Ficha rápida ---------- */
 
 .tp-ficha {
+    scroll-margin-top: 10px;
     background: var(--tp-carbon);
     color: #fff;
     border-radius: 20px;
