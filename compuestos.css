@@ -14,6 +14,8 @@
     --cmp-alto: #d63a3a;
     color: var(--cmp-texto);
     padding-bottom: 24px;
+    max-width: 860px;
+    margin: 0 auto;
 }
 
 .cmp-app button {
@@ -299,19 +301,20 @@
     overflow: hidden;
 }
 
+/* Cabecera: nombre a la izquierda (tinta oscura), fórmula a la derecha (blanca) */
+
 .cmp-cab {
     position: relative;
-    overflow: hidden;
-    padding: 20px 18px 18px;
-    color: #fff;
+    padding: 12px 16px 14px;
+    color: var(--ink, #111);
     background-color: var(--c);
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(0, 0, 0, .24));
+    background-image: linear-gradient(100deg, rgba(255, 255, 255, .14) 0%, rgba(0, 0, 0, .06) 45%, rgba(0, 0, 0, .5) 100%);
 }
 
 .cmp-cab-fila {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
 }
 
@@ -319,57 +322,53 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 5px 12px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, .22);
-    font-size: .9rem;
+    background: rgba(255, 255, 255, .26);
+    font-size: .88rem;
 }
 
 .cmp-cab .cmp-star {
-    color: rgba(255, 255, 255, .7);
+    color: #fff;
 }
 
 .cmp-cab .cmp-star[aria-pressed="true"] {
     color: #ffd54a;
 }
 
-.cmp-cab h2 {
-    margin: 14px 0 2px;
-    font-size: 2.3rem;
-    line-height: 1.05;
-    font-weight: 800;
-    letter-spacing: .01em;
+.cmp-cab-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
 }
 
-.cmp-cab p {
+.cmp-cab h2 {
     margin: 0;
-    font-size: 1.1rem;
-    opacity: .95;
+    font-size: clamp(1.3rem, 4.6vw, 2rem);
+    line-height: 1.08;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+    color: var(--ink, #111);
 }
 
 .cmp-cab .cmp-otros {
-    margin-top: 6px;
-    font-size: .92rem;
+    margin: 6px 0 0;
+    font-size: .9rem;
     opacity: .85;
 }
 
-/* Marca de agua: icono grande de la clasificación (cero peso) */
-
-.cmp-marca {
-    position: absolute;
-    right: 14px;
-    bottom: 6px;
-    font-size: 6.5rem;
+.cmp-cab .cmp-form {
+    margin: 0;
+    text-align: right;
+    font-size: clamp(1.7rem, 6.5vw, 2.9rem);
+    font-weight: 800;
     line-height: 1;
     color: #fff;
-    opacity: .2;
-    transform: rotate(-12deg);
-    pointer-events: none;
-}
-
-.cmp-cab > *:not(.cmp-marca) {
-    position: relative;
-    z-index: 1;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+    overflow-wrap: anywhere;
 }
 
 /* Datos clave */
