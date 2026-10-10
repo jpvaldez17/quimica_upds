@@ -1,0 +1,647 @@
+/* =========================================
+   QUÍMICA UPDS
+   ENLACES · Calculadora TOM
+   Developed by J. Poma · 2026
+   ========================================= */
+
+.tom {
+    --tom-azul: #1686c9;
+    --tom-azul-osc: #145da0;
+    --tom-rojo: #d4144e;
+    --tom-naranja: #e67e00;
+    --tom-verde: #15965a;
+    --tom-gris: #6b7280;
+    --tom-borde: #d4d7da;
+}
+
+.tom .tom-p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333333;
+    margin: 8px 0;
+}
+
+.tom .tom-suave {
+    color: #666666;
+    font-size: 13px;
+}
+
+.tom b {
+    color: #171717;
+}
+
+
+/* ---------- Selector de modo ---------- */
+
+.tom-seg {
+    display: flex;
+    background: #eceff1;
+    border-radius: 26px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+
+.tom-seg button {
+    flex: 1;
+    min-height: 42px;
+    border: none;
+    border-radius: 22px;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    color: #444444;
+    cursor: pointer;
+}
+
+.tom-seg button.activo {
+    background: var(--tom-naranja);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(230, 126, 0, 0.35);
+}
+
+.tom-seg-chico {
+    max-width: 260px;
+    margin-bottom: 6px;
+}
+
+.tom-seg-chico button {
+    min-height: 36px;
+    font-size: 13px;
+}
+
+
+/* ---------- Formulario ---------- */
+
+.tom-sub {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--tom-azul-osc);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 16px 0 8px;
+}
+
+.tom-sub2 {
+    font-size: 12px;
+    color: #666666;
+    margin: 8px 0 6px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.tom-campos {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.tom-campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 5px;
+}
+
+.tom-input {
+    width: 100%;
+    min-height: 48px;
+    border: 2px solid #222222;
+    border-radius: 14px;
+    padding: 0 14px;
+    font-size: 16px;
+    background: #ffffff;
+    color: #171717;
+    outline: none;
+}
+
+.tom-input:focus {
+    border-color: var(--tom-naranja);
+    box-shadow: 0 0 0 3px rgba(230, 126, 0, 0.18);
+}
+
+.tom-info {
+    font-size: 12.5px;
+    color: #777777;
+    margin-top: 5px;
+    min-height: 18px;
+}
+
+.tom-info.ok {
+    color: #333333;
+}
+
+.tom-info.mal {
+    color: var(--tom-rojo);
+    font-weight: 700;
+}
+
+.tom-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tom-chip {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 20px;
+    border: 2px solid #c4c9cd;
+    background: #ffffff;
+    color: #222222;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tom-chip:hover {
+    background: #f4f8fb;
+}
+
+.tom-chip.activo {
+    background: var(--tom-azul);
+    border-color: var(--tom-azul);
+    color: #ffffff;
+}
+
+.tom-chip.ej {
+    border-color: var(--tom-naranja);
+    color: #a35700;
+    min-height: 34px;
+    padding: 0 12px;
+}
+
+.tom-chip.ej:hover {
+    background: #fff4e5;
+}
+
+.tom-acciones {
+    margin-top: 16px;
+}
+
+.tom-btn-borrar {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 22px;
+    border: 2px solid #b51e3d;
+    background: #ffffff;
+    color: #a51d35;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tom-btn-borrar:hover {
+    background: #b51e3d;
+    color: #ffffff;
+}
+
+
+/* ---------- Avisos ---------- */
+
+.tom-aviso {
+    background: #fdecef;
+    border-left: 6px solid var(--tom-rojo);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #3a1f27;
+    margin-bottom: 14px;
+}
+
+.tom-aviso-amarillo {
+    background: #fff6e5;
+    border-left-color: var(--tom-naranja);
+    color: #4a3410;
+}
+
+.tom-aviso-info {
+    background: #e9f6ff;
+    border-left-color: var(--tom-azul);
+    color: #17384f;
+}
+
+
+/* ---------- Estructura (resultado principal) ---------- */
+
+.tom-estructura {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0 2px;
+}
+
+.tom-corchete {
+    font-size: 54px;
+    font-weight: 300;
+    color: #444444;
+    line-height: 1;
+}
+
+.tom-atomo {
+    min-width: 52px;
+    height: 52px;
+    padding: 0 8px;
+    border-radius: 50%;
+    border: 3px solid var(--tom-azul-osc);
+    background: #e9f6ff;
+    color: var(--tom-azul-osc);
+    font-size: 24px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tom-enlace {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--tom-naranja);
+    line-height: 1;
+    min-width: 40px;
+    text-align: center;
+}
+
+.tom-enlace.roto {
+    color: var(--tom-gris);
+}
+
+.tom-carga {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--tom-rojo);
+    align-self: flex-start;
+    margin-top: 6px;
+}
+
+.tom-leyenda-e {
+    text-align: center;
+    font-size: 14px;
+    color: #444444;
+    margin: 4px 0 14px;
+}
+
+
+/* ---------- Fichas de resumen ---------- */
+
+.tom-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.tom-tile {
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+    background: #f2f4f6;
+    border: 2px solid transparent;
+}
+
+.tom-tile-v {
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #171717;
+}
+
+.tom-tile-v small {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555555;
+    margin-top: 3px;
+}
+
+.tom-tile-e {
+    font-size: 12px;
+    color: #555555;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tom-tile.azul { background: #e9f6ff; border-color: #b9dcf5; }
+.tom-tile.azul .tom-tile-v { color: var(--tom-azul-osc); }
+.tom-tile.naranja { background: #fff4e5; border-color: #f6d4a3; }
+.tom-tile.naranja .tom-tile-v { color: #b25f00; }
+.tom-tile.rojo { background: #fdecef; border-color: #f4c0cc; }
+.tom-tile.rojo .tom-tile-v { color: #b01040; }
+.tom-tile.verde { background: #e8f6ef; border-color: #b7e0cb; }
+.tom-tile.verde .tom-tile-v { color: #0f7545; }
+.tom-tile.gris { background: #f2f4f6; border-color: #dde1e4; }
+
+
+/* ---------- Notación de orbitales ---------- */
+
+.tom-notacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #f7f9fb;
+    border-radius: 12px;
+    border: 1px solid #e1e5e8;
+}
+
+.tom-notacion .tom-corchete {
+    font-size: 30px;
+}
+
+.tom-kk {
+    font-weight: 800;
+    color: #444444;
+    font-size: 15px;
+}
+
+.tom-mo {
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 4px 9px;
+    border-radius: 10px;
+    border: 2px solid;
+    background: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.tom-mo sup {
+    font-size: 11px;
+    margin-left: 2px;
+}
+
+.tom-mo.enl { border-color: var(--tom-azul); color: var(--tom-azul-osc); }
+.tom-mo.anti { border-color: var(--tom-rojo); color: #b01040; }
+.tom-mo.nb { border-color: var(--tom-gris); color: #4b5563; }
+
+.tom-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 4px;
+}
+
+.tom-lg {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 2px solid;
+    background: #ffffff;
+}
+
+.tom-lg.enl { border-color: var(--tom-azul); color: var(--tom-azul-osc); }
+.tom-lg.anti { border-color: var(--tom-rojo); color: #b01040; }
+.tom-lg.nb { border-color: var(--tom-gris); color: #4b5563; }
+
+
+/* ---------- Diagrama ---------- */
+
+.tom-btn-diag {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 24px;
+    border: 2px solid var(--tom-azul);
+    background: #ffffff;
+    color: var(--tom-azul-osc);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tom-btn-diag:hover {
+    background: #e9f6ff;
+}
+
+.tom-diag-cuerpo {
+    margin-top: 12px;
+}
+
+.tom-diag-cuerpo[hidden] {
+    display: none;
+}
+
+.tom-svg {
+    display: block;
+    width: 100%;
+    max-width: 430px;
+    height: auto;
+    margin: 0 auto;
+}
+
+.tom-eje { stroke: #888888; stroke-width: 2; }
+.tom-eje-p { fill: #888888; }
+.tom-ao { stroke: #333333; stroke-width: 3; stroke-linecap: round; }
+.tom-cx { stroke: #9aa3ab; stroke-width: 1.3; stroke-dasharray: 4 4; }
+.tom-t-s { font-size: 12px; fill: #666666; font-family: Arial, Helvetica, sans-serif; }
+.tom-t-ao { font-size: 13px; fill: #222222; text-anchor: middle; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+.tom-t-e { font-size: 17px; fill: #171717; text-anchor: middle; font-family: Arial, Helvetica, sans-serif; }
+.tom-t-n { font-size: 11px; text-anchor: middle; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+.tom-t-a { font-size: 22px; font-weight: 800; fill: var(--tom-azul-osc); text-anchor: middle; font-family: Arial, Helvetica, sans-serif; }
+
+
+/* ---------- Paso a paso ---------- */
+
+.tom-paso {
+    border: 1px solid var(--tom-borde);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.tom-paso summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #171717;
+    cursor: pointer;
+    list-style: none;
+    background: #f7f9fb;
+}
+
+.tom-paso summary::-webkit-details-marker {
+    display: none;
+}
+
+.tom-paso summary::after {
+    content: "\25BE";
+    margin-left: auto;
+    color: #777777;
+    transition: transform 0.2s ease;
+}
+
+.tom-paso[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.tom-num {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: var(--tom-naranja);
+    color: #ffffff;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tom-cuerpo {
+    padding: 4px 14px 12px;
+}
+
+.tom-fila {
+    padding: 10px 0;
+    border-bottom: 1px dashed #dde1e4;
+}
+
+.tom-fila:last-of-type {
+    border-bottom: none;
+}
+
+.tom-fila-t {
+    font-size: 14px;
+    color: #222222;
+}
+
+.tom-rol {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--tom-gris);
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: 4px;
+    text-transform: uppercase;
+}
+
+.tom-config {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666666;
+    margin: 4px 0;
+    word-spacing: 2px;
+}
+
+.tom-config .tom-val {
+    color: var(--tom-naranja);
+    font-weight: 800;
+}
+
+.tom-fila-v {
+    font-size: 13px;
+    color: #333333;
+}
+
+.tom-formula {
+    background: #f2f6fa;
+    border-left: 5px solid var(--tom-azul);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    margin: 10px 0;
+    overflow-x: auto;
+}
+
+.tom-lista {
+    margin: 6px 0 6px 20px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333333;
+}
+
+.tom-dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+.tom-tabla {
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.tom-tabla td {
+    padding: 6px 12px 6px 0;
+}
+
+
+/* ---------- Lewis (3 elementos) ---------- */
+
+.tom-lewis {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 0 14px;
+}
+
+.tom-lw-a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 86px;
+}
+
+.tom-lw-e {
+    padding-top: 6px;
+}
+
+.tom-lw-d {
+    font-size: 11.5px;
+    text-align: center;
+    color: #555555;
+    line-height: 1.5;
+}
+
+.tom-fc {
+    font-weight: 800;
+    border-radius: 8px;
+    padding: 1px 7px;
+    display: inline-block;
+}
+
+.tom-fc.fc0 { background: #e8f6ef; color: #0f7545; }
+.tom-fc.fcp { background: #e9f6ff; color: var(--tom-azul-osc); }
+.tom-fc.fcn { background: #fdecef; color: #b01040; }
+
+.tom-sup-carga {
+    margin-bottom: 4px;
+}
+
+
+/* ---------- Ajustes ---------- */
+
+.tom .card {
+    margin-bottom: 14px;
+}
+
+.tom-hero .tom-p {
+    margin-top: 0;
+}
+
+@media (min-width: 640px) {
+
+    .tom-campos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tom-tiles {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+}
