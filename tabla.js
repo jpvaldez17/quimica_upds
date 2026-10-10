@@ -822,6 +822,34 @@ Developed by J. Poma · 2026
         }
     }
 
+    /* =========================================
+    ZOOM DE LA TABLA (solo la tabla)
+    ========================================= */
+
+    var ZOOMS = [0.5, 0.65, 0.8, 1, 1.2, 1.4, 1.7];
+    var zoomIdx = 3;
+
+    function aplicarZoom(delta) {
+        var nuevo = zoomIdx + delta;
+        if (nuevo < 0 || nuevo >= ZOOMS.length) { return; }
+
+        var grid = $("tp-grid");
+        var sc = $("tp-scroll");
+        if (!grid || !sc) { return; }
+
+        /* Conserva el punto que se está mirando */
+        var centro = (sc.scrollLeft + sc.clientWidth / 2) / sc.scrollWidth;
+
+        zoomIdx = nuevo;
+        grid.style.setProperty("--tp-z", ZOOMS[zoomIdx]);
+        sc.scrollLeft = centro * sc.scrollWidth - sc.clientWidth / 2;
+
+        var menos = $("tp-zoom-menos");
+        var mas = $("tp-zoom-mas");
+        if (menos) { menos.disabled = (zoomIdx === 0); }
+        if (mas) { mas.disabled = (zoomIdx === ZOOMS.length - 1); }
+    }
+
     function iniciarEventos() {
         var grid = $("tp-grid");
         if (grid) {
@@ -858,6 +886,12 @@ Developed by J. Poma · 2026
 
         var mas = $("tp-mas-info");
         if (mas) { mas.addEventListener("click", alternarInfo); }
+
+        var zMenos = $("tp-zoom-menos");
+        if (zMenos) { zMenos.addEventListener("click", function () { aplicarZoom(-1); }); }
+
+        var zMas = $("tp-zoom-mas");
+        if (zMas) { zMas.addEventListener("click", function () { aplicarZoom(1); }); }
     }
 
     /* =========================================
