@@ -1,0 +1,628 @@
+/* =========================================================
+   COMPUESTOS · Química UPDS
+   Todo con prefijo "cmp-" para no chocar con style.css
+   Sin imágenes: solo CSS + Font Awesome (ya cargado)
+   ========================================================= */
+
+.cmp-app {
+    --cmp-texto: #1b2430;
+    --cmp-suave: #5b6675;
+    --cmp-linea: #e3e7ec;
+    --cmp-fondo: #ffffff;
+    --cmp-bajo: #2e9e5b;
+    --cmp-medio: #f0a30a;
+    --cmp-alto: #d63a3a;
+    color: var(--cmp-texto);
+    padding-bottom: 24px;
+}
+
+.cmp-app button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border: 0;
+    background: none;
+}
+
+.cmp-app button:focus-visible,
+.cmp-app summary:focus-visible,
+.cmp-app input:focus-visible {
+    outline: 3px solid #1e88e5;
+    outline-offset: 2px;
+}
+
+/* ---------- Barra superior (buscador + filtros) ---------- */
+
+.cmp-toolbar {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.cmp-toolbar[hidden] {
+    display: none;
+}
+
+.cmp-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--cmp-fondo);
+    border-radius: 16px;
+    padding: 0 14px;
+    box-shadow: 0 1px 6px rgba(20, 30, 50, .08);
+}
+
+.cmp-search i {
+    color: var(--cmp-suave);
+}
+
+.cmp-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    padding: 14px 0;
+    color: inherit;
+}
+
+.cmp-search input:focus-visible {
+    outline: none;
+}
+
+.cmp-search:focus-within {
+    box-shadow: 0 0 0 3px #1e88e5;
+}
+
+.cmp-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+}
+
+.cmp-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.cmp-chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--cmp-fondo);
+    box-shadow: 0 1px 4px rgba(20, 30, 50, .08);
+    font-size: .92rem;
+    transition: background .15s, color .15s;
+}
+
+.cmp-chip[aria-pressed="true"] {
+    background: var(--cmp-texto);
+    color: #fff;
+}
+
+/* ---------- Navegación (volver / título) ---------- */
+
+.cmp-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.cmp-back {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--cmp-fondo);
+    box-shadow: 0 1px 6px rgba(20, 30, 50, .1);
+    display: grid;
+    place-items: center;
+}
+
+.cmp-nav h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.cmp-nav small {
+    color: var(--cmp-suave);
+}
+
+/* ---------- Cuadrícula de clasificaciones ---------- */
+
+.cmp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.cmp-cat {
+    --c: #888;
+    position: relative;
+    text-align: left;
+    padding: 16px 14px 14px;
+    border-radius: 20px;
+    background: var(--cmp-fondo);
+    box-shadow: 0 2px 10px rgba(20, 30, 50, .08);
+    overflow: hidden;
+    display: grid;
+    gap: 10px;
+    min-height: 118px;
+    align-content: space-between;
+}
+
+.cmp-cat::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    background: var(--c);
+}
+
+.cmp-cat-ic {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: var(--c);
+    font-size: 1.15rem;
+}
+
+.cmp-cat b {
+    display: block;
+    line-height: 1.15;
+}
+
+.cmp-cat small {
+    color: var(--cmp-suave);
+}
+
+.cmp-cat[data-vacio="1"] {
+    opacity: .6;
+}
+
+/* ---------- Lista de compuestos ---------- */
+
+.cmp-list {
+    display: grid;
+    gap: 10px;
+}
+
+.cmp-item {
+    --c: #888;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: stretch;
+    background: var(--cmp-fondo);
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(20, 30, 50, .07);
+    overflow: hidden;
+    border-left: 6px solid var(--c);
+}
+
+.cmp-open {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    text-align: left;
+    padding: 12px 6px 12px 12px;
+}
+
+.cmp-item-ic {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 14%, white);
+    font-size: 1.05rem;
+}
+
+.cmp-formula {
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+.cmp-item-main span.cmp-nombre {
+    display: block;
+    color: var(--cmp-suave);
+    font-size: .93rem;
+}
+
+.cmp-item-main small {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3px;
+    color: var(--cmp-suave);
+}
+
+.cmp-item-side {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 10px;
+}
+
+.cmp-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cmp-bajo);
+}
+
+.cmp-dot.medio {
+    background: var(--cmp-medio);
+}
+
+.cmp-dot.alto {
+    background: var(--cmp-alto);
+}
+
+.cmp-star {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: #b6bdc7;
+    font-size: 1.05rem;
+}
+
+.cmp-star[aria-pressed="true"] {
+    color: #f0a30a;
+}
+
+.cmp-vacio {
+    text-align: center;
+    padding: 28px 12px;
+    color: var(--cmp-suave);
+    background: var(--cmp-fondo);
+    border-radius: 18px;
+}
+
+/* ---------- Ficha ---------- */
+
+.cmp-ficha {
+    --c: #888;
+    background: var(--cmp-fondo);
+    border-radius: 24px;
+    box-shadow: 0 3px 14px rgba(20, 30, 50, .1);
+    overflow: hidden;
+}
+
+.cmp-cab {
+    position: relative;
+    padding: 20px 18px 18px;
+    color: #fff;
+    background-color: var(--c);
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(0, 0, 0, .24));
+}
+
+.cmp-cab-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.cmp-cab .cmp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .22);
+    font-size: .9rem;
+}
+
+.cmp-cab .cmp-star {
+    color: rgba(255, 255, 255, .7);
+}
+
+.cmp-cab .cmp-star[aria-pressed="true"] {
+    color: #ffd54a;
+}
+
+.cmp-cab h2 {
+    margin: 14px 0 2px;
+    font-size: 2.3rem;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: .01em;
+}
+
+.cmp-cab p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: .95;
+}
+
+.cmp-cab .cmp-otros {
+    margin-top: 6px;
+    font-size: .92rem;
+    opacity: .85;
+}
+
+.cmp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 18px 0;
+}
+
+.cmp-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eef1f5;
+    font-size: .88rem;
+}
+
+.cmp-tag.riesgo-bajo {
+    background: #e2f4ea;
+    color: #1f7a45;
+}
+
+.cmp-tag.riesgo-medio {
+    background: #fdf1d3;
+    color: #8a5f00;
+}
+
+.cmp-tag.riesgo-alto {
+    background: #fbe0e0;
+    color: #a52626;
+}
+
+/* Visuales: rombo NFPA + barra de pH */
+
+.cmp-visual {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: center;
+    padding: 20px 18px 8px;
+}
+
+.cmp-visual.sin-ph {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+.cmp-nfpa-caja {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+}
+
+.cmp-nfpa {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    margin: 12px;
+    transform: rotate(45deg);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: #1b2430;
+    border: 2px solid #1b2430;
+}
+
+.cmp-nfpa div {
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.15rem;
+}
+
+.cmp-nfpa div span {
+    transform: rotate(-45deg);
+}
+
+.cmp-nfpa .inflam {
+    background: #e53935;
+    color: #fff;
+}
+
+.cmp-nfpa .react {
+    background: #fdd835;
+    color: #1b2430;
+}
+
+.cmp-nfpa .salud {
+    background: #1e88e5;
+    color: #fff;
+}
+
+.cmp-nfpa .espec {
+    background: #fff;
+    color: #1b2430;
+    font-size: .95rem;
+}
+
+.cmp-nfpa-caja small {
+    color: var(--cmp-suave);
+    text-align: center;
+}
+
+.cmp-ph-caja b {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.cmp-ph {
+    position: relative;
+    height: 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #e53935 0%, #fb8c00 18%, #fdd835 34%, #43a047 50%, #00acc1 64%, #1e88e5 78%, #5e35b1 100%);
+}
+
+.cmp-ph-marca {
+    position: absolute;
+    top: -6px;
+    width: 4px;
+    height: 28px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: #1b2430;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.cmp-ph-escala {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    color: var(--cmp-suave);
+    font-size: .78rem;
+}
+
+.cmp-ph-valor {
+    margin-top: 8px;
+    font-size: .95rem;
+}
+
+/* Datos clave */
+
+.cmp-datos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px 18px;
+}
+
+.cmp-dato {
+    background: #f4f6f9;
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+.cmp-dato small {
+    display: block;
+    color: var(--cmp-suave);
+    font-size: .8rem;
+}
+
+.cmp-dato span {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.cmp-dato.ancho {
+    grid-column: 1 / -1;
+}
+
+/* Acordeones (details nativo: sin JavaScript extra) */
+
+.cmp-acordeon {
+    border-top: 1px solid var(--cmp-linea);
+}
+
+.cmp-acordeon summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cmp-acordeon summary::-webkit-details-marker {
+    display: none;
+}
+
+.cmp-acordeon summary .cmp-sum-ic {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: var(--c);
+    font-size: .9rem;
+}
+
+.cmp-acordeon summary::after {
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-left: auto;
+    font-size: .8rem;
+    color: var(--cmp-suave);
+    transition: transform .2s;
+}
+
+.cmp-acordeon[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.cmp-acordeon .cmp-cuerpo {
+    padding: 0 18px 16px 62px;
+    line-height: 1.5;
+}
+
+.cmp-acordeon.seguridad {
+    background: #fff6f4;
+}
+
+.cmp-uso {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cmp-uso i {
+    margin-top: 3px;
+    width: 18px;
+    text-align: center;
+    color: var(--c);
+}
+
+.cmp-uso b {
+    display: block;
+    font-size: .88rem;
+    color: var(--cmp-suave);
+}
+
+.cmp-rel {
+    padding: 14px 18px 18px;
+    border-top: 1px solid var(--cmp-linea);
+}
+
+.cmp-rel b {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.cmp-rel .cmp-chips {
+    flex-wrap: wrap;
+    overflow: visible;
+}
+
+.cmp-rel .cmp-chip {
+    background: #eef1f5;
+    box-shadow: none;
+}
+
+@media (min-width: 640px) {
+    .cmp-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cmp-acordeon summary::after,
+    .cmp-chip {
+        transition: none;
+    }
+}
