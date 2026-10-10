@@ -21,13 +21,13 @@
         { id: 'oxidos',       nombre: 'Óxidos',                  icono: 'fa-layer-group',    color: '#8d6e63', total: 12 },
         { id: 'gases',        nombre: 'Gases industriales',      icono: 'fa-wind',           color: '#78909c', total: 14 },
         { id: 'solventes',    nombre: 'Solventes y orgánicos',   icono: 'fa-bottle-droplet', color: '#fb8c00', total: 31 },
-        { id: 'combustibles', nombre: 'Combustibles y explosivos', icono: 'fa-gas-pump',     color: '#bf360c', total: 16 },
+        { id: 'combustibles', nombre: 'Combustibles y explosivos', icono: 'fa-gas-pump',     color: '#bf360c', total: 16, ink: '#fff' },
         { id: 'limpieza',     nombre: 'Limpieza y hogar',        icono: 'fa-broom',          color: '#00897b', total: 18 },
         { id: 'agro',         nombre: 'Agro y fertilizantes',    icono: 'fa-seedling',       color: '#43a047', total: 12 },
         { id: 'alimentos',    nombre: 'Alimentos y aditivos',    icono: 'fa-utensils',       color: '#f9a825', total: 14 },
-        { id: 'laboratorio',  nombre: 'Laboratorio y farmacia',  icono: 'fa-pills',          color: '#5e35b1', total: 15 },
-        { id: 'plasticos',    nombre: 'Plásticos y polímeros',   icono: 'fa-recycle',        color: '#3949ab', total: 10 },
-        { id: 'mineria',      nombre: 'Minería',                 icono: 'fa-gem',            color: '#455a64', total: 12 }
+        { id: 'laboratorio',  nombre: 'Laboratorio y farmacia',  icono: 'fa-pills',          color: '#5e35b1', total: 15, ink: '#fff' },
+        { id: 'plasticos',    nombre: 'Plásticos y polímeros',   icono: 'fa-recycle',        color: '#3949ab', total: 10, ink: '#fff' },
+        { id: 'mineria',      nombre: 'Minería',                 icono: 'fa-gem',            color: '#455a64', total: 12, ink: '#fff' }
     ];
 
     /* Áreas de uso (filtros) */
@@ -344,17 +344,18 @@
                 '<button class="cmp-back" data-back="1" aria-label="Volver"><i class="fa-solid fa-arrow-left"></i></button>' +
                 '<div><small>' + esc(cat.nombre) + '</small></div></div>';
 
-        h += '<article class="cmp-ficha" style="--c:' + cat.color + '">' +
+        h += '<article class="cmp-ficha" style="--c:' + cat.color + ';--ink:' + (cat.ink || '#111') + '">' +
             '<header class="cmp-cab">' +
-                '<i class="fa-solid ' + cat.icono + ' cmp-marca" aria-hidden="true"></i>' +
                 '<div class="cmp-cab-fila">' +
                     '<span class="cmp-badge"><i class="fa-solid ' + cat.icono + '" aria-hidden="true"></i>' + esc(cat.nombre) + '</span>' +
                     '<button class="cmp-star" data-fav="' + c.id + '" aria-pressed="' + fav + '" aria-label="Favorito">' +
                         '<i class="fa-' + (fav ? 'solid' : 'regular') + ' fa-star" aria-hidden="true"></i></button>' +
                 '</div>' +
-                '<h2>' + esc(c.formula) + '</h2>' +
-                '<p>' + esc(c.nombre) + '</p>' +
-                '<p class="cmp-otros">' + esc(c.otros) + '</p>' +
+                '<div class="cmp-cab-main">' +
+                    '<div><h2>' + esc(c.nombre) + '</h2>' +
+                    '<p class="cmp-otros">' + esc(c.otros) + '</p></div>' +
+                    '<p class="cmp-form" aria-label="Fórmula">' + esc(c.formula) + '</p>' +
+                '</div>' +
             '</header>' +
 
             '<div class="cmp-datos">' +
