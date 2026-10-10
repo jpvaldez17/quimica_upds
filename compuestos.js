@@ -284,7 +284,7 @@
                  (n === 0 ? ' data-vacio="1"' : '') + '>' +
                  '<span class="cmp-cat-ic"><i class="fa-solid ' + c.icono + '" aria-hidden="true"></i></span>' +
                  '<span><b>' + esc(c.nombre) + '</b>' +
-                 '<small>' + (n === 0 ? 'Próximamente' : n + ' de ' + c.total + ' fichas') + '</small></span>' +
+                 (n === 0 ? '<small>Próximamente</small>' : '') + '</span>' +
                  '</button>';
         });
         return h + '</div>';
@@ -320,13 +320,13 @@
         var h = '<div class="cmp-nav">';
         if (cat) {
             h += '<button class="cmp-back" data-back="1" aria-label="Volver a clasificaciones"><i class="fa-solid fa-arrow-left"></i></button>' +
-                 '<div><h2>' + esc(cat.nombre) + '</h2><small>' + lista.length + ' resultados</small></div>';
+                 '<div><h2>' + esc(cat.nombre) + '</h2><small>' + lista.length + (lista.length === 1 ? ' resultado' : ' resultados') + '</small></div>';
         } else {
             var partes = [];
             if (state.area) { var ar = porId(AREAS, state.area); partes.push(ar ? ar.nombre : state.area); }
             if (state.soloFavs) partes.push('Favoritos');
             h += '<button class="cmp-back" data-back="1" aria-label="Volver a clasificaciones"><i class="fa-solid fa-arrow-left"></i></button>' +
-                 '<div><h2>Resultados</h2><small>' + lista.length + ' encontrados' +
+                 '<div><h2>Resultados</h2><small>' + lista.length + (lista.length === 1 ? ' encontrado' : ' encontrados') +
                  (partes.length ? ' · ' + esc(partes.join(' · ')) : '') + '</small></div>';
         }
         h += '</div>';
