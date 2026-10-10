@@ -14,7 +14,7 @@
 
     <!-- ESTILOS -->
     <link rel="stylesheet" href="style.css?v=5">
-    <link rel="stylesheet" href="tabla.css?v=1">
+    <link rel="stylesheet" href="tabla.css?v=3">
     <link rel="stylesheet" href="compuestos.css?v=3">
     <link rel="stylesheet" href="enlaces.css?v=1">
 
@@ -351,28 +351,58 @@ Tabla periódica interactiva
         <!-- FICHA RÁPIDA -->
         <section class="tp-ficha">
 
-            <h2 class="tp-ficha-titulo">
+            <div class="tp-ficha-cab">
+
+                <h2 class="tp-ficha-titulo">
 Ficha rápida <span id="tp-f-titulo">(Carbono)</span>
-            </h2>
+                </h2>
+
+                <div class="tp-nav">
+
+                    <button
+                        type="button"
+                        id="tp-prev"
+                        aria-label="Elemento anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <span class="tp-contador" id="tp-f-contador">6 / 118</span>
+
+                    <button
+                        type="button"
+                        id="tp-next"
+                        aria-label="Elemento siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
 
             <div class="tp-ficha-cuerpo">
 
                 <div class="tp-ficha-izq">
 
-                    <div class="tp-casilla">
-                        <div class="tp-c-z" id="tp-f-z">6</div>
+                    <div id="tp-casilla" class="tp-casilla tpc-nometal">
+                        <span class="tp-c-z" id="tp-f-z">6</span>
+                        <span class="tp-c-masa" id="tp-f-masa-caja">12.011</span>
                         <div class="tp-c-sym" id="tp-f-sym">C</div>
-                        <div class="tp-c-masa" id="tp-f-masa-caja">12.011</div>
+                        <div class="tp-c-nom" id="tp-f-nom-caja">Carbono</div>
+                    </div>
+
+                    <div class="tp-familia">
+                        <span class="tp-familia-et">Familia</span>
+                        <span id="tp-f-familia"></span>
                     </div>
 
                     <button
                         type="button"
                         id="tp-mas-info"
-                        class="tp-btn-rojo"
+                        class="tp-btn-info"
                         aria-expanded="false"
                         aria-controls="tp-info">
 
-                        <i class="fa-solid fa-info"></i>
+                        <i class="fa-solid fa-plus"></i>
                         <span>Más información</span>
 
                     </button>
@@ -409,27 +439,12 @@ Ficha rápida <span id="tp-f-titulo">(Carbono)</span>
                         <dt>Período:</dt>
                         <dd id="tp-f-periodo">2</dd>
 
+                        <div class="tp-sep"></div>
+
+                        <dt class="tp-full">Configuración electrónica:</dt>
+                        <dd id="tp-f-config" class="tp-full">[He] 2s<sup>2</sup> 2p<sup>2</sup></dd>
+
                     </dl>
-
-                    <div class="tp-nav">
-
-                        <button
-                            type="button"
-                            id="tp-prev"
-                            aria-label="Elemento anterior">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-
-                        <span class="tp-contador" id="tp-f-contador">6 / 118</span>
-
-                        <button
-                            type="button"
-                            id="tp-next"
-                            aria-label="Elemento siguiente">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-
-                    </div>
 
                 </div>
 
@@ -607,7 +622,8 @@ JAVASCRIPT
 ========================================= -->
 
 <script src="app.js?v=2"></script>
-<script src="tabla.js?v=1"></script>
+<script src="datos.js?v=1"></script>
+<script src="tabla.js?v=3"></script>
 <script src="compuestos.js?v=3"></script>
 <script src="enlaces.js?v=1"></script>
 
