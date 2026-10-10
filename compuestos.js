@@ -41,7 +41,7 @@
     ];
 
     /* ---------------------------------------------------------
-       2) DATOS  (nfpa = [salud, inflamabilidad, reactividad, especial])
+       2) DATOS
        --------------------------------------------------------- */
     var DATA = [
         {
@@ -58,8 +58,6 @@
             ebull: '≈ 337 °C',
             dens: '1,84 g/cm³',
             solub: 'Miscible en agua (libera mucho calor)',
-            ph: 0,
-            nfpa: [3, 0, 2, 'W'],
             riesgo: 'alto',
             areas: ['industria', 'laboratorio'],
             desc: 'Líquido denso, aceitoso e incoloro. Es un ácido fuerte y un potente deshidratante: arranca el agua de muchas sustancias.',
@@ -86,8 +84,6 @@
             ebull: '1388 °C',
             dens: '2,13 g/cm³',
             solub: 'Muy soluble en agua (libera calor)',
-            ph: 14,
-            nfpa: [3, 0, 1, null],
             riesgo: 'alto',
             areas: ['industria', 'hogar', 'laboratorio'],
             desc: 'Base fuerte, sólida y blanca que absorbe la humedad del aire. En agua forma una solución muy alcalina que disuelve grasas y materia orgánica.',
@@ -115,9 +111,6 @@
             ebull: 'Se descompone al calentarse',
             dens: '≈ 1,1 g/cm³',
             solub: 'Soluble en agua',
-            ph: 12,
-            phTxt: '≈ 11–13',
-            nfpa: [2, 0, 1, null],
             riesgo: 'medio',
             areas: ['hogar', 'industria'],
             desc: 'Solución acuosa de hipoclorito de sodio, oxidante y desinfectante. Su olor característico viene del cloro que libera.',
@@ -144,8 +137,6 @@
             ebull: '80,1 °C',
             dens: '0,88 g/cm³',
             solub: 'Casi insoluble en agua; soluble en solventes orgánicos',
-            ph: null,
-            nfpa: [2, 3, 0, null],
             riesgo: 'alto',
             areas: ['industria', 'laboratorio'],
             desc: 'Hidrocarburo aromático: un anillo de seis carbonos con electrones deslocalizados. Es muy volátil e inflamable y es la base de muchos otros compuestos.',
@@ -172,9 +163,6 @@
             ebull: '1413 °C',
             dens: '2,16 g/cm³',
             solub: 'Muy soluble: ≈ 360 g/L a 25 °C',
-            ph: 7,
-            phTxt: 'neutro',
-            nfpa: [0, 0, 0, null],
             riesgo: 'bajo',
             areas: ['hogar', 'alimentacion', 'salud', 'industria'],
             desc: 'Sal iónica formada por iones Na⁺ y Cl⁻. En agua se disocia por completo y conduce la electricidad.',
@@ -329,29 +317,6 @@
         return h;
     }
 
-    function nfpaHtml(n) {
-        return '<div class="cmp-nfpa-caja">' +
-            '<div class="cmp-nfpa" role="img" aria-label="NFPA 704: salud ' + n[0] + ', inflamabilidad ' + n[1] + ', reactividad ' + n[2] + (n[3] ? ', especial ' + n[3] : '') + '">' +
-                '<div class="inflam"><span>' + n[1] + '</span></div>' +
-                '<div class="react"><span>' + n[2] + '</span></div>' +
-                '<div class="salud"><span>' + n[0] + '</span></div>' +
-                '<div class="espec"><span>' + (n[3] ? esc(n[3]) : '') + '</span></div>' +
-            '</div>' +
-            '<small>Rombo NFPA 704<br>azul salud · rojo fuego · amarillo reactividad</small>' +
-        '</div>';
-    }
-
-    function phHtml(c) {
-        var pos = Math.max(0, Math.min(100, (c.ph / 14) * 100));
-        var tipo = c.ph < 7 ? 'Ácido' : (c.ph > 7 ? 'Básico' : 'Neutro');
-        return '<div class="cmp-ph-caja">' +
-            '<b>Escala de pH</b>' +
-            '<div class="cmp-ph" role="img" aria-label="pH ' + (c.phTxt || c.ph) + '"><span class="cmp-ph-marca" style="left:' + pos + '%"></span></div>' +
-            '<div class="cmp-ph-escala"><span>0</span><span>7</span><span>14</span></div>' +
-            '<div class="cmp-ph-valor">pH ' + esc(c.phTxt || c.ph) + ' · ' + tipo + '</div>' +
-        '</div>';
-    }
-
     function dato(etq, val, ancho) {
         if (!val) return '';
         return '<div class="cmp-dato' + (ancho ? ' ancho' : '') + '"><small>' + etq + '</small><span>' + esc(val) + '</span></div>';
@@ -366,7 +331,6 @@
     function pintarFicha(c) {
         var cat = porId(CATS, c.cat);
         var fav = state.favs.has(c.id);
-        var iconoRiesgo = { bajo: 'fa-shield-halved', medio: 'fa-circle-exclamation', alto: 'fa-triangle-exclamation' }[c.riesgo];
 
         var usos = Object.keys(c.usos).map(function (id) {
             var a = porId(AREAS, id);
@@ -382,6 +346,7 @@
 
         h += '<article class="cmp-ficha" style="--c:' + cat.color + '">' +
             '<header class="cmp-cab">' +
+                '<i class="fa-solid ' + cat.icono + ' cmp-marca" aria-hidden="true"></i>' +
                 '<div class="cmp-cab-fila">' +
                     '<span class="cmp-badge"><i class="fa-solid ' + cat.icono + '" aria-hidden="true"></i>' + esc(cat.nombre) + '</span>' +
                     '<button class="cmp-star" data-fav="' + c.id + '" aria-pressed="' + fav + '" aria-label="Favorito">' +
@@ -391,15 +356,6 @@
                 '<p>' + esc(c.nombre) + '</p>' +
                 '<p class="cmp-otros">' + esc(c.otros) + '</p>' +
             '</header>' +
-
-            '<div class="cmp-meta">' +
-                '<span class="cmp-tag riesgo-' + c.riesgo + '"><i class="fa-solid ' + iconoRiesgo + '" aria-hidden="true"></i>Riesgo ' + c.riesgo + '</span>' +
-                '<span class="cmp-tag"><i class="fa-solid fa-droplet" aria-hidden="true"></i>' + esc(c.tipo) + '</span>' +
-            '</div>' +
-
-            '<div class="cmp-visual' + (c.ph == null ? ' sin-ph' : '') + '">' +
-                nfpaHtml(c.nfpa) + (c.ph == null ? '' : phHtml(c)) +
-            '</div>' +
 
             '<div class="cmp-datos">' +
                 dato('Estado', c.estado, true) +
