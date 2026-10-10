@@ -301,6 +301,7 @@
 
 .cmp-cab {
     position: relative;
+    overflow: hidden;
     padding: 20px 18px 18px;
     color: #fff;
     background-color: var(--c);
@@ -352,143 +353,23 @@
     opacity: .85;
 }
 
-.cmp-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 14px 18px 0;
-}
+/* Marca de agua: icono grande de la clasificación (cero peso) */
 
-.cmp-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: #eef1f5;
-    font-size: .88rem;
-}
-
-.cmp-tag.riesgo-bajo {
-    background: #e2f4ea;
-    color: #1f7a45;
-}
-
-.cmp-tag.riesgo-medio {
-    background: #fdf1d3;
-    color: #8a5f00;
-}
-
-.cmp-tag.riesgo-alto {
-    background: #fbe0e0;
-    color: #a52626;
-}
-
-/* Visuales: rombo NFPA + barra de pH */
-
-.cmp-visual {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 18px;
-    align-items: center;
-    padding: 20px 18px 8px;
-}
-
-.cmp-visual.sin-ph {
-    grid-template-columns: 1fr;
-    justify-items: center;
-}
-
-.cmp-nfpa-caja {
-    display: grid;
-    justify-items: center;
-    gap: 6px;
-}
-
-.cmp-nfpa {
-    position: relative;
-    width: 92px;
-    height: 92px;
-    margin: 12px;
-    transform: rotate(45deg);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    background: #1b2430;
-    border: 2px solid #1b2430;
-}
-
-.cmp-nfpa div {
-    display: grid;
-    place-items: center;
-    font-weight: 800;
-    font-size: 1.15rem;
-}
-
-.cmp-nfpa div span {
-    transform: rotate(-45deg);
-}
-
-.cmp-nfpa .inflam {
-    background: #e53935;
-    color: #fff;
-}
-
-.cmp-nfpa .react {
-    background: #fdd835;
-    color: #1b2430;
-}
-
-.cmp-nfpa .salud {
-    background: #1e88e5;
-    color: #fff;
-}
-
-.cmp-nfpa .espec {
-    background: #fff;
-    color: #1b2430;
-    font-size: .95rem;
-}
-
-.cmp-nfpa-caja small {
-    color: var(--cmp-suave);
-    text-align: center;
-}
-
-.cmp-ph-caja b {
-    display: block;
-    margin-bottom: 8px;
-}
-
-.cmp-ph {
-    position: relative;
-    height: 16px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #e53935 0%, #fb8c00 18%, #fdd835 34%, #43a047 50%, #00acc1 64%, #1e88e5 78%, #5e35b1 100%);
-}
-
-.cmp-ph-marca {
+.cmp-marca {
     position: absolute;
-    top: -6px;
-    width: 4px;
-    height: 28px;
-    margin-left: -2px;
-    border-radius: 2px;
-    background: #1b2430;
-    box-shadow: 0 0 0 2px #fff;
+    right: 14px;
+    bottom: 6px;
+    font-size: 6.5rem;
+    line-height: 1;
+    color: #fff;
+    opacity: .2;
+    transform: rotate(-12deg);
+    pointer-events: none;
 }
 
-.cmp-ph-escala {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 6px;
-    color: var(--cmp-suave);
-    font-size: .78rem;
-}
-
-.cmp-ph-valor {
-    margin-top: 8px;
-    font-size: .95rem;
+.cmp-cab > *:not(.cmp-marca) {
+    position: relative;
+    z-index: 1;
 }
 
 /* Datos clave */
