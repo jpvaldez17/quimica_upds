@@ -3,14 +3,14 @@ QUÍMICA UPDS
 TABLA PERIÓDICA INTERACTIVA
 Developed by J. Poma · 2026
 ========================================= */
- 
+
 (function () {
     "use strict";
- 
+
     /* =========================================
     CATEGORÍAS
     ========================================= */
- 
+
     var CATEGORIAS = [
         { id: "alcalino",       nombre: "Metales alcalinos" },
         { id: "alcalinoterreo", nombre: "Alcalinotérreos" },
@@ -23,14 +23,14 @@ Developed by J. Poma · 2026
         { id: "lantanido",      nombre: "Lantánidos" },
         { id: "actinido",       nombre: "Actínidos" }
     ];
- 
+
     function nombreCategoria(id) {
         for (var i = 0; i < CATEGORIAS.length; i++) {
             if (CATEGORIAS[i].id === id) { return CATEGORIAS[i].nombre; }
         }
         return id;
     }
- 
+
     function categoriaDe(z) {
         var l = function (arr) { return arr.indexOf(z) !== -1; };
         if (l([3, 11, 19, 37, 55, 87])) { return "alcalino"; }
@@ -44,12 +44,12 @@ Developed by J. Poma · 2026
         if (l([13, 31, 49, 50, 81, 82, 83, 84, 113, 114, 115, 116])) { return "postransicion"; }
         return "transicion";
     }
- 
+
     /* =========================================
     DATOS BÁSICOS
     Z | Símbolo | Nombre | Masa | EN | Valencias
     ========================================= */
- 
+
     var RAW = [
         "1|H|Hidrógeno|1.008|2.20|-1, +1",
         "2|He|Helio|4.0026|—|0",
@@ -170,7 +170,7 @@ Developed by J. Poma · 2026
         "117|Ts|Teneso|294|—|—",
         "118|Og|Oganesón|294|—|—"
     ];
- 
+
     var ELEMENTOS = RAW.map(function (linea) {
         var p = linea.split("|");
         var z = parseInt(p[0], 10);
@@ -187,20 +187,20 @@ Developed by J. Poma · 2026
             grupo: pos.g
         };
     });
- 
+
     /* Elementos cuya masa se expresa como número másico del isótopo más estable */
     function masaEsNumeroMasico(z) {
         return z === 43 || z === 61 || (z >= 84 && z <= 89) || z >= 93;
     }
- 
+
     function esRadiactivo(z) {
         return z === 43 || z === 61 || z >= 84;
     }
- 
+
     /* =========================================
     PERIODO Y GRUPO
     ========================================= */
- 
+
     function periodoGrupo(z) {
         if (z <= 2)  { return { p: 1, g: z === 1 ? 1 : 18 }; }
         if (z <= 10) { return { p: 2, g: z <= 4 ? z - 2 : z + 8 }; }
@@ -214,20 +214,20 @@ Developed by J. Poma · 2026
         if (z <= 103) { return { p: 7, g: null }; }
         return { p: 7, g: z - 100 };
     }
- 
+
     /* =========================================
     CONFIGURACIÓN ELECTRÓNICA
     ========================================= */
- 
+
     var ORDEN = [
         ["1s", 2], ["2s", 2], ["2p", 6], ["3s", 2], ["3p", 6], ["4s", 2],
         ["3d", 10], ["4p", 6], ["5s", 2], ["4d", 10], ["5p", 6], ["6s", 2],
         ["4f", 14], ["5d", 10], ["6p", 6], ["7s", 2], ["5f", 14], ["6d", 10],
         ["7p", 6]
     ];
- 
+
     var NOBLES = [[86, "[Rn]"], [54, "[Xe]"], [36, "[Kr]"], [18, "[Ar]"], [10, "[Ne]"], [2, "[He]"]];
- 
+
     var EXCEPCIONES = {
         24: "[Ar] 3d5 4s1",
         29: "[Ar] 3d10 4s1",
@@ -250,10 +250,10 @@ Developed by J. Poma · 2026
         96: "[Rn] 5f7 6d1 7s2",
         103: "[Rn] 5f14 7s2 7p1"
     };
- 
+
     function configuracion(z) {
         var texto;
- 
+
         if (EXCEPCIONES[z]) {
             texto = EXCEPCIONES[z];
         } else {
@@ -264,7 +264,7 @@ Developed by J. Poma · 2026
                 llenos.push({ sub: ORDEN[i][0], e: n });
                 restantes -= n;
             }
- 
+
             var nucleo = "";
             var corte = 0;
             for (var k = 0; k < NOBLES.length; k++) {
@@ -274,14 +274,14 @@ Developed by J. Poma · 2026
                     break;
                 }
             }
- 
+
             var acumulado = 0;
             var resto = [];
             llenos.forEach(function (x) {
                 if (acumulado >= corte) { resto.push(x); }
                 acumulado += x.e;
             });
- 
+
             var letras = "spdf";
             resto.sort(function (a, b) {
                 var na = parseInt(a.sub.charAt(0), 10);
@@ -289,91 +289,15 @@ Developed by J. Poma · 2026
                 if (na !== nb) { return na - nb; }
                 return letras.indexOf(a.sub.charAt(1)) - letras.indexOf(b.sub.charAt(1));
             });
- 
+
             texto = (nucleo ? nucleo + " " : "") + resto.map(function (x) {
                 return x.sub + x.e;
             }).join(" ");
         }
- 
+
         return texto.replace(/([spdf])(\d+)/g, "$1<sup>$2</sup>");
     }
- 
-    /* =========================================
-    PROPIEDADES FÍSICAS (°C · g/cm³ salvo indicación)
-    z: [fusión, ebullición, densidad]
-    ========================================= */
- 
-    var FISICAS = {
-        1: ["-259", "-253", "0.0899 g/L"],
-        2: ["—", "-269", "0.1786 g/L"],
-        3: ["180.5", "1342", "0.534"],
-        4: ["1287", "2469", "1.85"],
-        5: ["2076", "3927", "2.34"],
-        7: ["-210", "-196", "1.251 g/L"],
-        8: ["-219", "-183", "1.429 g/L"],
-        9: ["-220", "-188", "1.696 g/L"],
-        10: ["-249", "-246", "0.900 g/L"],
-        11: ["97.8", "883", "0.971"],
-        12: ["650", "1090", "1.74"],
-        13: ["660.3", "2470", "2.70"],
-        14: ["1414", "3265", "2.33"],
-        15: ["44.2 (blanco)", "280", "1.82"],
-        16: ["115.2", "444.6", "2.07"],
-        17: ["-101.5", "-34", "3.214 g/L"],
-        18: ["-189", "-186", "1.784 g/L"],
-        19: ["63.5", "759", "0.862"],
-        20: ["842", "1484", "1.55"],
-        21: ["1541", "2836", "2.99"],
-        22: ["1668", "3287", "4.51"],
-        23: ["1910", "3407", "6.0"],
-        24: ["1907", "2671", "7.19"],
-        25: ["1246", "2061", "7.21"],
-        26: ["1538", "2861", "7.87"],
-        27: ["1495", "2927", "8.90"],
-        28: ["1455", "2913", "8.91"],
-        29: ["1085", "2562", "8.96"],
-        30: ["419.5", "907", "7.14"],
-        31: ["29.8", "2204", "5.91"],
-        32: ["938", "2833", "5.32"],
-        33: ["sublima a 614", "—", "5.73"],
-        34: ["221", "685", "4.81"],
-        35: ["-7.2", "58.8", "3.12"],
-        36: ["-157", "-153", "3.749 g/L"],
-        37: ["39.3", "688", "1.53"],
-        38: ["777", "1377", "2.64"],
-        39: ["1526", "3336", "4.47"],
-        40: ["1855", "4409", "6.51"],
-        41: ["2477", "4744", "8.57"],
-        42: ["2623", "4639", "10.28"],
-        44: ["2334", "4150", "12.37"],
-        45: ["1964", "3695", "12.41"],
-        46: ["1555", "2963", "12.02"],
-        47: ["961.8", "2162", "10.49"],
-        48: ["321", "767", "8.65"],
-        49: ["156.6", "2072", "7.31"],
-        50: ["231.9", "2602", "7.31"],
-        51: ["630.6", "1587", "6.70"],
-        52: ["449.5", "988", "6.24"],
-        53: ["113.7", "184.3", "4.93"],
-        54: ["-112", "-108", "5.894 g/L"],
-        55: ["28.4", "671", "1.93"],
-        56: ["727", "1897", "3.51"],
-        72: ["2233", "4603", "13.31"],
-        73: ["3017", "5458", "16.65"],
-        74: ["3422", "5555", "19.25"],
-        75: ["3186", "5596", "21.02"],
-        76: ["3033", "5012", "22.59"],
-        77: ["2446", "4428", "22.56"],
-        78: ["1768", "3825", "21.45"],
-        79: ["1064", "2856", "19.30"],
-        80: ["-38.8", "356.7", "13.53"],
-        81: ["304", "1473", "11.85"],
-        82: ["327.5", "1749", "11.34"],
-        83: ["271.4", "1564", "9.78"],
-        90: ["1750", "4788", "11.72"],
-        92: ["1135", "4131", "19.1"]
-    };
- 
+
     function estadoFisico(z) {
         var gases = [1, 2, 7, 8, 9, 10, 17, 18, 36, 54, 86];
         if (gases.indexOf(z) !== -1) { return "Gas"; }
@@ -382,12 +306,12 @@ Developed by J. Poma · 2026
         if (z === 85 || z === 87) { return "Sólido (probable)"; }
         return "Sólido";
     }
- 
+
     /* =========================================
     INFORMACIÓN AMPLIADA
     Plantillas por categoría y datos específicos
     ========================================= */
- 
+
     var PLANTILLAS = {
         alcalino: {
             dato: "Metal blando, de baja densidad y con un único electrón de valencia; forma cationes +1.",
@@ -440,13 +364,13 @@ Developed by J. Poma · 2026
             reac: "Radiactivo: requiere blindaje, control de dosis y manejo regulado por la normativa nuclear."
         }
     };
- 
+
     var SUPERPESADO = {
         dato: "Elemento sintético superpesado; solo se obtiene en aceleradores de partículas y sus isótopos duran desde milisegundos hasta pocos minutos.",
         apl: "Sin aplicaciones industriales; se estudia en investigación de física nuclear y química de los elementos superpesados.",
         reac: "Radiactivo. Sus propiedades químicas son en buena parte predichas; solo se maneja en laboratorios especializados."
     };
- 
+
     var INFO = {
         1:  { dato: "Es el elemento más abundante del universo y el más ligero.", apl: "Producción de amoníaco (proceso Haber-Bosch), refinación de petróleo, celdas de combustible y soldadura.", reac: "Gas inflamable; forma mezclas explosivas con el aire en un rango muy amplio de concentración. Evite fuentes de ignición." },
         2:  { dato: "Segundo elemento más abundante del universo; no solidifica a presión atmosférica.", apl: "Refrigerante criogénico (resonancia magnética), atmósferas inertes, detección de fugas y globos.", reac: "Inerte. El riesgo es la asfixia por desplazamiento de oxígeno y la alta presión de los cilindros." },
@@ -490,7 +414,7 @@ Developed by J. Poma · 2026
         83: { dato: "Metal pesado de toxicidad relativamente baja.", apl: "Aleaciones de bajo punto de fusión, cosméticos y medicamentos gástricos.", reac: "Baja toxicidad comparada con otros metales pesados; evite la ingestión de polvos." },
         92: { dato: "Metal denso y radiactivo; es la base del combustible nuclear.", apl: "Combustible de reactores nucleares (U-235 enriquecido) y blindaje (uranio empobrecido).", reac: "Radiactivo y químicamente tóxico (nefrotóxico); su manejo está regulado." }
     };
- 
+
     function infoDe(e) {
         var base = e.z >= 104 ? SUPERPESADO : PLANTILLAS[e.cat];
         var esp = INFO[e.z] || {};
@@ -501,54 +425,56 @@ Developed by J. Poma · 2026
             especifico: !!INFO[e.z]
         };
     }
- 
+
     /* =========================================
     ESTADO
     ========================================= */
- 
+
     var seleccionado = 6;
     var filtroActivo = "";
     var celdas = {};
     var marcadores = [];
- 
+
     function $(id) { return document.getElementById(id); }
- 
+
     function normalizar(t) {
         return String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
- 
+
     /* =========================================
     CONSTRUCCIÓN DE LA TABLA
     ========================================= */
- 
+
     function crearCelda(e) {
         var b = document.createElement("button");
         b.type = "button";
-        b.className = "tp-cell cat-" + e.cat;
+        b.className = "tp-cell tpc-" + e.cat;
         b.setAttribute("data-z", e.z);
         b.setAttribute("data-cat", e.cat);
         b.setAttribute("aria-label", e.n + ", número atómico " + e.z);
-        b.innerHTML = "<small>" + e.z + "</small><b>" + e.s + "</b>";
- 
-        var pos = periodoGrupo(e.z);
+
+        var tam = e.n.length >= 12 ? " tp-n-xl" : (e.n.length >= 10 ? " tp-n-l" : "");
+        b.innerHTML = "<small>" + e.z + "</small><b>" + e.s + "</b>" +
+            '<em class="tp-n' + tam + '">' + e.n + "</em>";
+
         var fila, col;
- 
+
         if (e.z >= 57 && e.z <= 71) {
             fila = 10;
-            col = 2 + 3 + (e.z - 57);
+            col = 4 + (e.z - 57);
         } else if (e.z >= 89 && e.z <= 103) {
             fila = 11;
-            col = 2 + 3 + (e.z - 89);
+            col = 4 + (e.z - 89);
         } else {
-            fila = 1 + pos.p;
-            col = 1 + pos.g + 1;
+            fila = 1 + e.periodo;
+            col = 1 + e.grupo;
         }
- 
+
         b.style.gridRow = fila;
         b.style.gridColumn = col;
         return b;
     }
- 
+
     function crearEtiqueta(texto, fila, col, clase) {
         var d = document.createElement("div");
         d.className = clase;
@@ -557,30 +483,35 @@ Developed by J. Poma · 2026
         d.style.gridColumn = col;
         return d;
     }
- 
+
+    var ORDEN_LEYENDA = [
+        "noble", "halogeno", "nometal", "metaloide", "postransicion",
+        "transicion", "alcalinoterreo", "alcalino", "lantanido", "actinido"
+    ];
+
     function construirTabla() {
         var grid = $("tp-grid");
         if (!grid) { return; }
         grid.innerHTML = "";
- 
+
         /* Números de grupo */
         for (var g = 1; g <= 18; g++) {
             grid.appendChild(crearEtiqueta(g, 1, g + 1, "tp-eje"));
         }
- 
+
         /* Números de periodo */
         for (var p = 1; p <= 7; p++) {
             grid.appendChild(crearEtiqueta(p, p + 1, 1, "tp-eje"));
         }
- 
+
         /* Elementos */
         ELEMENTOS.forEach(function (e) {
             var c = crearCelda(e);
             celdas[e.z] = c;
             grid.appendChild(c);
         });
- 
-        /* Marcadores de series f en la tabla principal */
+
+        /* Marcadores de las series f (grupo 3) */
         var m1 = crearEtiqueta("57–71", 7, 4, "tp-ph");
         m1.setAttribute("data-serie", "lantanido");
         var m2 = crearEtiqueta("89–103", 8, 4, "tp-ph");
@@ -588,51 +519,62 @@ Developed by J. Poma · 2026
         grid.appendChild(m1);
         grid.appendChild(m2);
         marcadores.push(m1, m2);
- 
+
         /* Etiquetas de las filas f */
         grid.appendChild(crearEtiqueta("*", 10, 1, "tp-eje tp-eje-f"));
         grid.appendChild(crearEtiqueta("**", 11, 1, "tp-eje tp-eje-f"));
+
+        /* Leyenda de familias en el espacio vacío superior */
+        var ley = document.createElement("div");
+        ley.className = "tp-leyenda";
+        ley.style.gridRow = "2 / 5";
+        ley.style.gridColumn = "4 / 14";
+        ley.innerHTML = ORDEN_LEYENDA.map(function (id) {
+            return '<span class="tp-ley"><i class="tp-sw tpc-' + id + '"></i>' +
+                nombreCategoria(id) + "</span>";
+        }).join("");
+        grid.appendChild(ley);
     }
- 
+
     /* =========================================
     FILTROS
     ========================================= */
- 
+
     function construirFiltros() {
         var cont = $("tp-chips");
         if (!cont) { return; }
- 
+
         var html = '<button type="button" class="tp-chip activo" data-cat="">' +
             '<i class="tp-dot tp-dot-todas"></i>Todas</button>';
- 
+
         CATEGORIAS.forEach(function (c) {
             html += '<button type="button" class="tp-chip" data-cat="' + c.id + '">' +
-                '<i class="tp-dot cat-' + c.id + '"></i>' + c.nombre + "</button>";
+                '<i class="tp-dot tpc-' + c.id + '"></i>' + c.nombre + "</button>";
         });
- 
+
         cont.innerHTML = html;
     }
- 
+
     function aplicarFiltro(cat) {
         filtroActivo = cat;
         var total = 0;
- 
+
         ELEMENTOS.forEach(function (e) {
             var ok = !cat || e.cat === cat;
             celdas[e.z].classList.toggle("tp-dim", !ok);
             if (ok) { total++; }
         });
- 
+
         marcadores.forEach(function (m) {
             var ok = !cat || m.getAttribute("data-serie") === cat;
             m.classList.toggle("tp-dim", !ok);
         });
- 
+
         var chips = document.querySelectorAll("#tp-chips .tp-chip");
         for (var i = 0; i < chips.length; i++) {
             chips[i].classList.toggle("activo", chips[i].getAttribute("data-cat") === cat);
         }
- 
+
         var estado = $("tp-filtro-estado");
         if (estado) {
             estado.textContent = cat
@@ -640,7 +582,7 @@ Developed by J. Poma · 2026
                 : "Mostrando los 118 elementos";
         }
     }
- 
+
     function alternarFiltros() {
         var panel = $("tp-filtros");
         var boton = $("tp-filtro-btn");
@@ -650,29 +592,40 @@ Developed by J. Poma · 2026
         boton.setAttribute("aria-expanded", abrir ? "true" : "false");
         boton.classList.toggle("activo", abrir);
     }
- 
+
     /* =========================================
     FICHA RÁPIDA
     ========================================= */
- 
+
     function texto(id, valor) {
         var el = $(id);
         if (el) { el.textContent = valor; }
     }
- 
+
     function masaTexto(e) {
         return masaEsNumeroMasico(e.z) ? "(" + e.masa + ")" : e.masa;
     }
- 
+
     function grupoTexto(e) {
         return e.grupo === null ? "Serie f" : String(e.grupo);
     }
- 
+
     function actualizarFicha(e) {
         texto("tp-f-titulo", "(" + e.n + ")");
+
+        var cas = $("tp-casilla");
+        if (cas) { cas.className = "tp-casilla tpc-" + e.cat; }
+
         texto("tp-f-z", e.z);
-        texto("tp-f-sym", e.s);
         texto("tp-f-masa-caja", masaTexto(e));
+        texto("tp-f-sym", e.s);
+        texto("tp-f-nom-caja", e.n);
+
+        var fam = $("tp-f-familia");
+        if (fam) {
+            fam.innerHTML = '<i class="tp-sw tpc-' + e.cat + '"></i>' + nombreCategoria(e.cat);
+        }
+
         texto("tp-f-nombre", e.n);
         texto("tp-f-simbolo", e.s);
         texto("tp-f-numero", e.z);
@@ -681,75 +634,103 @@ Developed by J. Poma · 2026
         texto("tp-f-val", e.val);
         texto("tp-f-grupo", grupoTexto(e));
         texto("tp-f-periodo", e.periodo);
+
+        var conf = $("tp-f-config");
+        if (conf) { conf.innerHTML = configuracion(e.z); }
+
         texto("tp-f-contador", e.z + " / " + ELEMENTOS.length);
     }
- 
+
     /* =========================================
     INFORMACIÓN AMPLIADA
     ========================================= */
- 
+
     function filaDato(etiqueta, valor) {
         return "<li><span>" + etiqueta + "</span><strong>" + valor + "</strong></li>";
     }
- 
+
+    function conUnidadT(v) {
+        return (v === "—" || v.indexOf("°C") !== -1) ? v : v + " °C";
+    }
+
+    function conUnidadD(v) {
+        return (v === "—" || v.indexOf("g/") !== -1) ? v : v + " g/cm³";
+    }
+
+    function datosExtra(z) {
+        if (window.QUIMICA_DATOS && window.QUIMICA_DATOS.obtener) {
+            return window.QUIMICA_DATOS.obtener(z);
+        }
+        return { p: "—", a: "—", c: "—", e: "—", f: "—", b: "—", d: "—", r: "—", s: "—", k: "—" };
+    }
+
     function actualizarInfo(e) {
         var cuerpo = $("tp-info-cuerpo");
         if (!cuerpo) { return; }
- 
+
         var inf = infoDe(e);
-        var f = FISICAS[e.z] || ["—", "—", "—"];
- 
-        var radiactivo = esRadiactivo(e.z) ? "Radiactivo (sin isótopos estables)" : "Tiene isótopos estables";
-        var nota = masaEsNumeroMasico(e.z)
-            ? "<p class='tp-nota'>La masa entre paréntesis es el número másico del isótopo más estable.</p>"
-            : "";
- 
+        var x = datosExtra(e.z);
+
+        var radiactivo = "Tiene isótopos estables";
+        if (esRadiactivo(e.z)) {
+            radiactivo = masaEsNumeroMasico(e.z)
+                ? "Radiactivo (masa = isótopo más estable)"
+                : "Radiactivo (sin isótopos estables)";
+        }
+
         var html = "";
- 
+
         html += '<h3 class="tp-info-titulo">' + e.n + " (" + e.s + ")</h3>";
- 
-        html += '<div class="tp-bloque tp-b-azul"><h4><i class="fa-solid fa-star"></i> Características y datos importantes</h4>' +
+
+        html += '<div class="tp-bloque tp-b-azul"><h4><i class="fa-solid fa-book-open"></i> Características y datos importantes</h4>' +
             "<p>" + inf.dato + "</p>" +
+            '<p class="tp-linea"><strong>Dónde se encuentra / cómo se obtiene:</strong> ' + x.p + "</p>" +
             '<ul class="tp-lista">' +
             filaDato("Categoría", nombreCategoria(e.cat)) +
             filaDato("Estado a 25 °C", estadoFisico(e.z)) +
             filaDato("Radiactividad", radiactivo) +
             "</ul></div>";
- 
+
         html += '<div class="tp-bloque tp-b-naranja"><h4><i class="fa-solid fa-industry"></i> Aplicaciones en ingeniería e industria</h4>' +
             "<p>" + inf.apl + "</p></div>";
- 
+
         html += '<div class="tp-bloque tp-b-rojo"><h4><i class="fa-solid fa-triangle-exclamation"></i> Reactividad y seguridad</h4>' +
             "<p>" + inf.reac + "</p></div>";
- 
+
         html += '<div class="tp-bloque tp-b-verde"><h4><i class="fa-solid fa-flask"></i> Propiedades físicas y químicas</h4>' +
+            '<h5 class="tp-sub">Físicas</h5>' +
             '<ul class="tp-lista">' +
-            filaDato("Masa atómica", masaTexto(e) + " u") +
-            filaDato("Configuración electrónica", configuracion(e.z)) +
-            filaDato("Electronegatividad (Pauling)", e.en) +
-            filaDato("Valencias", e.val) +
-            filaDato("Punto de fusión", f[0] === "—" ? "—" : f[0] + " °C") +
-            filaDato("Punto de ebullición", f[1] === "—" ? "—" : f[1] + " °C") +
-            filaDato("Densidad", f[2] === "—" ? "—" : (f[2].indexOf("g/L") !== -1 ? f[2] : f[2] + " g/cm³")) +
-            "</ul>" + nota + "</div>";
- 
+            filaDato("Aspecto", x.a) +
+            filaDato("Conductividad", x.c) +
+            filaDato("Estructura cristalina", x.e) +
+            filaDato("Punto de fusión", conUnidadT(x.f)) +
+            filaDato("Punto de ebullición", conUnidadT(x.b)) +
+            filaDato("Densidad", conUnidadD(x.d)) +
+            "</ul>" +
+            '<h5 class="tp-sub">Químicas</h5>' +
+            '<ul class="tp-lista">' +
+            filaDato("Reactividad", x.r) +
+            filaDato("Resistencia a ácidos", x.s) +
+            filaDato("Compuestos comunes", x.k) +
+            "</ul></div>";
+
         html += '<p class="tp-aviso">Información de referencia con fines educativos. ' +
             "Consulte siempre la hoja de seguridad (SDS) antes de manipular sustancias.</p>";
- 
+
         cuerpo.innerHTML = html;
     }
- 
+
     /* =========================================
     SELECCIÓN
     ========================================= */
- 
+
     function seleccionar(z, desplazar) {
         if (z < 1) { z = ELEMENTOS.length; }
         if (z > ELEMENTOS.length) { z = 1; }
- 
+
         var anterior = celdas[seleccionado];
         if (anterior) { anterior.classList.remove("sel"); }
- 
+
         seleccionado = z;
         var e = ELEMENTOS[z - 1];
         var celda = celdas[z];
@@ -759,25 +740,25 @@ Developed by J. Poma · 2026
                 celda.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
             }
         }
- 
+
         actualizarFicha(e);
         actualizarInfo(e);
     }
- 
+
     /* =========================================
     BUSCADOR
     ========================================= */
- 
+
     function buscar(consulta) {
         var q = normalizar(consulta);
         if (!q) { return null; }
         var i;
- 
+
         if (/^\d+$/.test(q)) {
             var n = parseInt(q, 10);
             return (n >= 1 && n <= ELEMENTOS.length) ? n : null;
         }
- 
+
         for (i = 0; i < ELEMENTOS.length; i++) {
             if (normalizar(ELEMENTOS[i].s) === q) { return ELEMENTOS[i].z; }
         }
@@ -792,49 +773,54 @@ Developed by J. Poma · 2026
         }
         return null;
     }
- 
+
     function ejecutarBusqueda() {
         var campo = $("tp-buscador");
         var msg = $("tp-mensaje");
         if (!campo) { return; }
- 
+
         var valor = campo.value;
         if (!valor.trim()) {
             if (msg) { msg.textContent = ""; }
             return;
         }
- 
+
         var z = buscar(valor);
         if (z === null) {
             if (msg) { msg.textContent = "Sin resultados para «" + valor.trim() + "»."; }
             return;
         }
- 
+
         if (msg) { msg.textContent = ""; }
         seleccionar(z, true);
     }
- 
+
     /* =========================================
     EVENTOS
     ========================================= */
- 
+
     function alternarInfo() {
         var panel = $("tp-info");
         var boton = $("tp-mas-info");
         if (!panel || !boton) { return; }
- 
+
         var abrir = panel.hasAttribute("hidden");
         if (abrir) { panel.removeAttribute("hidden"); } else { panel.setAttribute("hidden", ""); }
- 
+
         boton.setAttribute("aria-expanded", abrir ? "true" : "false");
+        boton.classList.toggle("abierto", abrir);
+
         var rotulo = boton.querySelector("span");
         if (rotulo) { rotulo.textContent = abrir ? "Ocultar información" : "Más información"; }
- 
+
+        var ico = boton.querySelector("i");
+        if (ico) { ico.className = abrir ? "fa-solid fa-minus" : "fa-solid fa-plus"; }
+
         if (abrir) {
             panel.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }
- 
+
     function iniciarEventos() {
         var grid = $("tp-grid");
         if (grid) {
@@ -843,7 +829,7 @@ Developed by J. Poma · 2026
                 if (c) { seleccionar(parseInt(c.getAttribute("data-z"), 10), false); }
             });
         }
- 
+
         var campo = $("tp-buscador");
         if (campo) {
             campo.addEventListener("input", ejecutarBusqueda);
@@ -851,10 +837,10 @@ Developed by J. Poma · 2026
                 if (ev.key === "Enter") { ejecutarBusqueda(); campo.blur(); }
             });
         }
- 
+
         var btnFiltro = $("tp-filtro-btn");
         if (btnFiltro) { btnFiltro.addEventListener("click", alternarFiltros); }
- 
+
         var chips = $("tp-chips");
         if (chips) {
             chips.addEventListener("click", function (ev) {
@@ -862,21 +848,21 @@ Developed by J. Poma · 2026
                 if (chip) { aplicarFiltro(chip.getAttribute("data-cat")); }
             });
         }
- 
+
         var prev = $("tp-prev");
         if (prev) { prev.addEventListener("click", function () { seleccionar(seleccionado - 1, true); }); }
- 
+
         var next = $("tp-next");
         if (next) { next.addEventListener("click", function () { seleccionar(seleccionado + 1, true); }); }
- 
+
         var mas = $("tp-mas-info");
         if (mas) { mas.addEventListener("click", alternarInfo); }
     }
- 
+
     /* =========================================
     INICIO
     ========================================= */
- 
+
     document.addEventListener("DOMContentLoaded", function () {
         if (!$("tp-grid")) { return; }
         construirTabla();
@@ -885,6 +871,5 @@ Developed by J. Poma · 2026
         aplicarFiltro("");
         seleccionar(6, false);
     });
- 
+
 })();
- 
