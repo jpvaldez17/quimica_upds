@@ -30,8 +30,8 @@ Developed by J. Poma · 2026
 .tp-sw {
     display: inline-block;
     flex-shrink: 0;
-    width: 14px;
-    height: 14px;
+    width: calc(14px * var(--tp-z, 1));
+    height: calc(14px * var(--tp-z, 1));
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.25);
     vertical-align: middle;
@@ -40,7 +40,7 @@ Developed by J. Poma · 2026
 /* ---------- Mensaje de búsqueda ---------- */
 
 .tp-mensaje {
-    margin: 6px 6px 0;
+    margin: 0 2px 8px;
     font-size: 0.85rem;
     color: var(--tp-rojo);
 }
@@ -51,7 +51,7 @@ Developed by J. Poma · 2026
 
 /* ---------- Botón de filtro activo ---------- */
 
-#tabla .search-settings.activo {
+.tp-filtro-mini.activo {
     background: var(--tp-azul);
     color: #fff;
 }
@@ -59,11 +59,10 @@ Developed by J. Poma · 2026
 /* ---------- Panel de filtros ---------- */
 
 .tp-filtros {
-    background: #fff;
-    border-radius: 20px;
-    padding: 14px;
-    margin: 14px 0 0;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: #f4f8fc;
+    border-radius: 14px;
+    padding: 12px;
+    margin: 0 0 10px;
 }
 
 .tp-filtros[hidden] {
@@ -121,10 +120,116 @@ Developed by J. Poma · 2026
     color: #5f6b78;
 }
 
+/* ---------- Encabezado de la tabla: título + buscador + zoom ---------- */
+
+.tp-cab {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tp-cab-icono {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--tp-azul);
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+.tp-cab-titulo {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--tp-texto);
+    white-space: nowrap;
+}
+
+.tp-busca {
+    flex: 1 1 84px;
+    min-width: 84px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 34px;
+    padding: 0 3px 0 10px;
+    border: 2px solid var(--tp-texto);
+    border-radius: 999px;
+    background: #fff;
+}
+
+.tp-busca:focus-within {
+    border-color: var(--tp-azul);
+}
+
+.tp-busca input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--tp-texto);
+}
+
+.tp-busca input::placeholder {
+    color: #7a8896;
+}
+
+.tp-filtro-mini {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--tp-texto);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.tp-zoom {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.tp-zoom button {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #cfe0f1;
+    border-radius: 50%;
+    background: #eef5fc;
+    color: var(--tp-azul-osc);
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.tp-zoom button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
 /* ---------- Tabla periódica ---------- */
 
 .tp-tarjeta {
-    margin-top: 14px;
+    margin-top: 0;
 }
 
 .tp-scroll {
@@ -134,10 +239,12 @@ Developed by J. Poma · 2026
 }
 
 .tp-grid {
+    --tp-z: 1;
+    font-size: calc(16px * var(--tp-z));
     display: grid;
-    grid-template-columns: 24px repeat(18, 50px);
-    grid-template-rows: 20px repeat(7, 58px) 12px 58px 58px;
-    gap: 4px;
+    grid-template-columns: calc(24px * var(--tp-z)) repeat(18, calc(50px * var(--tp-z)));
+    grid-template-rows: calc(20px * var(--tp-z)) repeat(7, calc(58px * var(--tp-z))) calc(12px * var(--tp-z)) calc(58px * var(--tp-z)) calc(58px * var(--tp-z));
+    gap: calc(4px * var(--tp-z));
     width: max-content;
     min-width: max-content;
 }
@@ -160,30 +267,30 @@ Developed by J. Poma · 2026
 }
 
 .tp-cell small {
-    font-size: 0.62rem;
+    font-size: 0.62em;
     font-weight: 600;
 }
 
 .tp-cell b {
-    font-size: 1.1rem;
+    font-size: 1.1em;
     font-weight: 800;
     line-height: 1.05;
 }
 
 .tp-cell .tp-n {
     font-style: normal;
-    font-size: 0.5rem;
+    font-size: 0.5em;
     font-weight: 500;
     max-width: 100%;
     white-space: nowrap;
 }
 
 .tp-cell .tp-n-l {
-    font-size: 0.43rem;
+    font-size: 0.43em;
 }
 
 .tp-cell .tp-n-xl {
-    font-size: 0.38rem;
+    font-size: 0.38em;
 }
 
 .tp-cell.sel {
@@ -201,14 +308,14 @@ Developed by J. Poma · 2026
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.72rem;
+    font-size: 0.72em;
     font-weight: 700;
     color: #5b7ea6;
 }
 
 .tp-eje-f {
     color: var(--tp-azul-osc);
-    font-size: 0.9rem;
+    font-size: 0.9em;
 }
 
 .tp-ph {
@@ -218,7 +325,7 @@ Developed by J. Poma · 2026
     border-radius: 8px;
     background: #e4edf4;
     color: #4a5967;
-    font-size: 0.62rem;
+    font-size: 0.62em;
     font-weight: 700;
     text-align: center;
     transition: opacity 0.2s ease;
@@ -241,7 +348,7 @@ Developed by J. Poma · 2026
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.76rem;
+    font-size: 0.76em;
     font-weight: 600;
     color: var(--tp-texto);
     white-space: nowrap;
