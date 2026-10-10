@@ -228,12 +228,13 @@ Developed by J. Poma · 2026
 
 .tp-leyenda {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto;
     grid-template-rows: repeat(5, 1fr);
     grid-auto-flow: column;
     align-items: center;
-    column-gap: 14px;
-    padding: 4px 6px;
+    justify-content: space-evenly;
+    column-gap: 0;
+    padding: 4px 0;
 }
 
 .tp-ley {
@@ -335,8 +336,11 @@ Developed by J. Poma · 2026
 .tp-casilla {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
     align-items: start;
-    padding: 8px 9px 10px;
+    flex: 1 1 auto;
+    min-height: 96px;
+    padding: 12px 10px 14px;
     border-radius: 12px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
@@ -356,15 +360,16 @@ Developed by J. Poma · 2026
 
 .tp-c-sym {
     grid-column: 1 / -1;
+    align-self: center;
     font-size: 3.1rem;
     font-weight: 800;
     line-height: 1.1;
-    margin: 6px 0 2px;
+    margin: 0;
 }
 
 .tp-c-nom {
     grid-column: 1 / -1;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
@@ -461,6 +466,7 @@ Developed by J. Poma · 2026
 .tp-datos dd.tp-full {
     margin-top: -4px;
     font-size: 1rem;
+    color: #7fd0ff;
 }
 
 .tp-sep {
