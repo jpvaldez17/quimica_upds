@@ -166,11 +166,13 @@
 }
 
 .cmp-back {
-    width: 42px;
+    flex: none;
+    width: 68px;
     height: 42px;
-    border-radius: 50%;
-    background: var(--cmp-fondo);
-    box-shadow: 0 1px 6px rgba(20, 30, 50, .1);
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    box-shadow: 0 1px 6px rgba(20, 30, 50, .25);
     display: grid;
     place-items: center;
 }
@@ -198,12 +200,13 @@
     text-align: left;
     padding: 16px 14px 14px;
     border-radius: 20px;
-    background: var(--cmp-fondo);
+    background: #14171c;
+    color: #fff;
     box-shadow: 0 2px 10px rgba(20, 30, 50, .08);
     overflow: hidden;
     display: grid;
     gap: 10px;
-    min-height: 118px;
+    min-height: 108px;
     align-content: space-between;
 }
 
@@ -232,11 +235,11 @@
 }
 
 .cmp-cat small {
-    color: var(--cmp-suave);
+    color: rgba(255, 255, 255, .62);
 }
 
 .cmp-cat[data-vacio="1"] {
-    opacity: .6;
+    opacity: .55;
 }
 
 /* ---------- Lista de compuestos ---------- */
