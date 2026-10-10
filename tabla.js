@@ -453,7 +453,7 @@ Developed by J. Poma · 2026
         b.setAttribute("data-cat", e.cat);
         b.setAttribute("aria-label", e.n + ", número atómico " + e.z);
 
-        var tam = e.n.length >= 12 ? " tp-n-xl" : (e.n.length >= 10 ? " tp-n-l" : "");
+        var tam = e.n.length >= 11 ? " tp-n-xl" : (e.n.length >= 9 ? " tp-n-l" : "");
         b.innerHTML = "<small>" + e.z + "</small><b>" + e.s + "</b>" +
             '<em class="tp-n' + tam + '">' + e.n + "</em>";
 
@@ -860,11 +860,12 @@ Developed by J. Poma · 2026
         if (!grid || !sc) { return; }
 
         /* Conserva el punto que se está mirando */
+        var alInicio = sc.scrollLeft < 2;
         var centro = (sc.scrollLeft + sc.clientWidth / 2) / sc.scrollWidth;
 
         zoomIdx = nuevo;
         grid.style.setProperty("--tp-z", ZOOMS[zoomIdx]);
-        sc.scrollLeft = centro * sc.scrollWidth - sc.clientWidth / 2;
+        sc.scrollLeft = alInicio ? 0 : centro * sc.scrollWidth - sc.clientWidth / 2;
 
         estadoZoom();
     }
