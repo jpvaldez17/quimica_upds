@@ -216,18 +216,31 @@
     root.classList.add('cmp-app');
     root.innerHTML =
         '<div class="cmp-toolbar" id="cmp-toolbar">' +
-            '<label class="cmp-search">' +
+            '<div class="cmp-search">' +
                 '<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>' +
                 '<input id="cmp-q" type="search" placeholder="Buscar por nombre o fórmula..." autocomplete="off" aria-label="Buscar compuesto">' +
-            '</label>' +
-            '<div class="cmp-chips" id="cmp-chips"></div>' +
+                '<button type="button" class="cmp-filtro-btn" id="cmp-filtro-btn" data-filtro="1" aria-label="Filtrar por uso" aria-expanded="false" aria-controls="cmp-filtros">' +
+                    '<i class="fa-solid fa-sliders" aria-hidden="true"></i></button>' +
+            '</div>' +
+            '<div class="cmp-filtros" id="cmp-filtros" hidden>' +
+                '<b>Filtrar por uso</b>' +
+                '<div class="cmp-chips" id="cmp-chips"></div>' +
+            '</div>' +
         '</div>' +
         '<div id="cmp-body"></div>';
 
     var elToolbar = root.querySelector('#cmp-toolbar');
     var elChips = root.querySelector('#cmp-chips');
+    var elFiltros = root.querySelector('#cmp-filtros');
+    var elFiltroBtn = root.querySelector('#cmp-filtro-btn');
     var elBody = root.querySelector('#cmp-body');
     var elQ = root.querySelector('#cmp-q');
+
+    function hayFiltroUso() { return !!(state.area || state.soloFavs); }
+    function abrirPanel(si) {
+        elFiltros.hidden = !si;
+        elFiltroBtn.setAttribute('aria-expanded', String(si));
+    }
 
     /* ---------------------------------------------------------
        5) FILTRADO
@@ -256,7 +269,11 @@
             h += '<button class="cmp-chip" data-area="' + a.id + '" aria-pressed="' + (state.area === a.id) + '">' +
                  '<i class="fa-solid ' + a.icono + '" aria-hidden="true"></i>' + a.nombre + '</button>';
         });
+        if (hayFiltroUso()) {
+            h += '<button class="cmp-chip" data-limpiar="1"><i class="fa-solid fa-xmark" aria-hidden="true"></i>Quitar filtros</button>';
+        }
         elChips.innerHTML = h;
+        elFiltroBtn.classList.toggle('activo', hayFiltroUso());
     }
 
     function pintarGrilla() {
@@ -305,12 +322,18 @@
             h += '<button class="cmp-back" data-back="1" aria-label="Volver a clasificaciones"><i class="fa-solid fa-arrow-left"></i></button>' +
                  '<div><h2>' + esc(cat.nombre) + '</h2><small>' + lista.length + ' resultados</small></div>';
         } else {
-            h += '<div><h2>Resultados</h2><small>' + lista.length + ' encontrados</small></div>';
+            var partes = [];
+            if (state.area) { var ar = porId(AREAS, state.area); partes.push(ar ? ar.nombre : state.area); }
+            if (state.soloFavs) partes.push('Favoritos');
+            h += '<button class="cmp-back" data-back="1" aria-label="Volver a clasificaciones"><i class="fa-solid fa-arrow-left"></i></button>' +
+                 '<div><h2>Resultados</h2><small>' + lista.length + ' encontrados' +
+                 (partes.length ? ' · ' + esc(partes.join(' · ')) : '') + '</small></div>';
         }
         h += '</div>';
         if (!lista.length) {
             h += '<div class="cmp-vacio"><i class="fa-solid fa-flask-vial fa-2x" aria-hidden="true"></i>' +
-                 '<p>No hay compuestos con esos filtros. Prueba con otra palabra o quita un filtro.</p></div>';
+                 '<p>No hay compuestos con esos filtros. Prueba con otra palabra o quita un filtro.</p>' +
+                 (hayFiltroUso() ? '<button class="cmp-chip" data-limpiar="1">Quitar filtros</button>' : '') + '</div>';
         } else {
             h += '<div class="cmp-list">' + lista.map(filaCompuesto).join('') + '</div>';
         }
@@ -400,7 +423,7 @@
        7) EVENTOS (delegación: un solo listener)
        --------------------------------------------------------- */
     root.addEventListener('click', function (e) {
-        var t = e.target.closest('[data-cat],[data-open],[data-fav],[data-area],[data-favs],[data-back]');
+        var t = e.target.closest('[data-cat],[data-open],[data-fav],[data-area],[data-favs],[data-back],[data-filtro],[data-limpiar]');
         if (!t) return;
 
         if (t.dataset.fav) {
@@ -412,15 +435,26 @@
             if (state.id) window.scrollTo(0, y);
             return;
         }
+        if (t.dataset.filtro) {
+            abrirPanel(elFiltros.hidden);
+            return;
+        }
         if (t.dataset.open) {
             if (!state.id) state.scrollLista = window.scrollY;
             state.id = t.dataset.open;
+            abrirPanel(false);
         } else if (t.dataset.cat) {
             state.cat = t.dataset.cat;
         } else if (t.dataset.area) {
             state.area = state.area === t.dataset.area ? null : t.dataset.area;
+            abrirPanel(false);
         } else if (t.dataset.favs) {
             state.soloFavs = !state.soloFavs;
+            abrirPanel(false);
+        } else if (t.dataset.limpiar) {
+            state.area = null;
+            state.soloFavs = false;
+            abrirPanel(false);
         } else if (t.dataset.back) {
             if (state.id) {
                 state.id = null;
@@ -428,7 +462,14 @@
                 window.scrollTo(0, state.scrollLista);
                 return;
             }
-            state.cat = null;
+            if (state.cat) {
+                state.cat = null;
+            } else {
+                state.q = '';
+                elQ.value = '';
+                state.area = null;
+                state.soloFavs = false;
+            }
         }
         pintar();
     });
