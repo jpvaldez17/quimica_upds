@@ -678,26 +678,8 @@ Developed by J. Poma · 2026
                 : "Radiactivo (sin isótopos estables)";
         }
 
-        var html = "";
-
-        html += '<h3 class="tp-info-titulo">' + e.n + " (" + e.s + ")</h3>";
-
-        html += '<div class="tp-bloque tp-b-azul"><h4><i class="fa-solid fa-book-open"></i> Características y datos importantes</h4>' +
-            "<p>" + inf.dato + "</p>" +
-            '<p class="tp-linea"><strong>Dónde se encuentra / cómo se obtiene:</strong> ' + x.p + "</p>" +
-            '<ul class="tp-lista">' +
-            filaDato("Categoría", nombreCategoria(e.cat)) +
-            filaDato("Estado a 25 °C", estadoFisico(e.z)) +
-            filaDato("Radiactividad", radiactivo) +
-            "</ul></div>";
-
-        html += '<div class="tp-bloque tp-b-naranja"><h4><i class="fa-solid fa-industry"></i> Aplicaciones en ingeniería e industria</h4>' +
-            "<p>" + inf.apl + "</p></div>";
-
-        html += '<div class="tp-bloque tp-b-rojo"><h4><i class="fa-solid fa-triangle-exclamation"></i> Reactividad y seguridad</h4>' +
-            "<p>" + inf.reac + "</p></div>";
-
-        html += '<div class="tp-bloque tp-b-verde"><h4><i class="fa-solid fa-flask"></i> Propiedades físicas y químicas</h4>' +
+        /* 1. Propiedades físicas y químicas (primero) */
+        var fisicoquimicas = '<div class="tp-bloque tp-b-verde"><h4><i class="fa-solid fa-flask"></i> Propiedades físicas y químicas</h4>' +
             '<h5 class="tp-sub">Físicas</h5>' +
             '<ul class="tp-lista">' +
             filaDato("Aspecto", x.a) +
@@ -714,10 +696,29 @@ Developed by J. Poma · 2026
             filaDato("Compuestos comunes", x.k) +
             "</ul></div>";
 
-        html += '<p class="tp-aviso">Información de referencia con fines educativos. ' +
+        /* 2. Características y datos importantes */
+        var caracteristicas = '<div class="tp-bloque tp-b-azul"><h4><i class="fa-solid fa-book-open"></i> Características y datos importantes</h4>' +
+            "<p>" + inf.dato + "</p>" +
+            '<p class="tp-linea"><strong>Obtención:</strong> ' + x.p + "</p>" +
+            '<ul class="tp-lista">' +
+            filaDato("Categoría", nombreCategoria(e.cat)) +
+            filaDato("Estado a 25 °C", estadoFisico(e.z)) +
+            filaDato("Radiactividad", radiactivo) +
+            "</ul></div>";
+
+        /* 3. Aplicaciones */
+        var aplicaciones = '<div class="tp-bloque tp-b-naranja"><h4><i class="fa-solid fa-industry"></i> Aplicaciones en ingeniería e industria</h4>' +
+            "<p>" + inf.apl + "</p></div>";
+
+        /* 4. Reactividad y seguridad */
+        var seguridad = '<div class="tp-bloque tp-b-rojo"><h4><i class="fa-solid fa-triangle-exclamation"></i> Reactividad y seguridad</h4>' +
+            "<p>" + inf.reac + "</p></div>";
+
+        var aviso = '<p class="tp-aviso">Información de referencia con fines educativos. ' +
             "Consulte siempre la hoja de seguridad (SDS) antes de manipular sustancias.</p>";
 
-        cuerpo.innerHTML = html;
+        cuerpo.innerHTML = '<h3 class="tp-info-titulo">' + e.n + " (" + e.s + ")</h3>" +
+            fisicoquimicas + caracteristicas + aplicaciones + seguridad + aviso;
     }
 
     /* =========================================
