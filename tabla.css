@@ -1,0 +1,453 @@
+/* =========================================
+QUÍMICA UPDS
+ESTILOS · TABLA PERIÓDICA INTERACTIVA
+Developed by J. Poma · 2026
+========================================= */
+
+#tabla {
+    --tp-azul: #1e88e5;
+    --tp-azul-osc: #1565c0;
+    --tp-rojo: #e53935;
+    --tp-carbon: #1f2428;
+    --tp-texto: #1b2733;
+}
+
+/* ---------- Colores por categoría ---------- */
+
+.cat-alcalino       { background: #f67f7f; }
+.cat-alcalinoterreo { background: #fbad6d; }
+.cat-transicion     { background: #8ec9f2; }
+.cat-postransicion  { background: #bcd7e6; }
+.cat-metaloide      { background: #c5e47a; }
+.cat-nometal        { background: #9fe08a; }
+.cat-halogeno       { background: #f7e36b; }
+.cat-noble          { background: #6fd6e3; }
+.cat-lantanido      { background: #d6b0f7; }
+.cat-actinido       { background: #ea9fe0; }
+
+/* ---------- Mensaje de búsqueda ---------- */
+
+.tp-mensaje {
+    min-height: 0;
+    margin: 6px 6px 0;
+    font-size: 0.85rem;
+    color: var(--tp-rojo);
+}
+
+.tp-mensaje:empty {
+    display: none;
+}
+
+/* ---------- Botón de filtro activo ---------- */
+
+#tabla .search-settings.activo {
+    background: var(--tp-azul);
+    color: #fff;
+}
+
+/* ---------- Panel de filtros ---------- */
+
+.tp-filtros {
+    background: #fff;
+    border-radius: 20px;
+    padding: 14px;
+    margin: 14px 0 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tp-filtros[hidden] {
+    display: none;
+}
+
+.tp-filtros-titulo {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--tp-azul-osc);
+}
+
+.tp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid #d5dde5;
+    background: #fff;
+    color: var(--tp-texto);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.tp-chip.activo {
+    background: var(--tp-azul);
+    border-color: var(--tp-azul);
+    color: #fff;
+}
+
+.tp-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.tp-dot-todas {
+    background: conic-gradient(#f67f7f, #fbad6d, #f7e36b, #9fe08a, #6fd6e3, #d6b0f7, #f67f7f);
+}
+
+.tp-filtro-estado {
+    margin: 10px 2px 0;
+    font-size: 0.8rem;
+    color: #5f6b78;
+}
+
+/* ---------- Tabla periódica ---------- */
+
+.tp-tarjeta {
+    margin-top: 14px;
+}
+
+.tp-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 8px;
+}
+
+.tp-grid {
+    display: grid;
+    grid-template-columns: 22px repeat(18, 44px);
+    grid-template-rows: 20px repeat(7, 50px) 12px 50px 50px;
+    gap: 4px;
+    width: max-content;
+    min-width: max-content;
+}
+
+.tp-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    color: var(--tp-texto);
+    font-family: inherit;
+    line-height: 1.15;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+}
+
+.tp-cell small {
+    font-size: 0.62rem;
+    font-weight: 500;
+}
+
+.tp-cell b {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.tp-cell.sel {
+    z-index: 2;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px var(--tp-azul), 0 4px 12px rgba(30, 136, 229, 0.45);
+}
+
+.tp-dim {
+    opacity: 0.18;
+}
+
+.tp-eje {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #5b7ea6;
+}
+
+.tp-eje-f {
+    color: var(--tp-azul-osc);
+    font-size: 0.9rem;
+}
+
+.tp-ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #e4edf4;
+    color: #4a5967;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-align: center;
+    transition: opacity 0.2s ease;
+}
+
+.tp-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #5f6b78;
+}
+
+.tp-hint i {
+    color: var(--tp-azul-osc);
+}
+
+/* ---------- Ficha rápida ---------- */
+
+.tp-ficha {
+    background: var(--tp-carbon);
+    color: #fff;
+    border-radius: 20px;
+    padding: 18px;
+    margin-top: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.tp-ficha-titulo {
+    margin: 0 0 14px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.tp-ficha-titulo span {
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+.tp-ficha-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(112px, 34%) 1fr;
+    gap: 16px;
+}
+
+.tp-ficha-izq {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tp-casilla {
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    background: #2b3440;
+    text-align: center;
+    padding: 12px 6px;
+}
+
+.tp-casilla .tp-c-z {
+    font-size: 1.3rem;
+}
+
+.tp-casilla .tp-c-sym {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.tp-casilla .tp-c-masa {
+    font-size: 1.1rem;
+}
+
+.tp-btn-rojo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    background: var(--tp-rojo);
+    color: #fff;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tp-btn-rojo i {
+    background: #fff;
+    color: var(--tp-rojo);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.tp-ficha-der {
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.tp-datos {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.tp-datos dt {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.tp-datos dd {
+    margin: 0;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.tp-sep {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.tp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.tp-nav button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #3a4a5e;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tp-contador {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+/* ---------- Información ampliada ---------- */
+
+.tp-info {
+    background: #fff;
+    border-radius: 20px;
+    padding: 16px;
+    margin-top: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tp-info[hidden] {
+    display: none;
+}
+
+.tp-info-titulo {
+    margin: 0 0 12px;
+    font-size: 1.15rem;
+    color: var(--tp-azul-osc);
+}
+
+.tp-bloque {
+    border-left: 4px solid var(--tp-azul);
+    background: #f6f9fc;
+    border-radius: 0 12px 12px 0;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+.tp-bloque h4 {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    color: var(--tp-texto);
+}
+
+.tp-bloque p {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: #34414f;
+}
+
+.tp-b-azul   { border-left-color: var(--tp-azul); }
+.tp-b-naranja { border-left-color: #f59e0b; }
+.tp-b-rojo   { border-left-color: var(--tp-rojo); }
+.tp-b-verde  { border-left-color: #22a06b; }
+
+.tp-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tp-lista li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid #e3eaf1;
+    font-size: 0.88rem;
+}
+
+.tp-lista span {
+    color: #5f6b78;
+}
+
+.tp-lista strong {
+    text-align: right;
+    font-weight: 600;
+    color: var(--tp-texto);
+}
+
+.tp-nota,
+.tp-aviso {
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    color: #6b7785;
+}
+
+/* ---------- Pantallas muy pequeñas ---------- */
+
+@media (max-width: 360px) {
+    .tp-ficha {
+        padding: 14px;
+    }
+
+    .tp-ficha-cuerpo {
+        gap: 10px;
+    }
+
+    .tp-casilla .tp-c-sym {
+        font-size: 2.6rem;
+    }
+
+    .tp-datos {
+        font-size: 0.82rem;
+    }
+}
