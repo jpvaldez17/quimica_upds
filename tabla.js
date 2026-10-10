@@ -725,6 +725,22 @@ Developed by J. Poma · 2026
     SELECCIÓN
     ========================================= */
 
+    function centrarEnTabla(celda) {
+        var sc = $("tp-scroll");
+        if (!sc || !celda) { return; }
+        var r = celda.getBoundingClientRect();
+        var s = sc.getBoundingClientRect();
+        sc.scrollBy({
+            left: (r.left + r.width / 2) - (s.left + s.width / 2),
+            behavior: "smooth"
+        });
+    }
+
+    function irAFicha() {
+        var ficha = document.querySelector(".tp-ficha");
+        if (ficha) { ficha.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    }
+
     function seleccionar(z, desplazar) {
         if (z < 1) { z = ELEMENTOS.length; }
         if (z > ELEMENTOS.length) { z = 1; }
@@ -737,9 +753,7 @@ Developed by J. Poma · 2026
         var celda = celdas[z];
         if (celda) {
             celda.classList.add("sel");
-            if (desplazar) {
-                celda.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }
+            if (desplazar) { centrarEnTabla(celda); }
         }
 
         actualizarFicha(e);
@@ -778,22 +792,23 @@ Developed by J. Poma · 2026
     function ejecutarBusqueda() {
         var campo = $("tp-buscador");
         var msg = $("tp-mensaje");
-        if (!campo) { return; }
+        if (!campo) { return false; }
 
         var valor = campo.value;
         if (!valor.trim()) {
             if (msg) { msg.textContent = ""; }
-            return;
+            return false;
         }
 
         var z = buscar(valor);
         if (z === null) {
             if (msg) { msg.textContent = "Sin resultados para «" + valor.trim() + "»."; }
-            return;
+            return false;
         }
 
         if (msg) { msg.textContent = ""; }
         seleccionar(z, true);
+        return true;
     }
 
     /* =========================================
@@ -826,8 +841,15 @@ Developed by J. Poma · 2026
     ZOOM DE LA TABLA (solo la tabla)
     ========================================= */
 
-    var ZOOMS = [0.5, 0.65, 0.8, 1, 1.2, 1.4, 1.7];
-    var zoomIdx = 3;
+    var ZOOMS = [0.65, 0.8, 1];
+    var zoomIdx = 1;
+
+    function estadoZoom() {
+        var menos = $("tp-zoom-menos");
+        var mas = $("tp-zoom-mas");
+        if (menos) { menos.disabled = (zoomIdx === 0); }
+        if (mas) { mas.disabled = (zoomIdx === ZOOMS.length - 1); }
+    }
 
     function aplicarZoom(delta) {
         var nuevo = zoomIdx + delta;
@@ -844,10 +866,7 @@ Developed by J. Poma · 2026
         grid.style.setProperty("--tp-z", ZOOMS[zoomIdx]);
         sc.scrollLeft = centro * sc.scrollWidth - sc.clientWidth / 2;
 
-        var menos = $("tp-zoom-menos");
-        var mas = $("tp-zoom-mas");
-        if (menos) { menos.disabled = (zoomIdx === 0); }
-        if (mas) { mas.disabled = (zoomIdx === ZOOMS.length - 1); }
+        estadoZoom();
     }
 
     function iniciarEventos() {
@@ -855,7 +874,10 @@ Developed by J. Poma · 2026
         if (grid) {
             grid.addEventListener("click", function (ev) {
                 var c = ev.target.closest(".tp-cell");
-                if (c) { seleccionar(parseInt(c.getAttribute("data-z"), 10), false); }
+                if (c) {
+                    seleccionar(parseInt(c.getAttribute("data-z"), 10), false);
+                    irAFicha();
+                }
             });
         }
 
@@ -863,7 +885,11 @@ Developed by J. Poma · 2026
         if (campo) {
             campo.addEventListener("input", ejecutarBusqueda);
             campo.addEventListener("keydown", function (ev) {
-                if (ev.key === "Enter") { ejecutarBusqueda(); campo.blur(); }
+                if (ev.key === "Enter") {
+                    var encontrado = ejecutarBusqueda();
+                    campo.blur();
+                    if (encontrado) { irAFicha(); }
+                }
             });
         }
 
@@ -901,6 +927,8 @@ Developed by J. Poma · 2026
     document.addEventListener("DOMContentLoaded", function () {
         if (!$("tp-grid")) { return; }
         construirTabla();
+        $("tp-grid").style.setProperty("--tp-z", ZOOMS[zoomIdx]);
+        estadoZoom();
         construirFiltros();
         iniciarEventos();
         aplicarFiltro("");
