@@ -76,4 +76,89 @@ document.addEventListener("DOMContentLoaded", function() {
 
     mostrarPagina("inicio");
 
+    iniciarDesafio();
+
 });
+
+
+/* =========================================
+   DESAFÍO RÁPIDO DEL DÍA
+   Verde si acierta, rojo si se equivoca
+   ========================================= */
+
+function iniciarDesafio() {
+
+    const tarjeta = document.querySelector(".challenge-card");
+
+    if (!tarjeta) {
+
+        return;
+
+    }
+
+    const botones = tarjeta.querySelectorAll(".answer-buttons button");
+
+    const resultado = tarjeta.querySelector(".challenge-result");
+
+    let respondido = false;
+
+
+    botones.forEach(function(boton) {
+
+        boton.addEventListener("click", function() {
+
+            if (respondido) {
+
+                return;
+
+            }
+
+            respondido = true;
+
+
+            const acerto = boton.hasAttribute("data-correcta");
+
+            boton.classList.add(acerto ? "correcta" : "incorrecta");
+
+
+            /* Si falla, se muestra cuál era la correcta */
+
+            if (!acerto) {
+
+                botones.forEach(function(otro) {
+
+                    if (otro.hasAttribute("data-correcta")) {
+
+                        otro.classList.add("correcta");
+
+                    }
+
+                });
+
+            }
+
+
+            botones.forEach(function(otro) {
+
+                otro.disabled = true;
+
+            });
+
+
+            if (resultado) {
+
+                const titulo = acerto
+                    ? '<strong class="ok">¡Correcto!</strong> '
+                    : '<strong class="no">Incorrecto.</strong> ';
+
+                resultado.innerHTML = titulo + (resultado.getAttribute("data-explicacion") || "");
+
+                resultado.hidden = false;
+
+            }
+
+        });
+
+    });
+
+}
