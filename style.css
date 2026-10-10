@@ -62,8 +62,8 @@ body {
 
     transform: translateY(-50%) !important;
 
-    width: 60px;
-    height: 60px;
+    width: 82px;
+    height: 82px;
 
     display: flex;
 
@@ -108,11 +108,15 @@ body {
 
 
 .header .brand-text h1 {
-    font-size: 25px;
+    font-family: "Poppins", "Segoe UI", Arial, Helvetica, sans-serif;
+
+    font-size: 30px;
 
     line-height: 1.1;
 
-    font-weight: 800;
+    font-weight: 700;
+
+    letter-spacing: -0.01em;
 
     color: #111111;
 }
@@ -124,11 +128,23 @@ body {
 
 
 .header .brand-text p {
-    margin-top: 5px;
+    font-family: "Poppins", "Segoe UI", Arial, Helvetica, sans-serif;
+
+    margin-top: 3px;
 
     font-size: 13px;
 
+    font-weight: 500;
+
+    line-height: 1.25;
+
+    letter-spacing: 0.01em;
+
     color: #444444;
+
+    white-space: normal;
+
+    max-width: 420px;
 }
 
 
@@ -146,8 +162,8 @@ body {
 
     transform: translateY(-50%) !important;
 
-    width: 66px;
-    height: 66px;
+    width: 82px;
+    height: 82px;
 
     display: flex;
 
@@ -1251,13 +1267,30 @@ body {
     /* LOGOS */
 
     .header .brand-icon {
-        width: 54px;
-        height: 54px;
+        width: 72px;
+        height: 72px;
+
+        left: 10px !important;
     }
 
     .header .profile-button {
-        width: 58px;
-        height: 58px;
+        width: 72px;
+        height: 72px;
+
+        right: 10px !important;
+    }
+
+
+    /* TÍTULO Y SUBTÍTULO (se ajustan al espacio entre los logos) */
+
+    .header .brand-text h1 {
+        font-size: clamp(21px, 7.2vw, 27px);
+    }
+
+    .header .brand-text p {
+        font-size: 11.5px;
+
+        max-width: calc(100vw - 190px);
     }
 
 
