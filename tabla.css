@@ -240,7 +240,7 @@ Developed by J. Poma · 2026
 
 .tp-grid {
     --tp-z: 0.8;
-    font-size: calc(16px * var(--tp-z));
+    font-size: calc(20.5px * var(--tp-z));
     display: grid;
     grid-template-columns: calc(24px * var(--tp-z)) repeat(18, calc(50px * var(--tp-z)));
     grid-template-rows: calc(20px * var(--tp-z)) repeat(7, calc(58px * var(--tp-z))) calc(12px * var(--tp-z)) calc(58px * var(--tp-z)) calc(58px * var(--tp-z));
@@ -255,11 +255,12 @@ Developed by J. Poma · 2026
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 2px 1px;
+    padding: 1px;
     border: none;
     border-radius: 8px;
     font-family: inherit;
-    line-height: 1.1;
+    font-size: inherit;
+    line-height: 1.02;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -272,9 +273,9 @@ Developed by J. Poma · 2026
 }
 
 .tp-cell b {
-    font-size: 1.1em;
+    font-size: 1.18em;
     font-weight: 800;
-    line-height: 1.05;
+    line-height: 1;
 }
 
 .tp-cell .tp-n {
