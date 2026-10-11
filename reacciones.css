@@ -1,12 +1,9 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v4.0
-   Simulador didáctico paso a paso: pasos, selectores flotantes, tarjetas que
-   aparecen en secuencia (reacción → ecuación sin balancear → balanceada → cálculos).
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v4.0 (simulador paso a paso)
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
    ========================================================================== */
-
 
 #reacciones .rxn-root {
   --rxn-fondo: #F4F6F9;
@@ -94,6 +91,45 @@
 #reacciones .rxn-contador--error { color: var(--rxn-rojo); background: var(--rxn-rojo-fondo); }
 #reacciones .rxn-contador--oscuro { color: #d9e2ec; background: #2a2a2a; border: 1px solid #3a3a3a; }
 
+/* ---- Campo de entrada -------------------------------------------------------- */
+#reacciones .rxn-entrada-wrap { position: relative; }
+#reacciones .rxn-campo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 3px solid #000;          /* borde negro grueso */
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+#reacciones .rxn-campo--ok { border-color: #000; }
+#reacciones .rxn-campo--error { border-color: #000; box-shadow: 0 0 0 3px rgba(211, 47, 47, .35); }
+#reacciones .rxn-campo .rxn-input { flex: 1 1 auto; width: auto; }
+
+/* Botón verde con "+" al lado del campo: agrega el reactivo escrito (o Enter) */
+#reacciones .rxn-campo-mas {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 46px; height: 36px;
+  margin: 0 4px 0 0;
+  padding: 0;
+  font: inherit;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: #1e8e4e;
+  border: 2px solid #14532d;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s ease, background-color .1s ease;
+}
+#reacciones .rxn-campo-mas:active:not(:disabled) { transform: scale(.94); background: #176f3d; }
+#reacciones .rxn-campo-mas:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
+#reacciones .rxn-campo-mas:disabled { color: #9aa5b4; background: #e6eaf0; border-color: #cdd5df; cursor: not-allowed; }
+
 #reacciones .rxn-input {
   display: block;
   width: 100%;
@@ -108,7 +144,25 @@
   border: 0;
   border-radius: 12px;
 }
+#reacciones .rxn-campo .rxn-input { position: relative; z-index: 1; color: transparent; caret-color: #000; }
+#reacciones .rxn-campo .rxn-input::selection { background: rgba(211, 47, 47, .25); }
 #reacciones .rxn-input:focus { outline: none; }
+
+/* Capa con el mismo texto (negro, negrita; los + en verde) */
+#reacciones .rxn-espejo {
+  position: absolute;
+  top: 0; right: 56px; bottom: 0; left: 0;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 42px;
+  color: #000;
+  white-space: pre;
+  overflow: hidden;
+  pointer-events: none;
+}
+#reacciones .rxn-espejo-mas { color: #1e8e4e; }
 #reacciones .rxn-input::placeholder { color: #9aa5b4; font-weight: 400; }
 #reacciones .rxn-input--masa {
   font-weight: 600;
@@ -118,6 +172,87 @@
   text-align: right;
 }
 #reacciones .rxn-input--masa:focus { border-color: var(--rxn-verde); outline: 2px solid rgba(39, 174, 96, .25); }
+
+/* ---- Sugerencias --------------------------------------------------------------- */
+#reacciones .rxn-sugerencias {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  z-index: 20;
+  margin: 0; padding: 4px;
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--rxn-borde);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(20, 35, 55, .16);
+}
+/* Lista de la cadena (sin texto escrito): ocupa su sitio en el flujo en vez de flotar encima */
+#reacciones .rxn-sugerencias--cadena { position: static; margin-top: 8px; max-height: 240px; box-shadow: none; border: 2px solid #000; }
+#reacciones .rxn-sug {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font: inherit;
+  text-align: left;
+  color: var(--rxn-texto);
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#reacciones .rxn-sug:hover,
+#reacciones .rxn-sug:focus-visible { background: var(--rxn-verde-fondo); outline: none; }
+#reacciones .rxn-sug-formula { min-width: 3.6em; font-weight: 700; }
+#reacciones .rxn-sug-nombre { flex: 1 1 auto; font-size: 0.88rem; }
+#reacciones .rxn-sug-tipo { font-size: 0.7rem; color: var(--rxn-suave); white-space: nowrap; }
+#reacciones .rxn-sug-cab { padding: 6px 10px 4px; font-size: 0.74rem; font-weight: 700; color: var(--rxn-suave); }
+#reacciones .rxn-sug-vacio { padding: 10px; font-size: 0.84rem; color: var(--rxn-ambar-texto); }
+
+/* ---- Barra de entrada rápida: + → Borrar (planos, centrados) ---------------------- */
+#reacciones .rxn-pastillas {
+  position: sticky;
+  bottom: calc(var(--rxn-nav) + 8px);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+  margin: 10px auto;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--rxn-borde);
+  border-radius: 999px;
+}
+#reacciones .rxn-pastilla {
+  flex: 1 1 0;
+  min-height: 46px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  border: 2px solid;               /* el color del borde es el mismo tono, más oscuro */
+  border-radius: 999px;
+  box-shadow: none;                /* sin brillos ni sombras */
+  background-image: none;          /* sin degradados */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s ease, background-color .1s ease;
+}
+#reacciones .rxn-pastilla--mas    { background-color: #1e8e4e; border-color: #14532d; }   /* = acordeón 1 */
+#reacciones .rxn-pastilla--flecha { background-color: #1d63d6; border-color: #123f8c; font-size: 1.6rem; line-height: 1; }   /* = acordeón 2 */
+#reacciones .rxn-pastilla--borrar { background-color: #D32F2F; border-color: #8f1d1d; font-size: 1rem; }   /* = botón de semirreacciones */
+#reacciones .rxn-pastilla:active { transform: scale(.95); }
+#reacciones .rxn-pastilla--mas:active    { background-color: #176f3d; }
+#reacciones .rxn-pastilla--flecha:active { background-color: #174fab; }
+#reacciones .rxn-pastilla--borrar:active { background-color: #b32323; }
+#reacciones .rxn-pastilla:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
 
 /* ---- Mensajes -------------------------------------------------------------------- */
 #reacciones .rxn-msg {
@@ -132,6 +267,64 @@
 #reacciones .rxn-msg--error { color: #8c2a26; background: var(--rxn-rojo-fondo); }
 #reacciones .rxn-msg--aviso { color: var(--rxn-ambar-texto); background: var(--rxn-ambar-fondo); }
 #reacciones .rxn-msg--exito { color: #14532d; background: #dcfce7; border: 1px solid #a7e3bd; }
+
+#reacciones .rxn-vacio {
+  padding: 12px 10px;
+  font-size: 0.84rem;
+  text-align: center;
+  color: var(--rxn-suave);
+  background: var(--rxn-fondo);
+  border: 1px dashed #cdd5df;
+  border-radius: 12px;
+}
+
+/* ---- Chips compactos (fórmula + nombre + ×) ---------------------------------------- */
+#reacciones .rxn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
+#reacciones .rxn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 4px 4px 10px;
+  background: var(--rxn-verde-fondo);
+  border: 1px solid #bfe6cf;
+  border-radius: 12px;
+}
+#reacciones .rxn-chip--error { background: var(--rxn-rojo-fondo); border-color: #f2b8b4; }
+#reacciones .rxn-chip-textos { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+#reacciones .rxn-chip-formula { font-size: 0.98rem; font-weight: 800; color: #000; white-space: nowrap; }
+#reacciones .rxn-chip-nombre {
+  max-width: 128px;
+  font-size: 0.66rem;
+  color: var(--rxn-suave);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#reacciones .rxn-chip-x {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  padding: 0;
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--rxn-suave);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#reacciones .rxn-chip-x:hover,
+#reacciones .rxn-chip-x:active { color: var(--rxn-rojo); background: rgba(214, 69, 65, .14); }
+#reacciones .rxn-chip-x:focus-visible { outline: 2px solid var(--rxn-verde); }
 
 /* ---- Botones ------------------------------------------------------------------------------ */
 #reacciones .rxn-btn {
@@ -159,6 +352,11 @@
 #reacciones .rxn-btn:focus-visible { outline: 3px solid rgba(39, 174, 96, .4); outline-offset: 2px; }
 #reacciones .rxn-btn:disabled { color: #9aa5b4; background: #e6eaf0; box-shadow: none; cursor: not-allowed; }
 #reacciones .rxn-btn--ancho { width: 100%; margin-top: 12px; }
+
+/* Acciones inferiores: Determinar reacción (grande) + Borrar (pequeño) */
+#reacciones .rxn-acciones { display: flex; align-items: stretch; gap: 8px; margin-top: 12px; }
+#reacciones .rxn-btn--fila { flex: 1 1 auto; min-width: 0; min-height: 52px; font-size: 1.05rem; }
+#reacciones .rxn-btn-borrar { flex: 0 0 auto; min-width: 84px; min-height: 52px; }
 
 /* Balancear: naranja vivo con letras negras */
 #reacciones .rxn-btn--balancear {
@@ -206,6 +404,49 @@
 #reacciones .rxn-leyenda { margin: 0 0 2px; font-size: 0.76rem; color: #9aa5b4; }
 #reacciones .rxn-leyenda p { margin: 0 0 3px; }
 #reacciones .rxn-leyenda b { color: #cfd6de; }
+
+/* Pasos del simulador (productos → clasificación → observación → botón) */
+#reacciones .rxn-paso-etiqueta { margin: 2px 0 6px !important; font-size: 0.78rem; font-weight: 700; color: #9aa5b4; }
+#reacciones .rxn-revela { animation: rxn-aparecer .5s ease both; }
+@keyframes rxn-aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+#reacciones .rxn-card--oscura .rxn-reaccion { margin-bottom: 8px; }
+#reacciones .rxn-dato-banco {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  background: #1b1b1b;
+  border: 1px solid #2a2a2a;
+  border-left: 4px solid;
+  border-radius: 12px;
+}
+#reacciones .rxn-dato-banco--clasif { border-left-color: var(--rxn-flecha-oscuro); }
+#reacciones .rxn-dato-banco--nota { border-left-color: #FFB74D; }
+#reacciones .rxn-dato-et { font-size: 0.72rem; font-weight: 700; color: #9aa5b4; }
+#reacciones .rxn-dato-val { font-size: 0.92rem; font-weight: 600; line-height: 1.35; color: #fff; }
+
+/* Variantes de una misma combinación de reactivos */
+#reacciones .rxn-variantes { margin: 0 0 10px; }
+#reacciones .rxn-variantes-tit { margin: 0 0 6px !important; font-size: 0.78rem; color: #9aa5b4; }
+#reacciones .rxn-variantes-fila { display: flex; flex-wrap: wrap; gap: 6px; }
+#reacciones .rxn-variante {
+  min-height: 40px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+  color: #d9e2ec;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#reacciones .rxn-variante--activa { color: #000; background: var(--rxn-flecha-oscuro); border-color: var(--rxn-flecha-oscuro); }
+#reacciones .rxn-variante:focus-visible { outline: 3px solid var(--rxn-flecha-oscuro); outline-offset: 2px; }
 
 /* ---- Tarjeta GRIS: ecuación balanceada ---------------------------------------------------------- */
 #reacciones .rxn-card--gris {
@@ -365,6 +606,16 @@
 #reacciones .rxn-acordeon[open] .rxn-acordeon-mas { color: var(--acc); background: #fff; }
 #reacciones .rxn-acordeon[open] .rxn-acordeon-mas::before { content: '\2212'; }
 
+/* Paneles que se activan por pasos (1 al determinar · 2, 3 y 4 al balancear) */
+#reacciones .rxn-acordeon { transition: opacity .3s ease, filter .3s ease; }
+#reacciones .rxn-acordeon--bloqueado { opacity: .55; filter: grayscale(.45); }
+#reacciones .rxn-acordeon--activo { animation: rxn-activar 1.1s ease both; }
+@keyframes rxn-activar {
+  0%   { box-shadow: 0 0 0 0 var(--acc); }
+  70%  { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+}
+
 #reacciones .rxn-acordeon-cuerpo { padding: 14px 12px; font-size: 0.88rem; animation: rxn-abrir .22s ease; }
 @keyframes rxn-abrir { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
@@ -440,233 +691,6 @@
 #reacciones .rxn-res-val { font-size: 1.15rem; font-weight: 800; color: #111827; }
 #reacciones .rxn-res-det { font-size: 0.78rem; color: var(--rxn-suave); }
 
-/* ============================================================================
-   SIMULADOR PASO A PASO (v4.0)
-   ========================================================================== */
-
-/* ---- Animaciones de entrada (cada bloque usa --i para escalonarse) ---------------- */
-@keyframes rxn-entra { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
-@keyframes rxn-pop   { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
-@keyframes rxn-sube  { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
-@keyframes rxn-fade  { from { opacity: 0; } to { opacity: 1; } }
-#reacciones .rxn-aparece { animation: rxn-entra .5s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 180ms); }
-#reacciones .rxn-card.rxn-aparece { animation-delay: 0s; }
-#reacciones .rxn-rx-cuerpo .rxn-aparece { animation-delay: calc(var(--i, 0) * 200ms + 200ms); }
-#reacciones .rxn-card--gris .rxn-eq-bloque { animation-delay: calc(var(--i, 0) * 450ms + 250ms); }
-#reacciones .rxn-card--analisis.rxn-aparece .rxn-acordeon { animation: rxn-entra .45s cubic-bezier(.2, .8, .2, 1) both; }
-#reacciones .rxn-card--analisis.rxn-aparece .rxn-acc-1 { animation-delay: .15s; }
-#reacciones .rxn-card--analisis.rxn-aparece .rxn-acc-2 { animation-delay: .30s; }
-#reacciones .rxn-card--analisis.rxn-aparece .rxn-acc-3 { animation-delay: .45s; }
-#reacciones .rxn-card--analisis.rxn-aparece .rxn-acc-4 { animation-delay: .60s; }
-
-/* ---- Indicador de pasos ------------------------------------------------------------ */
-#reacciones .rxn-pasos {
-  display: flex;
-  margin: 0 0 12px;
-  padding: 12px 4px 10px;
-  list-style: none;
-  background: var(--rxn-card);
-  border-radius: var(--rxn-radio);
-  box-shadow: var(--rxn-sombra);
-}
-#reacciones .rxn-paso {
-  position: relative;
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--rxn-suave);
-}
-#reacciones .rxn-paso::before { content: ''; position: absolute; top: 14px; right: 50%; width: 100%; height: 3px; background: #e1e6ed; }
-#reacciones .rxn-paso:first-child::before { display: none; }
-#reacciones .rxn-paso--hecho::before,
-#reacciones .rxn-paso--actual::before { background: var(--rxn-verde); }
-#reacciones .rxn-paso-num {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; height: 30px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #8a96a6;
-  background: #eef1f5;
-  border: 2px solid #dfe4ea;
-  border-radius: 50%;
-  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-}
-#reacciones .rxn-paso--hecho .rxn-paso-num { color: #fff; background: var(--rxn-verde); border-color: var(--rxn-verde); }
-#reacciones .rxn-paso--actual { color: var(--rxn-texto); }
-#reacciones .rxn-paso--actual .rxn-paso-num { color: #fff; background: var(--rxn-naranja); border-color: var(--rxn-naranja); box-shadow: 0 0 0 4px rgba(255, 140, 0, .22); }
-
-/* ---- Paso 1: selectores ---------------------------------------------------------------- */
-#reacciones .rxn-sels { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
-#reacciones .rxn-mas {
-  align-self: center;
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px;
-  font-size: 1.3rem; font-weight: 800; line-height: 1;
-  color: #fff;
-  background: var(--rxn-verde);
-  border-radius: 50%;
-}
-#reacciones .rxn-sel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  width: 100%;
-  min-height: 64px;
-  padding: 8px 40px 8px 14px;
-  font: inherit;
-  text-align: left;
-  color: var(--rxn-texto);
-  background: #fff;
-  border: 2px solid var(--rxn-borde);
-  border-radius: 14px;
-  cursor: pointer;
-  transition: border-color .15s ease, background .15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-#reacciones .rxn-sel:hover:not(:disabled) { border-color: var(--rxn-verde); }
-#reacciones .rxn-sel--lleno { background: var(--rxn-verde-fondo); border-color: var(--rxn-verde); }
-#reacciones .rxn-sel:disabled { cursor: not-allowed; opacity: .55; background: #f1f3f6; }
-#reacciones .rxn-sel:focus-visible { outline: 3px solid rgba(39, 174, 96, .4); outline-offset: 2px; }
-#reacciones .rxn-sel-et { font-size: 0.68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--rxn-suave); }
-#reacciones .rxn-sel-valor { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; }
-#reacciones .rxn-sel-formula { font-size: 1.2rem; }
-#reacciones .rxn-sel-nombre { font-size: 0.82rem; color: var(--rxn-suave); }
-#reacciones .rxn-sel-ph { font-size: 1rem; color: #9aa5b4; }
-#reacciones .rxn-sel-flecha { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); font-size: 1rem; color: var(--rxn-verde-osc); }
-#reacciones .rxn-pista { margin: 8px 2px 0 !important; font-size: 0.8rem; color: var(--rxn-suave); }
-#reacciones .rxn-fila-r3 { margin-top: 6px; }
-#reacciones .rxn-variantes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-#reacciones .rxn-variantes .rxn-pista { flex: 0 0 100%; margin: 4px 2px 0 !important; }
-#reacciones .rxn-variante {
-  min-height: 40px;
-  padding: 6px 12px;
-  font: inherit; font-size: 0.84rem; font-weight: 600;
-  text-align: left;
-  color: var(--rxn-texto);
-  background: #fff;
-  border: 2px solid var(--rxn-borde);
-  border-radius: 12px;
-  cursor: pointer;
-}
-#reacciones .rxn-variante--sel { color: #fff; background: var(--rxn-verde); border-color: var(--rxn-verde); }
-#reacciones .rxn-btn-texto { padding: 6px 10px; font: inherit; font-size: 0.8rem; font-weight: 700; color: var(--rxn-verde-osc); background: transparent; border: 0; border-radius: 10px; cursor: pointer; }
-#reacciones .rxn-btn-texto:hover { background: var(--rxn-verde-fondo); }
-#reacciones .rxn-btn--determinar { min-height: 52px; font-size: 1.05rem; color: #fff; background: var(--rxn-verde); box-shadow: 0 4px 14px rgba(39, 174, 96, .35); }
-#reacciones .rxn-btn--determinar:hover:not(:disabled) { background: var(--rxn-verde-osc); }
-
-/* ---- Hoja flotante de selección (lista con scroll + búsqueda) ---------------------------- */
-#reacciones .rxn-hoja { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
-#reacciones .rxn-hoja-fondo { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(15, 23, 42, .55); animation: rxn-fade .2s ease both; }
-#reacciones .rxn-hoja-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 520px;
-  max-height: 82vh;
-  max-height: 82dvh;
-  padding: 12px 12px 4px;
-  background: #fff;
-  border-radius: 22px 22px 0 0;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, .25);
-  animation: rxn-sube .28s cubic-bezier(.2, .8, .2, 1) both;
-  outline: none;
-}
-#reacciones .rxn-hoja-cab { display: flex; align-items: center; justify-content: space-between; margin: 0 0 8px; }
-#reacciones .rxn-hoja-titulo { margin: 0; font-size: 1.05rem; font-weight: 700; }
-#reacciones .rxn-hoja-x { width: 40px; height: 40px; font-size: 1.6rem; line-height: 1; color: var(--rxn-suave); background: #eef1f5; border: 0; border-radius: 50%; cursor: pointer; }
-#reacciones .rxn-buscar {
-  display: block;
-  width: 100%;
-  height: 46px;
-  margin: 0 0 8px;
-  padding: 0 14px;
-  font: inherit; font-size: 1rem;           /* 16px: evita el zoom automático en iPhone */
-  color: var(--rxn-texto);
-  background: var(--rxn-fondo);
-  border: 2px solid var(--rxn-borde);
-  border-radius: 12px;
-}
-#reacciones .rxn-buscar:focus { outline: none; border-color: var(--rxn-verde); }
-#reacciones .rxn-lista { flex: 1 1 auto; margin: 0; padding: 0 0 12px; list-style: none; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-#reacciones .rxn-op {
-  display: grid;
-  grid-template-columns: minmax(64px, auto) 1fr auto;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 52px;
-  padding: 8px 10px;
-  font: inherit;
-  text-align: left;
-  color: var(--rxn-texto);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #eef1f5;
-  cursor: pointer;
-}
-#reacciones .rxn-op:hover,
-#reacciones .rxn-op:focus-visible { background: var(--rxn-verde-fondo); outline: none; }
-#reacciones .rxn-op--sel { background: var(--rxn-verde-fondo); box-shadow: inset 4px 0 0 var(--rxn-verde); }
-#reacciones .rxn-op-formula { font-size: 1.02rem; font-weight: 800; }
-#reacciones .rxn-op-nombre { font-size: 0.86rem; color: #334155; }
-#reacciones .rxn-op-n { font-size: 0.68rem; white-space: nowrap; color: var(--rxn-suave); }
-#reacciones .rxn-op-vacio { padding: 20px 10px; text-align: center; color: var(--rxn-suave); }
-
-/* ---- Paso 2: reacción determinada ----------------------------------------------------------- */
-#reacciones .rxn-card--rx { border-left: 6px solid var(--rxn-verde); }
-#reacciones .rxn-bloque { margin: 0 0 12px; }
-#reacciones .rxn-bloque:last-child { margin-bottom: 0; }
-#reacciones .rxn-bloque > .rxn-etiqueta,
-#reacciones .rxn-eq-bloque > .rxn-etiqueta,
-#reacciones .rxn-b-nota .rxn-etiqueta { display: block; margin: 0 0 4px; }
-#reacciones .rxn-rx-titulo { margin: 0 !important; font-size: 1.12rem; font-weight: 800; }
-#reacciones .rxn-prods { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-#reacciones .rxn-prod { display: flex; flex-direction: column; padding: 8px 14px; line-height: 1.2; background: var(--rxn-verde-fondo); border: 2px solid var(--rxn-verde); border-radius: 14px; }
-#reacciones .rxn-prod-formula { font-size: 1.3rem; color: #0f3d22; }
-#reacciones .rxn-prod-nombre { font-size: 0.76rem; color: #33664a; }
-#reacciones .rxn-categoria { display: inline-block; padding: 6px 14px; font-size: 0.9rem; font-weight: 700; color: #fff; background: #1d63d6; border-radius: 999px; }
-#reacciones .rxn-b-nota { display: flex; gap: 10px; padding: 12px; background: #fff8e1; border: 1px solid #f1d98a; border-left: 5px solid #F2B93B; border-radius: 12px; }
-#reacciones .rxn-nota-icono { font-size: 1.4rem; line-height: 1; }
-#reacciones .rxn-b-nota p { margin: 0 !important; font-size: 0.92rem; color: #4a3b05; }
-#reacciones .rxn-b-sinrx { padding: 12px; background: var(--rxn-rojo-fondo); border-left: 5px solid var(--rxn-rojo); border-radius: 12px; }
-#reacciones .rxn-rx-sin { margin: 0 !important; font-weight: 700; color: #8c2a26; }
-#reacciones .rxn-b-accion .rxn-btn--ancho { margin-top: 4px; }
-
-/* ---- Paso 3: ecuación sin balancear → balanceada ---------------------------------------------- */
-#reacciones .rxn-eq-bloque { margin: 0 0 12px; }
-#reacciones .rxn-eq-bloque > .rxn-etiqueta { color: #334155; }
-#reacciones .rxn-card--gris .rxn-reaccion { margin-bottom: 6px; }
-#reacciones .rxn-ecuacion .rxn-eq-coef {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 30px; height: 30px;
-  margin-right: 6px; padding: 0 8px;
-  font-size: 1.15rem; font-weight: 800;
-  color: #fff;
-  background: var(--rxn-verde);
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(39, 174, 96, .4);
-  animation: rxn-pop .5s cubic-bezier(.3, 1.6, .5, 1) both;
-  animation-delay: 1.9s;                      /* después de que aparece la ecuación balanceada */
-}
-#reacciones .rxn-conteo { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-#reacciones .rxn-at { padding: 3px 10px; font-size: 0.78rem; white-space: nowrap; color: #14532d; background: #dcfce7; border: 1px solid #a7e3bd; border-radius: 999px; }
-
-/* ---- Paso 4: se activa al balancear ------------------------------------------------------------- */
-#reacciones .rxn-card--analisis { border-top: 5px solid var(--rxn-verde); }
-
-
 /* ---- Utilidad --------------------------------------------------------------------------------------------------------- */
 #reacciones .rxn-solo-lector {
   position: absolute;
@@ -686,16 +710,11 @@
 @media (min-width: 600px) {
   #reacciones .rxn-root { padding: 18px 18px 28px; }
   #reacciones .rxn-card { padding: 18px; }
+  #reacciones .rxn-chip-nombre { max-width: 170px; }
   #reacciones .rxn-btn--ancho { width: auto; min-width: 260px; }
+  #reacciones .rxn-btn--fila { min-width: 0; }
+  #reacciones .rxn-pastillas { position: static; }
   #reacciones .rxn-reaccion,
   #reacciones .rxn-ecuacion { font-size: 1.5rem; }
   #reacciones .rxn-resumen { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 600px) {
-  #reacciones .rxn-sels { flex-direction: row; align-items: center; }
-  #reacciones .rxn-sels .rxn-sel { flex: 1 1 0; }
-  #reacciones .rxn-paso { font-size: 0.78rem; }
-  #reacciones .rxn-hoja { align-items: center; }
-  #reacciones .rxn-hoja-panel { border-radius: 22px; max-height: 76vh; }
 }
