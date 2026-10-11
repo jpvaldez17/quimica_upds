@@ -1,5 +1,5 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.0
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.1
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
@@ -50,19 +50,18 @@
 #reacciones .rxn-root p:last-child { margin-bottom: 0; }
 #reacciones .rxn-root [hidden] { display: none !important; }
 
-/* ---- Encabezado ----------------------------------------------------------- */
-#reacciones .rxn-encabezado { margin: 4px 2px 12px; }
-#reacciones .rxn-titulo { margin: 0 0 4px; font-size: 1.35rem; font-weight: 700; }
-#reacciones .rxn-lead { font-size: 0.88rem; color: var(--rxn-suave); }
-#reacciones .rxn-aviso {
-  margin-top: 8px !important;
-  padding: 7px 10px;
-  font-size: 0.76rem;
-  color: var(--rxn-ambar-texto);
-  background: var(--rxn-ambar-fondo);
-  border: 1px solid var(--rxn-ambar-borde);
-  border-radius: 10px;
+/* ---- Encabezado: título + icono verde ---------------------------------------- */
+#reacciones .rxn-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 2px 14px; }
+#reacciones .rxn-titulo { margin: 0; font-size: 1.4rem; font-weight: 700; line-height: 1.2; }
+#reacciones .rxn-logo {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px;
+  background: var(--rxn-verde-fondo);
+  border: 2px solid var(--rxn-verde);
+  border-radius: 14px;
 }
+#reacciones .rxn-logo svg { width: 28px; height: 28px; }
 
 /* ---- Tarjetas -------------------------------------------------------------- */
 #reacciones .rxn-card {
@@ -95,12 +94,12 @@
 /* ---- Campo de entrada -------------------------------------------------------- */
 #reacciones .rxn-entrada-wrap { position: relative; }
 #reacciones .rxn-campo {
-  border: 2px solid var(--rxn-borde);
+  border: 2px solid #000;
   border-radius: 14px;
   background: #fff;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-#reacciones .rxn-campo--ok { border-color: var(--rxn-verde); box-shadow: 0 0 0 3px rgba(39, 174, 96, .14); }
+#reacciones .rxn-campo--ok { border-color: #000; box-shadow: 0 0 0 3px rgba(0, 0, 0, .14); }
 #reacciones .rxn-campo--error { border-color: var(--rxn-rojo); box-shadow: 0 0 0 3px rgba(214, 69, 65, .12); }
 
 #reacciones .rxn-input {
@@ -180,21 +179,24 @@
 }
 #reacciones .rxn-pastilla {
   flex: 1 1 0;
-  min-height: 42px;
+  min-height: 46px;
   padding: 0 10px;
   font: inherit;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--rxn-verde-osc);
-  background: var(--rxn-verde-fondo);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: transform .1s ease, box-shadow .1s ease, filter .15s ease;
 }
-#reacciones .rxn-pastilla:active { background: #cfeedb; transform: scale(.97); }
-#reacciones .rxn-pastilla:last-child { color: var(--rxn-rojo); background: var(--rxn-rojo-fondo); font-size: .88rem; }
-#reacciones .rxn-pastilla:focus-visible { outline: 2px solid var(--rxn-verde); outline-offset: 2px; }
+#reacciones .rxn-pastilla--mas    { background: #10B981; box-shadow: 0 4px 10px rgba(16, 185, 129, .45); }  /* verde esmeralda vibrante */
+#reacciones .rxn-pastilla--flecha { font-size: 1.6rem; line-height: 1; background: #2563EB; box-shadow: 0 4px 10px rgba(37, 99, 235, .45); }   /* azul eléctrico */
+#reacciones .rxn-pastilla--borrar { background: #F43F5E; box-shadow: 0 4px 10px rgba(244, 63, 94, .45); font-size: 1rem; } /* rojo coral intenso */
+#reacciones .rxn-pastilla:hover { filter: brightness(1.06); }
+#reacciones .rxn-pastilla:active { transform: translateY(2px) scale(.96); box-shadow: 0 1px 3px rgba(0, 0, 0, .3); filter: brightness(.92); }
+#reacciones .rxn-pastilla:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
 
 /* ---- Mensajes -------------------------------------------------------------------- */
 #reacciones .rxn-msg {
