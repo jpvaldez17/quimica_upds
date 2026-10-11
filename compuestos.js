@@ -41,143 +41,35 @@
     ];
 
     /* ---------------------------------------------------------
-       2) DATOS
+       2) DATOS: todo viene de UN solo archivo, compuestosinformacion.js
+          (se carga solo; no hay que tocar index.html)
        --------------------------------------------------------- */
-    var DATA = [
-        {
-            id: 'acido-sulfurico',
-            nombre: 'Ácido sulfúrico',
-            formula: 'H₂SO₄',
-            otros: 'Aceite de vitriolo · Ácido de batería',
-            cat: 'acidos',
-            tipo: 'Compuesto',
-            estado: 'Líquido',
-            conc: '98 % (concentrado)',
-            masa: '98,08 g/mol',
-            fusion: '10 °C',
-            ebull: '≈ 337 °C',
-            dens: '1,84 g/cm³',
-            solub: 'Miscible en agua (libera mucho calor)',
-            riesgo: 'alto',
-            areas: ['industria', 'laboratorio'],
-            desc: 'Líquido denso, aceitoso e incoloro. Es un ácido fuerte y un potente deshidratante: arranca el agua de muchas sustancias.',
-            usos: {
-                industria: 'Fertilizantes, baterías de plomo, refinación de metales y petróleo',
-                laboratorio: 'Catalizador y agente deshidratante'
-            },
-            seg: 'Muy corrosivo: quema piel y ojos. Al diluirlo, agrega siempre el ácido al agua, nunca al revés, y despacio. Usa guantes, gafas y buena ventilación.',
-            curio: 'Es uno de los químicos industriales más producidos del mundo.',
-            rel: ['hidroxido-sodio'],
-            tags: ['acido fuerte', 'corrosivo', 'baterias', 'fertilizantes']
-        },
-        {
-            id: 'hidroxido-sodio',
-            nombre: 'Hidróxido de sodio',
-            formula: 'NaOH',
-            otros: 'Soda cáustica · Sosa cáustica',
-            cat: 'bases',
-            tipo: 'Compuesto',
-            estado: 'Sólido (escamas o perlas)',
-            conc: '≈ 99 % (grado técnico)',
-            masa: '40,00 g/mol',
-            fusion: '318 °C',
-            ebull: '1388 °C',
-            dens: '2,13 g/cm³',
-            solub: 'Muy soluble en agua (libera calor)',
-            riesgo: 'alto',
-            areas: ['industria', 'hogar', 'laboratorio'],
-            desc: 'Base fuerte, sólida y blanca que absorbe la humedad del aire. En agua forma una solución muy alcalina que disuelve grasas y materia orgánica.',
-            usos: {
-                industria: 'Jabones, papel, biodiésel y tratamiento de aguas',
-                hogar: 'Destapacañerías y limpiadores de grasa (en productos ya preparados)',
-                laboratorio: 'Titulaciones y preparación de soluciones básicas'
-            },
-            seg: 'Corrosivo: causa quemaduras graves en piel y ojos. Al disolverlo se calienta mucho: agrégalo poco a poco al agua. Usa guantes, gafas y delantal. No lo uses en recipientes de aluminio.',
-            curio: 'Su nombre común, soda cáustica, viene de "cáustico": que quema.',
-            rel: ['acido-sulfurico', 'cloruro-sodio'],
-            tags: ['base fuerte', 'soda caustica', 'jabon', 'destapacanerias']
-        },
-        {
-            id: 'lavandina',
-            nombre: 'Lavandina',
-            formula: 'NaClO',
-            otros: 'Hipoclorito de sodio · Cloro de casa',
-            cat: 'limpieza',
-            tipo: 'Solución',
-            estado: 'Líquido (amarillo pálido)',
-            conc: '≈ 4–6 % en productos domésticos',
-            masa: '74,44 g/mol',
-            fusion: '≈ −6 °C (solución al 5 %)',
-            ebull: 'Se descompone al calentarse',
-            dens: '≈ 1,1 g/cm³',
-            solub: 'Soluble en agua',
-            riesgo: 'medio',
-            areas: ['hogar', 'industria'],
-            desc: 'Solución acuosa de hipoclorito de sodio, oxidante y desinfectante. Su olor característico viene del cloro que libera.',
-            usos: {
-                hogar: 'Desinfección de superficies y blanqueo de ropa blanca',
-                industria: 'Tratamiento de agua, piscinas y blanqueo de papel'
-            },
-            seg: 'Nunca la mezcles con amoníaco, vinagre, ácidos ni otros limpiadores: libera gases tóxicos. Úsala diluida, en un lugar ventilado y con guantes. Guárdala cerrada y a la sombra.',
-            curio: 'Pierde fuerza con el tiempo: una lavandina vieja desinfecta menos.',
-            rel: ['hidroxido-sodio', 'cloruro-sodio'],
-            tags: ['cloro', 'desinfectante', 'blanqueador', 'hipoclorito', 'nunca mezclar']
-        },
-        {
-            id: 'benceno',
-            nombre: 'Benceno',
-            formula: 'C₆H₆',
-            otros: 'Benzol',
-            cat: 'solventes',
-            tipo: 'Compuesto',
-            estado: 'Líquido (incoloro, olor dulce)',
-            conc: 'Puro',
-            masa: '78,11 g/mol',
-            fusion: '5,5 °C',
-            ebull: '80,1 °C',
-            dens: '0,88 g/cm³',
-            solub: 'Casi insoluble en agua; soluble en solventes orgánicos',
-            riesgo: 'alto',
-            areas: ['industria', 'laboratorio'],
-            desc: 'Hidrocarburo aromático: un anillo de seis carbonos con electrones deslocalizados. Es muy volátil e inflamable y es la base de muchos otros compuestos.',
-            usos: {
-                industria: 'Materia prima para estireno, fenol, nailon y plásticos',
-                laboratorio: 'Solvente; hoy se sustituye por tolueno por su toxicidad'
-            },
-            seg: 'Cancerígeno comprobado (Grupo 1 de la IARC). Evita respirar sus vapores y el contacto con la piel; úsalo solo en campana de extracción y con guantes adecuados. Muy inflamable: lejos de chispas y llamas.',
-            curio: 'Según la anécdota, Kekulé imaginó el anillo del benceno en 1865 al soñar con una serpiente que se mordía la cola.',
-            rel: [],
-            tags: ['aromatico', 'cancerigeno', 'solvente', 'hidrocarburo']
-        },
-        {
-            id: 'cloruro-sodio',
-            nombre: 'Cloruro de sodio',
-            formula: 'NaCl',
-            otros: 'Sal común · Sal de mesa',
-            cat: 'sales',
-            tipo: 'Compuesto',
-            estado: 'Sólido cristalino (blanco)',
-            conc: 'Puro',
-            masa: '58,44 g/mol',
-            fusion: '801 °C',
-            ebull: '1413 °C',
-            dens: '2,16 g/cm³',
-            solub: 'Muy soluble: ≈ 360 g/L a 25 °C',
-            riesgo: 'bajo',
-            areas: ['hogar', 'alimentacion', 'salud', 'industria'],
-            desc: 'Sal iónica formada por iones Na⁺ y Cl⁻. En agua se disocia por completo y conduce la electricidad.',
-            usos: {
-                hogar: 'Condimento y conservación de alimentos',
-                alimentacion: 'Conservante y curado de carnes y quesos',
-                salud: 'Suero fisiológico (0,9 %) y lavados nasales',
-                industria: 'Materia prima de cloro y soda cáustica; deshielo de carreteras'
-            },
-            seg: 'Poco peligrosa, pero el exceso de sodio en la dieta eleva la presión arterial. Corroe los metales: sécalos bien después del contacto.',
-            curio: 'Bolivia alberga el Salar de Uyuni, el salar más grande del mundo.',
-            rel: ['hidroxido-sodio', 'lavandina'],
-            tags: ['sal', 'sal de mesa', 'electrolito', 'suero']
-        }
-    ];
+    var DATA = [];
+    var cargando = true;
+
+    function datosListos() {
+        DATA = window.CMP_DATOS || [];
+        cargando = false;
+        pintar();
+    }
+
+    if (window.CMP_DATOS) {
+        DATA = window.CMP_DATOS;   // ya estaba cargado (por una etiqueta script)
+        cargando = false;
+    } else {
+        var VER = '1';
+        try {
+            var csr = document.currentScript;
+            var mv = csr && /[?&]v=([^&]+)/.exec(csr.src);
+            if (mv) VER = mv[1];   // usa el mismo ?v= de compuestos.js
+        } catch (e) { /* sin versión: se usa 1 */ }
+        var sd = document.createElement('script');
+        sd.src = 'compuestosinformacion.js?v=' + VER;
+        sd.async = true;
+        sd.onload = datosListos;
+        sd.onerror = datosListos;   // si falla, se muestra vacío
+        document.head.appendChild(sd);
+    }
 
     /* ---------------------------------------------------------
        3) UTILIDADES
@@ -185,7 +77,8 @@
     var FAV_KEY = 'quimica_upds_favoritos';
 
     function norm(s) {
-        return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[\u2080-\u2089]/g, function (c) { return String(c.charCodeAt(0) - 8320); });  // H₂SO₄ → h2so4
     }
     function esc(s) {
         return String(s == null ? '' : s)
@@ -247,16 +140,31 @@
        --------------------------------------------------------- */
     function filtrados() {
         var q = norm(state.q).trim();
-        return DATA.filter(function (c) {
+        var lista = DATA.filter(function (c) {
             if (state.cat && c.cat !== state.cat) return false;
             if (state.area && c.areas.indexOf(state.area) < 0) return false;
             if (state.soloFavs && !state.favs.has(c.id)) return false;
             if (q) {
-                var pajar = norm([c.nombre, c.formula, c.otros, c.tags.join(' ')].join(' '));
+                var pajar = norm([c.nombre, c.formula, c.otros, (c.tags || []).join(' ')].join(' '));
                 if (pajar.indexOf(q) < 0) return false;
             }
             return true;
         });
+        if (q) {
+            // lo más parecido primero: nombre exacto → nombre que empieza → fórmula → nombre que contiene → resto
+            var puntos = function (c) {
+                var n = norm(c.nombre), f = norm(c.formula);
+                if (n === q || f === q) return 0;
+                if (n.indexOf(q) === 0) return 1;
+                if (f.indexOf(q) === 0) return 2;
+                if (n.indexOf(q) > 0) return 3;
+                return 4;
+            };
+            lista = lista.map(function (c, i) { return { c: c, p: puntos(c), i: i }; })
+                         .sort(function (a, b) { return a.p - b.p || a.i - b.i; })
+                         .map(function (x) { return x.c; });
+        }
+        return lista;
     }
 
     /* ---------------------------------------------------------
@@ -407,6 +315,11 @@
     }
 
     function pintar() {
+        if (cargando) {
+            elToolbar.hidden = false;
+            elBody.innerHTML = '<div class="cmp-vacio">Cargando compuestos…</div>';
+            return;
+        }
         var c = state.id ? porId(DATA, state.id) : null;
         elToolbar.hidden = !!c;
         if (c) {
@@ -485,7 +398,7 @@
        --------------------------------------------------------- */
     window.Compuestos = {
         abrir: function (id) {
-            if (!porId(DATA, id)) return;
+            if (!cargando && !porId(DATA, id)) return;
             if (typeof window.mostrarPagina === 'function') window.mostrarPagina('compuestos');
             state.id = id;
             pintar();
