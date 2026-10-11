@@ -558,7 +558,7 @@
         if (!ov || ov.hidden) { return; }
         var v = window.visualViewport, p = ov.firstChild;
         p.style.top = ((v ? v.offsetTop : 0) + 8) + "px";
-        p.style.maxHeight = Math.min((v ? v.height : window.innerHeight) - 16, 480) + "px";
+        p.style.maxHeight = Math.min((v ? v.height : window.innerHeight) - 16, 320) + "px";
     }
 
     function abrirPanel(i) {
