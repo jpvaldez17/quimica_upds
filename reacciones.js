@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 3.1 (rediseño: chips compactos, reacción completa en negro,
+   Versión 3.2 (rediseño: chips compactos, reacción completa en negro,
    ecuación balanceada en gris, acordeones de análisis llamativos)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
@@ -845,22 +845,23 @@
       type: 'text', id: 'rxn-entrada', class: 'rxn-input', autocomplete: 'off', autocapitalize: 'off',
       autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go',
       placeholder: 'Ej.: KMnO4 + KI + H2SO4', 'aria-controls': 'rxn-sugerencias',
-      oninput: alEscribir, onkeydown: alTecla, onfocus: alEscribir
+      oninput: alEscribir, onkeydown: alTecla, onfocus: alEscribir,
+      onscroll: sincronizarEspejo, onkeyup: sincronizarEspejo, onclick: sincronizarEspejo
     });
-    $.campo = el('div', { class: 'rxn-campo' }, [$.input]);
+    $.espejo = el('div', { class: 'rxn-espejo', 'aria-hidden': 'true' });
+    $.campo = el('div', { class: 'rxn-campo' }, [$.espejo, $.input]);
     $.sugerencias = el('ul', { class: 'rxn-sugerencias', id: 'rxn-sugerencias', role: 'listbox', hidden: true });
     $.pastillas = construirPastillas();
     $.msgEntrada = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
     $.chips = el('ul', { class: 'rxn-chips', 'aria-label': 'Reactivos agregados' });
     $.vacioR = el('p', { class: 'rxn-vacio', text: 'Aún no hay reactivos. Escribe una fórmula o un nombre (ej. HCl, agua).' });
-    $.ejemplos = el('div', { class: 'rxn-ejemplos' });
     $.btnDeterminar = el('button', { type: 'button', class: 'rxn-btn rxn-btn--primario rxn-btn--ancho', onclick: determinarReaccion }, ['Determinar reacción']);
 
     raiz.appendChild(el('section', { class: 'rxn-card' }, [
       el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Reactivos' }), $.contadorR]),
       el('label', { class: 'rxn-solo-lector', for: 'rxn-entrada', text: 'Escribe los reactivos separados por +' }),
       el('div', { class: 'rxn-entrada-wrap' }, [$.campo, $.sugerencias]),
-      $.pastillas, $.msgEntrada, $.chips, $.vacioR, $.ejemplos, $.btnDeterminar
+      $.pastillas, $.msgEntrada, $.chips, $.vacioR, $.btnDeterminar
     ]));
 
     /* --- 2. Reacción completa (fondo negro) --- */
@@ -979,20 +980,6 @@
     }
     $.contadorP.textContent = 'Productos ' + P.length + ' / ' + CONFIG.limiteProductos;
     $.btnBalancear.disabled = P.length === 0;
-  }
-
-  function renderEjemplos() {
-    limpiar($.ejemplos);
-    var ejemplos = ['KMnO4 + KI + H2SO4', 'NaOH + HCl', 'CH4 + O2', 'H2 + O2'];
-    var validos = ejemplos.filter(function (t) { return parsearEntrada(t).estado === 'ok'; });
-    if (!validos.length) { $.ejemplos.hidden = true; return; }
-    $.ejemplos.hidden = false;
-    $.ejemplos.appendChild(el('span', { class: 'rxn-ejemplos-et', text: 'Prueba con:' }));
-    validos.forEach(function (t) {
-      $.ejemplos.appendChild(el('button', { type: 'button', class: 'rxn-ejemplo', onclick: function () {
-        $.input.value = t; alEscribir(); desplazarA($.campo);
-      } }, [t]));
-    });
   }
 
   /* ---------- Ecuación ---------- */
@@ -1286,7 +1273,22 @@
     $.input.focus();
   }
 
+  /* La barra de entrada es un <input>, que no permite colorear letras sueltas.
+     Por eso se dibuja el mismo texto en una capa detrás (con los "+" en verde)
+     y el texto real del input se vuelve transparente. */
+  function sincronizarEspejo() { if ($.espejo) $.espejo.scrollLeft = $.input.scrollLeft; }
+  function actualizarEspejo() {
+    if (!$.espejo) return;
+    limpiar($.espejo);
+    String($.input.value).split('+').forEach(function (t, i) {
+      if (i > 0) $.espejo.appendChild(el('span', { class: 'rxn-espejo-mas', text: '+' }));
+      if (t) $.espejo.appendChild(document.createTextNode(t));
+    });
+    sincronizarEspejo();
+  }
+
   function alEscribir(sinSugerencias) {
+    actualizarEspejo();
     estado.entrada = parsearEntrada($.input.value);
     invalidarResultados();
     var e = estado.entrada;
@@ -1405,7 +1407,6 @@
       construirVista(temporal);
       limpiar(contenedor);
       while (temporal.firstChild) contenedor.appendChild(temporal.firstChild);
-      renderEjemplos();
       renderTodo();
     } catch (err) {
       console.error('[Reacciones] Error al construir la pestaña:', err);
