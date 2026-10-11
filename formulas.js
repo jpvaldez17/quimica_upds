@@ -1,6 +1,6 @@
 /* =============================================================================
    formulas.js — Motor de datos y cálculo químico de QuímicApp
-   Catálogo v1.1  ·  lo consume reacciones.js (pestaña Reacciones)
+   Catálogo v1.2  ·  lo consume reacciones.js (pestaña Reacciones)
 
    QUÉ HAY AQUÍ
    1. ELEMENTOS   Tabla periódica completa (118): símbolo, nombre, número
@@ -26,6 +26,13 @@
    - CATALOGO.resolverAmbiguedad(R, P)         → coeficientes de reacciones
                                                  redox que solo con átomos no
                                                  tienen solución única.
+
+   CONSULTA DEL BANCO (simulador paso a paso, v1.2)
+   - CATALOGO.reactivosCompatiblesCon([ids])   → qué reactivo se puede sumar a los ya elegidos
+                                                 (y si ya hay reacción exacta).
+   - CATALOGO.buscarReaccionExacta([ids])      → reacción(es) del banco para esos reactivos.
+   - CATALOGO.describirReaccion(r)             → productos, categoría, nota y coeficientes.
+   - CATALOGO.validarBanco()                   → [] si todo el banco conserva átomos y carga.
 
    CÓMO AMPLIAR
    - Elemento: ya están los 118.
@@ -1593,6 +1600,92 @@
     });
   }
 
+
+  /* =========================================================================
+     9d. CONSULTA ENCADENADA PARA N REACTIVOS  (v1.2 · simulador paso a paso)
+     Generaliza 9c a cualquier cantidad de reactivos (el banco llega hasta 3).
+     Solo lee BANCO_REACCIONES; no modifica datos ni funciones anteriores.
+     - buscarReaccionExacta(lista)      → reacciones cuyos reactivos son EXACTAMENTE
+                                          esos (varias = variantes, p. ej. combustión
+                                          completa / incompleta). El orden no importa.
+     - reactivosCompatiblesCon(lista)   → { companeros, exactas, hayExacta }
+         companeros: sustancias que se pueden SUMAR a la lista para llegar a alguna
+                     reacción del banco, con cuántas reacciones tiene cada una.
+         exactas:    lo mismo que buscarReaccionExacta(lista).
+         Con lista vacía devuelve todos los reactivos disponibles.
+     - describirReaccion(r)             → datos listos para mostrar (cualitativos primero).
+     - validarBanco()                   → problemas de datos (vacío = banco consistente).
+     ====================================================================== */
+  var NOMBRES_BANCO = {
+    'SCN-': 'Ion tiocianato',
+    '[FeSCN]^2+': 'Ion tiocianato de hierro(III)',
+    'S4O6^2-': 'Ion tetrationato',
+    'CH2=CH2': 'Eteno (etileno)',
+    'CH2=CHCl': 'Cloroeteno (cloruro de vinilo)',
+    '(--CH2--CH2--)n': 'Polietileno',
+    '(--CH2--CH(CH3)--)n': 'Polipropileno',
+    '(--CH2--CHCl--)n': 'Policloruro de vinilo (PVC)'
+  };
+
+  function incluyeTodos(reactivos, lista) {
+    return lista.every(function (x) { return reactivos.indexOf(x) >= 0; });
+  }
+
+  function buscarReaccionExacta(lista) {
+    var pedido = unicos((lista || []).filter(Boolean));
+    if (!pedido.length) return [];
+    var clave = pedido.slice().sort().join('|');
+    return BANCO_REACCIONES.filter(function (r) {
+      return r.reactivos.length === pedido.length && r.reactivos.slice().sort().join('|') === clave;
+    });
+  }
+
+  function reactivosCompatiblesCon(lista) {
+    var sel = unicos((lista || []).filter(Boolean));
+    if (!sel.length) return { companeros: reactivosDisponibles(), exactas: [], hayExacta: false };
+    var companeros = conteoBanco(function (r) {
+      return r.reactivos.length > sel.length && incluyeTodos(r.reactivos, sel);
+    }, function (r) { return r.reactivos.filter(function (x) { return sel.indexOf(x) < 0; }); });
+    var exactas = buscarReaccionExacta(sel);
+    return { companeros: companeros, exactas: exactas, hayExacta: exactas.length > 0 };
+  }
+
+  function describirReaccion(r) {
+    if (!r) return null;
+    return {
+      id: r.id, titulo: r.titulo, categoria: r.categoria, nota: r.nota || '',
+      reactivos: r.reactivos.slice(), productos: r.productos.slice(),
+      coeficientesR: r.coeficientesR.slice(), coeficientesP: r.coeficientesP.slice(),
+      sinReaccion: r.productos.length === 0
+    };
+  }
+
+  function validarBanco() {
+    var p = [];
+    function sp(id) { return registroIndice(id) || resolverFormula(id); }
+    BANCO_REACCIONES.forEach(function (r) {
+      var et = 'Banco #' + r.id + ' (' + r.titulo + '): ';
+      if (r.coeficientesR.length !== r.reactivos.length) { p.push(et + 'coeficientesR no coincide con reactivos.'); return; }
+      if (r.coeficientesP.length !== r.productos.length) { p.push(et + 'coeficientesP no coincide con productos.'); return; }
+      if (!r.productos.length) return;
+      var R = r.reactivos.map(sp), P = r.productos.map(sp);
+      if (R.concat(P).some(function (x) { return !x || !x.composicion || !Object.keys(x.composicion).length; })) return;   // polímeros / iones complejos: no verificables
+      var at = {}, carga = 0;
+      R.forEach(function (x, i) {
+        Object.keys(x.composicion).forEach(function (e) { at[e] = (at[e] || 0) + x.composicion[e] * r.coeficientesR[i]; });
+        carga += (x.carga || 0) * r.coeficientesR[i];
+      });
+      P.forEach(function (x, i) {
+        Object.keys(x.composicion).forEach(function (e) { at[e] = (at[e] || 0) - x.composicion[e] * r.coeficientesP[i]; });
+        carga -= (x.carga || 0) * r.coeficientesP[i];
+      });
+      var mal = Object.keys(at).filter(function (e) { return at[e] !== 0; });
+      if (mal.length) p.push(et + 'no conserva ' + mal.join(', ') + '.');
+      if (carga !== 0) p.push(et + 'no conserva la carga.');
+    });
+    return p;
+  }
+
   /* =========================================================================
      10. EXPORTACIÓN
      reacciones.js lee: elementos, compuestos, iones, reglas, resolverFormula,
@@ -1600,7 +1693,7 @@
      ====================================================================== */
   var CATALOGO = {
     meta: {
-      version: '1.1',
+      version: '1.2',
       datosDePrueba: false,
       nota: 'Masas atómicas estándar abreviadas (IUPAC, g/mol). Elementos sin isótopo estable: número de masa del ' +
             'isótopo más estable. Reglas de predicción de nivel introductorio: no inventan productos fuera de ellas.'
@@ -1635,7 +1728,14 @@
     reactivosDisponibles: reactivosDisponibles,
     reactivosCompatibles: reactivosCompatibles,
     tercerosPosibles: tercerosPosibles,
-    buscarReaccion: buscarReaccion
+    buscarReaccion: buscarReaccion,
+
+    /* consulta encadenada para N reactivos (simulador paso a paso) */
+    buscarReaccionExacta: buscarReaccionExacta,
+    reactivosCompatiblesCon: reactivosCompatiblesCon,
+    describirReaccion: describirReaccion,
+    nombresBanco: NOMBRES_BANCO,
+    validarBanco: validarBanco
   };
 
   /* Exportación global: FORMULAS_REACCIONES es el nombre que lee reacciones.js;
