@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 3.3 (rediseño: chips compactos, reacción completa en negro,
+   Versión 3.4 (usa el motor de formulas.js v1.0; rediseño: chips compactos, reacción completa en negro,
    ecuación balanceada en gris, acordeones de análisis llamativos)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
@@ -141,6 +141,13 @@
     if (porId.length === 1) return { sustancia: INDICE[porId[0]], interpretado: true };
     var porNombre = ORDEN.filter(function (id) { return normalizar(INDICE[id].nombre) === n; });
     if (porNombre.length === 1) return { sustancia: INDICE[porNombre[0]], interpretado: true };
+    /* Fórmula válida pero fuera del catálogo: formulas.js calcula su composición
+       y su masa molar con la tabla periódica (sin clasificación ni estados de oxidación). */
+    var dinamica = CATALOGO && CATALOGO.resolverFormula ? CATALOGO.resolverFormula(t) : null;
+    if (dinamica) {
+      if (!INDICE[dinamica.id]) INDICE[dinamica.id] = dinamica;   // no entra en ORDEN: no ensucia las sugerencias
+      return { sustancia: INDICE[dinamica.id], interpretado: false };
+    }
     return null;
   }
 
@@ -360,7 +367,7 @@
     return (ac.length === 1 && ba.length === 1) ? { acido: ac[0], base: ba[0] } : null;
   }
 
-  var REGLAS_PREDICCION = [
+  var REGLAS_INTERNAS = [
     reglaFija('permanganato-yoduro-acido', 'Permanganato + yoduro en medio ácido',
               ['KMnO4', 'KI', 'H2SO4'], ['MnSO4', 'I2', 'K2SO4', 'H2O']),
     reglaFija('sintesis-agua', 'Síntesis del agua', ['H2', 'O2'], ['H2O']),
@@ -390,6 +397,10 @@
       productos: function () { return ['CO2', 'H2O']; }
     }
   ];
+
+  /* Si formulas.js trae sus propias reglas (catálogo v1.0+), se usan esas;
+     las internas quedan solo como respaldo para catálogos antiguos. */
+  var REGLAS_PREDICCION = (CATALOGO && CATALOGO.reglas && CATALOGO.reglas.length) ? CATALOGO.reglas : REGLAS_INTERNAS;
 
   function proponerProductos(R) {
     if (!R.length) return { estado: 'sin-reactivos', productos: [], mensaje: 'Agrega al menos un reactivo.' };
@@ -487,6 +498,15 @@
     if (libres.length === 0) {
       return { estado: 'imposible',
         mensaje: 'Estas sustancias no se pueden balancear juntas: no existe una combinación de coeficientes que conserve los átomos' + (hayCarga ? ' y las cargas' : '') + '. Revisa que reactivos y productos sean los correctos.' };
+    }
+    if (libres.length > 1 && CATALOGO && CATALOGO.resolverAmbiguedad) {
+      var conocido = CATALOGO.resolverAmbiguedad(reactivos, productos);
+      if (conocido) {
+        var vc = verificarConservacion(reactivos, productos, conocido.coeficientesReactivos, conocido.coeficientesProductos);
+        if (vc.atomos && vc.carga) {
+          return { estado: 'ok', coeficientesReactivos: conocido.coeficientesReactivos, coeficientesProductos: conocido.coeficientesProductos };
+        }
+      }
     }
     if (libres.length > 1) {
       return { estado: 'ambigua',
@@ -623,10 +643,17 @@
         texto: 'Un ácido y una base reaccionan y se forman una sal y agua. Es como si el H\u207a del ácido se uniera al OH\u207b de la base para dar H\u2082O.',
         nota: esRedox ? '' : 'No cambia ningún número de oxidación, así que no es redox.' };
     }
-    if (R.length === 2 && ids(R).indexOf('O2') >= 0 && clases(R).indexOf('hidrocarburo') >= 0 && ids(P).indexOf('CO2') >= 0) {
+    if (R.length === 2 && ids(R).indexOf('O2') >= 0 && (clases(R).indexOf('hidrocarburo') >= 0 || clases(R).indexOf('organico') >= 0 || R.some(function (s) { return !!(CATALOGO && CATALOGO.compuestos[s.id] && CATALOGO.compuestos[s.id].combustible); })) && ids(P).indexOf('CO2') >= 0) {
       return { nombre: 'Combustión',
-        texto: 'Una sustancia reacciona con el oxígeno y libera energía. Con un hidrocarburo y oxígeno suficiente se forman CO\u2082 y H\u2082O.',
+        texto: 'Una sustancia reacciona con el oxígeno y libera energía. Con un compuesto orgánico y oxígeno suficiente se forman CO\u2082 y H\u2082O.',
         nota: 'También es redox: el carbono se oxida y el oxígeno se reduce.' };
+    }
+    if (R.length === 2 && ids(P).indexOf('CO2') >= 0 && ids(P).indexOf('H2O') >= 0 && !esRedox &&
+        R.some(function (s) { return s.clasificacion === 'acido'; }) &&
+        R.some(function (s) { var c = CATALOGO && CATALOGO.compuestos[s.id]; return !!(c && c.iones && (c.iones.anion === 'CO3^2-' || c.iones.anion === 'HCO3-') && c.clasificacion === 'sal'); })) {
+      return { nombre: 'Ácido + carbonato (desprende CO\u2082)',
+        texto: 'Un ácido ataca a un carbonato y se forman una sal, agua y CO\u2082 gaseoso (el burbujeo). En el fondo es un doble desplazamiento seguido de la descomposición del H\u2082CO\u2083.',
+        nota: 'No cambia ningún número de oxidación, así que no es redox.' };
     }
     if (R.length === 1 && P.length >= 2) {
       return { nombre: 'Descomposición',
@@ -636,8 +663,8 @@
       return { nombre: 'Síntesis (combinación)',
         texto: 'Dos o más sustancias se unen para formar una sola, más compleja.', nota: esRedox ? 'Además es redox.' : '' };
     }
-    var elR = R.filter(function (s) { return s.clasificacion === 'elemento'; }).length;
-    var elP = P.filter(function (s) { return s.clasificacion === 'elemento'; }).length;
+    var elR = R.filter(function (s) { return s.clasificacion === 'elemento' || s.tipo === 'elemento'; }).length;
+    var elP = P.filter(function (s) { return s.clasificacion === 'elemento' || s.tipo === 'elemento'; }).length;
     if (R.length === 2 && P.length === 2 && elR === 1 && elP === 1 && esRedox) {
       return { nombre: 'Desplazamiento simple',
         texto: 'Una sustancia simple desplaza a otro elemento de un compuesto y ocupa su lugar.', nota: 'Es redox.' };
