@@ -480,9 +480,11 @@
     function shell() {
 
         var campos = [0, 1].map(function (i) {
-            return '<div class="tom-campo"><label for="tom-e' + i + '">Elemento ' + (i + 1) + "</label>" +
-                '<input type="text" id="tom-e' + i + '" class="tom-input" data-i="' + i + '" list="tom-lista" placeholder="N, nitrógeno o 7" ' +
-                'autocomplete="off" autocapitalize="off" spellcheck="false"><div class="tom-info" id="tom-i' + i + '"></div></div>';
+            return '<div class="tom-campo"><label for="tom-e' + i + '">Elemento ' + (i + 1) + '</label><div class="tom-sel">' +
+                '<input type="text" id="tom-e' + i + '" class="tom-input" data-i="' + i + '" placeholder="Toca para elegir" readonly inputmode="none" autocomplete="off">' +
+                '<button type="button" class="tom-dd" data-a="dd" data-i="' + i + '" aria-label="Elegir elemento de la lista" aria-haspopup="dialog">' +
+                '<i class="fa-solid fa-chevron-down"></i></button></div>' +
+                '<div class="tom-info" id="tom-i' + i + '"></div></div>';
         }).join("");
 
         var cargas = [-3, -2, -1, 0, 1, 2, 3].map(function (v) {
@@ -493,7 +495,6 @@
             return '<button type="button" class="tom-caso" data-a="caso" data-i="' + i + '">' + c.t + "</button>";
         }).join("");
 
-        var lista = ELEMENTOS.map(function (e) { return '<option value="' + e.sym + '">' + e.nom + " · Z = " + e.z + "</option>"; }).join("");
 
         return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora TOM</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
             '<p class="tom-p">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p></section>' +
@@ -501,8 +502,7 @@
             '<div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
             '<div id="tom-res" aria-live="polite"></div>' +
-            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips">' + casos + "</div></section>" +
-            '<datalist id="tom-lista">' + lista + "</datalist>";
+            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips">' + casos + "</div></section>" ;
     }
 
     function marcarCarga() {
@@ -521,10 +521,102 @@
                 '<div class="tom-cfgl">' + cfgHtml(e) + "</div>";
         } else if (!texto.trim()) {
             d.className = "tom-info";
-            d.textContent = "Escribe un elemento";
+            d.textContent = "Toca para elegir un elemento";
         } else {
             d.className = "tom-info mal";
             d.textContent = "No encontré ese elemento";
+        }
+    }
+
+    /* Panel de elementos en pantalla: lista con scroll + buscador.
+       Los campos son de solo toque, así que el teclado solo se abre
+       si el usuario toca el buscador del panel. */
+    var ov, sel = 0;
+
+    function filtrarElementos(t) {
+        t = normalizar(t);
+        return ELEMENTOS.filter(function (e) {
+            return !t || normalizar(e.sym).indexOf(t) === 0 || normalizar(e.nom).indexOf(t) === 0 || String(e.z).indexOf(t) === 0;
+        });
+    }
+
+    function pintarLista(t, centrar) {
+
+        var act = buscar(est.t[sel]), ls = $("tom-ls"), items = filtrarElementos(t);
+
+        ls.innerHTML = items.length ? items.map(function (e) {
+            return '<button type="button" role="option" class="tom-op' + (act && act.z === e.z ? " sel" : "") + '" data-a="pick" data-s="' + e.sym +
+                '"><b>' + e.sym + "</b><span>" + e.nom + "</span><i>Z = " + e.z + "</i></button>";
+        }).join("") : '<div class="tom-vacio">Sin coincidencias</div>';
+
+        var s = ls.querySelector(".sel");
+        ls.scrollTop = (centrar && s) ? Math.max(0, s.offsetTop - ls.clientHeight / 2 + 23) : 0;
+    }
+
+    /* Mantiene el panel dentro de la zona visible (también con el teclado abierto) */
+    function ajustarPanel() {
+        if (!ov || ov.hidden) { return; }
+        var v = window.visualViewport, p = ov.firstChild;
+        p.style.top = ((v ? v.offsetTop : 0) + 8) + "px";
+        p.style.maxHeight = Math.min((v ? v.height : window.innerHeight) - 16, 480) + "px";
+    }
+
+    function abrirPanel(i) {
+        sel = i;
+        $("tom-pt").textContent = "Elemento " + (i + 1);
+        $("tom-q").value = "";
+        ov.hidden = false;
+        document.body.classList.add("tom-bloq");
+        ajustarPanel();
+        pintarLista("", true);
+    }
+
+    function cerrarPanel() {
+        ov.hidden = true;
+        $("tom-q").blur();
+        document.body.classList.remove("tom-bloq");
+    }
+
+    function elegir(sym) {
+        est.t[sel] = sym;
+        $("tom-e" + sel).value = sym;
+        cerrarPanel();
+        calcular();
+    }
+
+    function crearPanel() {
+
+        ov = document.createElement("div");
+        ov.id = "tom-ov";
+        ov.className = "tom-ov";
+        ov.hidden = true;
+        ov.innerHTML = '<div class="tom-pnl" role="dialog" aria-modal="true" aria-label="Elegir elemento">' +
+            '<div class="tom-ph"><b id="tom-pt">Elemento 1</b><button type="button" class="tom-x" data-a="cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>' +
+            '<input type="text" id="tom-q" class="tom-q" placeholder="Buscar: símbolo, nombre o Z" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">' +
+            '<div class="tom-ls" id="tom-ls" role="listbox"></div></div>';
+        document.body.appendChild(ov);
+
+        ov.addEventListener("click", function (ev) {
+            if (ev.target === ov || ev.target.closest('[data-a="cerrar"]')) { cerrarPanel(); return; }
+            var b = ev.target.closest('[data-a="pick"]');
+            if (b) { elegir(b.dataset.s); }
+        });
+
+        ov.addEventListener("input", function (ev) {
+            if (ev.target.id === "tom-q") { pintarLista(ev.target.value, false); }
+        });
+
+        ov.addEventListener("keydown", function (ev) {
+            if (ev.key === "Escape") { cerrarPanel(); }
+            if (ev.key === "Enter" && ev.target.id === "tom-q") {
+                var f = filtrarElementos(ev.target.value)[0];
+                if (f) { elegir(f.sym); }
+            }
+        });
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", ajustarPanel);
+            window.visualViewport.addEventListener("scroll", ajustarPanel);
         }
     }
 
@@ -540,7 +632,7 @@
         est.r = null;
 
         if (!els[0] || !els[1]) {
-            cont.innerHTML = aviso("Elige los dos elementos (símbolo, nombre o número atómico) para ver el análisis.", "inf");
+            cont.innerHTML = aviso("Elige los dos elementos para ver el análisis.", "inf");
             return;
         }
 
@@ -557,6 +649,11 @@
     }
 
     function alClick(ev) {
+
+        if (ev.target.classList.contains("tom-input")) {
+            abrirPanel(+ev.target.dataset.i);
+            return;
+        }
 
         var sm = ev.target.closest("summary");
         if (sm) {
@@ -580,7 +677,8 @@
             $("tom-e1").value = "";
             marcarCarga();
             calcular();
-            $("tom-e0").focus();
+        } else if (a === "dd") {
+            abrirPanel(+b.dataset.i);
         } else if (a === "caso") {
             var caso = CASOS[+b.dataset.i];
             est.t = caso.s.slice();
@@ -590,13 +688,6 @@
             marcarCarga();
             calcular();
             $("tom-e0").closest(".card").scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }
-
-    function alEscribir(ev) {
-        if (ev.target.classList && ev.target.classList.contains("tom-input")) {
-            est.t[+ev.target.dataset.i] = ev.target.value;
-            calcular();
         }
     }
 
@@ -624,8 +715,8 @@
         $("tom-e1").value = est.t[1];
 
         raiz.addEventListener("click", alClick);
-        raiz.addEventListener("input", alEscribir);
         raiz.addEventListener("toggle", alAbrir, true);
+        crearPanel();
 
         marcarCarga();
         calcular();
