@@ -1,5 +1,5 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.7
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.3
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
@@ -628,45 +628,3 @@
   #reacciones .rxn-ecuacion { font-size: 1.5rem; }
   #reacciones .rxn-resumen { grid-template-columns: repeat(2, 1fr); }
 }
-
-/* =============================================================================
-   TIPOGRAFÍA DE ENLACES — SOLO el sector superior:
-   título + tarjeta "Reactivos" + tarjeta negra "Reacción completa".
-   (No afecta a "Ecuación balanceada" ni a "Análisis y estequiometría".)
-   Solo cambia fuente, tamaños y pesos; ninguna medida ni color.
-   S = toda tarjeta que no sea #rxn-resultado ni #rxn-analisis.
-   ========================================================================== */
-
-#reacciones .rxn-encabezado,
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) {
-  font-family: "Poppins", Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.55;
-}
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) button,
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) input { font-family: inherit; }
-
-/* Título de la pestaña y de las tarjetas */
-#reacciones .rxn-encabezado .rxn-titulo { font-size: 18px; font-weight: 700; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-card-titulo { font-size: 16px; font-weight: 600; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-contador { font-size: 12px; font-weight: 600; }
-
-/* Campo de entrada y su capa de texto (deben llevar el mismo peso) */
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-input,
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-espejo { font-weight: 600; }
-
-/* Sugerencias, píldoras, chips, botones, mensajes */
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-sug-nombre { font-size: 14px; font-weight: 500; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-sug-tipo { font-size: 12px; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-pastilla { font-weight: 600; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-chip-formula { font-weight: 700; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-chip-nombre { font-size: 12px; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-btn { font-size: 15px; font-weight: 600; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-btn--balancear { font-size: 16px; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-msg { font-size: 14px; line-height: 1.5; }
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-vacio { font-size: 13px; }
-
-/* Reacción completa: signos y flecha (Poppins no se carga en peso 800) */
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-eq-signo,
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-eq-flecha,
-#reacciones .rxn-card:not(#rxn-resultado):not(#rxn-analisis) .rxn-eq-coef { font-weight: 700; }
