@@ -100,11 +100,13 @@
 
     /* =========================================
        2. MOTOR DE CÁLCULO
-       Niveles de menor a mayor energía (esquema 2s-2p).
-       k: enl / anti · t: tipo de enlace · n: orbitales
+       Esquema 2s-2p: 8 orbitales moleculares = máx. 16 e⁻.
+       Con N ≥ 12 (O₂, F₂…) el σ2px baja por debajo de los π2p.
+       Los e⁻ ocupan los mismos niveles en ambos órdenes, así que
+       el resultado no cambia: solo cambia el dibujo y la notación.
        ========================================= */
 
-    var NIV = [
+    var BASE = [
         { k: "enl", t: "σ", n: ["σ2s"] },
         { k: "anti", t: "σ", n: ["σ*2s"] },
         { k: "enl", t: "π", n: ["π2py", "π2pz"] },
@@ -113,24 +115,24 @@
         { k: "anti", t: "σ", n: ["σ*2px"] }
     ];
 
+    var MAX_E = 16;
+
     var ISO = { 2: "H₂", 4: "Be₂", 6: "B₂", 8: "C₂", 10: "N₂, CO, CN⁻ y NO⁺", 12: "O₂", 14: "F₂", 16: "Ne₂" };
 
-    /* Orden en que entra cada electrón: Aufbau + Hund + Pauli */
-    function secuencia(N) {
-        var seq = [], q = N;
-        NIV.forEach(function (nv, i) {
-            var d = nv.n.length, e = Math.min(d * 2, q);
-            q -= e;
-            for (var j = 0; j < e; j++) { seq.push({ i: i, o: j % d, up: j < d }); }
-        });
-        return seq;
+    function niveles(N) {
+        var orden = (N >= 12) ? [0, 1, 3, 2, 4, 5] : [0, 1, 2, 3, 4, 5];
+        return orden.map(function (i) { return BASE[i]; });
     }
 
-    /* Ocupación de cada orbital cuando hay k electrones colocados */
-    function ocupacion(seq, k) {
-        var oc = NIV.map(function (nv) { return nv.n.map(function () { return 0; }); });
-        for (var j = 0; j < k; j++) { oc[seq[j].i][seq[j].o]++; }
-        return oc;
+    /* Aufbau + Pauli + Hund: devuelve los e⁻ de cada orbital */
+    function llenar(niv, N) {
+        var q = N;
+        return niv.map(function (nv) {
+            var d = nv.n.length, e = Math.min(d * 2, q), oc = nv.n.map(function () { return 0; });
+            q -= e;
+            for (var j = 0; j < e; j++) { oc[j % d]++; }
+            return oc;
+        });
     }
 
     function analizar(e1, e2, c) {
@@ -142,18 +144,19 @@
             r.err = "Con esa carga no quedan electrones de valencia (N = " + N + "). Reduce la carga positiva.";
             return r;
         }
-        if (N > 16) {
-            r.err = "El esquema de clase admite como máximo 16 e⁻ de valencia y aquí hay " + N +
-                ". Reduce la carga negativa o elige otros elementos.";
+        if (N > MAX_E) {
+            r.err = "El esquema 2s–2p tiene 8 orbitales moleculares y admite como máximo " + MAX_E +
+                " e⁻ de valencia; aquí hay " + N + ". Reduce la carga negativa o cambia de elementos.";
             return r;
         }
 
-        r.seq = secuencia(N);
-        r.oc = ocupacion(r.seq, N);
+        r.niv = niveles(N);
+        r.oc = llenar(r.niv, N);
+        r.sigmaPrimero = (N >= 12);
 
         var enl = 0, anti = 0, pi = 0, pia = 0, des = [];
 
-        NIV.forEach(function (nv, i) {
+        r.niv.forEach(function (nv, i) {
             nv.n.forEach(function (nm, o) {
                 var e = r.oc[i][o];
                 if (nv.k === "enl") { enl += e; if (nv.t === "π") { pi += e; } }
@@ -207,6 +210,19 @@
         return f + " = <b>" + r.N + " e⁻</b>";
     }
 
+    /* Configuración completa en orden de llenado; la capa de valencia va resaltada */
+    function cfgHtml(e) {
+        return e.cfg.map(function (p) {
+            return '<span class="' + (+p[0].charAt(0) === e.n ? "tom-val" : "") + '">' + p[0] + sup(p[1]) + "</span>";
+        }).join(" ");
+    }
+
+    function ordenTexto(r) {
+        return r.niv.map(function (nv) {
+            return nv.n.length === 2 ? nv.n[0].slice(0, -1) : nv.n[0];
+        }).join(" &lt; ");
+    }
+
     function aviso(t, c) { return '<div class="tom-aviso ' + (c || "") + '">' + t + "</div>"; }
 
     function tile(v, e, c) {
@@ -225,7 +241,7 @@
 
     /* =========================================
        4. ESTRUCTURA MOLECULAR (SVG)
-       σ = línea recta · π = arcos
+       σ = línea recta naranja · π = arco suave
        ========================================= */
 
     function svgEstructura(r) {
@@ -240,32 +256,26 @@
 
         if (r.existe) {
             if (sg > 0) { s += '<line class="b-s" x1="120" y1="55" x2="180" y2="55"/>'; }
-            if (pi > 0) { s += '<path class="b-p" d="M124 49Q150 18 176 49"/>'; }
-            if (pi > 1) { s += '<path class="b-p" d="M124 61Q150 92 176 61"/>'; }
+            if (pi > 0) { s += '<path class="b-p" d="M124 44Q150 33 176 44"/>'; }
+            if (pi > 1) { s += '<path class="b-p" d="M124 66Q150 77 176 66"/>'; }
         } else {
             s += '<line class="b-x" x1="120" y1="55" x2="180" y2="55"/>';
         }
 
-        s += '<circle class="at" cx="92" cy="55" r="28"/><circle class="at" cx="208" cy="55" r="28"/>' +
+        return s + '<circle class="at" cx="92" cy="55" r="28"/><circle class="at" cx="208" cy="55" r="28"/>' +
             '<text class="t-at" x="92" y="64">' + r.e1.sym + '</text><text class="t-at" x="208" y="64">' + r.e2.sym + "</text></svg>";
-
-        return s;
     }
 
 
     /* =========================================
-       5. DIAGRAMA DE NIVELES DE ENERGÍA (SVG)
-       Muestra k electrones colocados, uno a uno.
+       5. DIAGRAMA DE NIVELES DE ENERGÍA (SVG estático)
        ========================================= */
 
     var Y = [300, 235, 190, 150, 100, 55];
 
     function segmentos(d) { return d === 1 ? [[128, 212]] : [[104, 160], [180, 236]]; }
 
-    function svgDiagrama(r, k, nuevo) {
-
-        var oc = ocupacion(r.seq, k);
-        var ult = (nuevo && k > 0) ? r.seq[k - 1] : null;
+    function svgDiagrama(r) {
 
         var s = '<svg viewBox="0 0 340 350" class="tom-svg" role="img" aria-label="Diagrama de niveles de energía de los orbitales moleculares">' +
             '<line class="eje" x1="10" y1="332" x2="10" y2="34"/><polygon class="eje-p" points="10,24 5,36 15,36"/>' +
@@ -287,29 +297,28 @@
                 var x1 = l ? 268 : 16, xa = l ? 268 : 72;
 
                 ao.a.forEach(function (i) {
-                    var sg = segmentos(NIV[i].n.length);
+                    var sg = segmentos(r.niv[i].n.length);
                     var q = l ? sg[sg.length - 1][1] : sg[0][0];
                     conex += '<line class="cx" x1="' + xa + '" y1="' + ao.y + '" x2="' + q + '" y2="' + Y[i] + '"/>';
                 });
 
-                atom += '<g class="ao"><line class="ln-ao" x1="' + x1 + '" y1="' + ao.y + '" x2="' + (x1 + 56) + '" y2="' + ao.y + '"/>' +
-                    '<text class="t-ao" x="' + (x1 + 28) + '" y="' + (ao.y - 8) + '">' + ao.t + "</text></g>";
+                atom += '<line class="ln-ao" x1="' + x1 + '" y1="' + ao.y + '" x2="' + (x1 + 56) + '" y2="' + ao.y + '"/>' +
+                    '<text class="t-ao" x="' + (x1 + 28) + '" y="' + (ao.y - 8) + '">' + ao.t + "</text>";
             });
         });
 
-        /* Orbitales moleculares */
-        NIV.forEach(function (nv, i) {
+        /* Orbitales moleculares con sus electrones */
+        r.niv.forEach(function (nv, i) {
 
             var sg = segmentos(nv.n.length);
 
             nv.n.forEach(function (nm, o) {
 
-                var e = oc[i][o], x1 = sg[o][0], x2 = sg[o][1], xm = (x1 + x2) / 2, y = Y[i];
-                var esNuevo = ult && ult.i === i && ult.o === o;
+                var e = r.oc[i][o], x1 = sg[o][0], x2 = sg[o][1], xm = (x1 + x2) / 2, y = Y[i];
 
-                niv += '<g class="lv ' + nv.k + (e ? "" : " vac") + (e === 1 ? " des" : "") + '">' +
+                niv += '<g class="lv ' + nv.k + (e ? "" : " vac") + '">' +
                     '<line class="ln" x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '"/>' +
-                    (e ? '<text class="t-e' + (esNuevo ? " nuevo" : "") + '" x="' + xm + '" y="' + (y - 8) + '">' + (e === 2 ? "↑↓" : "↑") + "</text>" : "") +
+                    (e ? '<text class="t-e" x="' + xm + '" y="' + (y - 8) + '">' + (e === 2 ? "↑↓" : "↑") + "</text>" : "") +
                     '<text class="nm" x="' + xm + '" y="' + (y + 16) + '">' + nm + "</text></g>";
             });
         });
@@ -318,23 +327,10 @@
             '<text class="t-a" x="44" y="346">' + r.e1.sym + '</text><text class="t-a" x="296" y="346">' + r.e2.sym + "</text></svg>";
     }
 
-    /* Explica qué regla se aplicó al último electrón colocado */
-    function regla(r, k) {
-
-        if (!k) { return "Pulsa + o ▶ para colocar los electrones de menor a mayor energía."; }
-
-        var q = r.seq[k - 1], nv = NIV[q.i], d = nv.n.length, por;
-
-        if (!q.up) { por = "Pauli: el segundo e⁻ del orbital entra con espín opuesto (↓)."; }
-        else if (d === 2) { por = "Hund: 1 e⁻ en cada orbital de igual energía antes de aparearlos."; }
-        else { por = "Aufbau: se ocupa el nivel libre de menor energía."; }
-
-        return "e⁻ " + k + " → " + nv.n[q.o] + ". " + por;
-    }
-
 
     /* =========================================
-       6. PANTALLA DE RESULTADOS
+       6. BLOQUES DE RESULTADOS (orden fijo)
+       1 Resultados · 2 Notación · 3 Diagrama · 4 Paso a paso
        ========================================= */
 
     function htmlResultado(r) {
@@ -357,8 +353,8 @@
         var det = r.existe ? desglose(r) : (r.impar ? "N impar" : "sin enlace");
         var el = r.c > 0 ? " − " + r.c + " e⁻" : (r.c < 0 ? " + " + (-r.c) + " e⁻" : "");
 
-        /* 1 · Resultado */
-        out += '<section class="card">' + cab("fa-flask", "Resultado") +
+        /* 1 · Resultados (tarjeta oscura) */
+        out += '<section class="card tom-dark">' + cab("fa-flask", "Resultados") +
             '<div class="tom-rx"><span class="tom-at">' + r.e1.sym + "</span><span>+</span>" +
             '<span class="tom-at">' + r.e2.sym + "</span>" + (el ? '<span class="tom-el">' + el + "</span>" : "") +
             '<span>→</span><span class="tom-pr">' + producto(r) + "</span></div>" +
@@ -371,32 +367,30 @@
             tile(r.N + " e⁻", "de valencia", "gr") +
             "</div></section>";
 
-        /* 2 · Diagrama (los electrones entran uno a uno) */
-        out += '<section class="card">' + cab("fa-chart-simple", "Diagrama de niveles de energía") +
-            '<div id="tom-dg" class="tom-dg" data-foco=""></div>' +
-            '<div class="tom-ctl">' +
-            '<button type="button" data-a="menos" aria-label="Quitar un electrón">−</button>' +
-            '<div class="tom-cnt"><b id="tom-k">0</b> / ' + r.N + " e⁻</div>" +
-            '<button type="button" data-a="mas" aria-label="Poner un electrón">+</button>' +
-            '<button type="button" data-a="play" class="tom-play"></button>' +
-            '<button type="button" data-a="reset" aria-label="Reiniciar"><i class="fa-solid fa-rotate-left"></i></button></div>' +
-            '<p id="tom-regla" class="tom-regla"></p>' +
-            '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span></div>' +
-            '<p class="tom-p tom-suave">Esquema cualitativo (no está a escala). Los orbitales atómicos están a los lados y los moleculares en el centro. ' +
-            "Se usa el esquema de clase 2s–2p.</p></section>";
-
-        /* 3 · Notación */
+        /* 2 · Notación con píldoras */
         var chips = "";
-        NIV.forEach(function (nv, i) {
+        r.niv.forEach(function (nv, i) {
             nv.n.forEach(function (nm, o) {
-                if (r.oc[i][o]) { chips += '<span class="tom-mo ' + nv.k + '">(' + nm + ")<sup>" + r.oc[i][o] + "</sup></span>"; }
+                var e = r.oc[i][o];
+                if (e) { chips += '<span class="tom-mo ' + nv.k + (e === 1 ? " des" : "") + '">(' + nm + ")<sup>" + e + "</sup></span>"; }
             });
         });
 
         out += '<section class="card">' + cab("fa-atom", "Notación de orbitales moleculares") +
             '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
-            '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span></div>' +
-            '<p class="tom-p tom-suave"><b>KK</b> = capas internas de ambos átomos (no cuentan).</p></section>';
+            '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span><span class="tom-lg des">1 e⁻ solo</span></div>' +
+            '<div class="tom-guia"><b>Cómo leerla:</b> cada píldora es un orbital molecular y el número pequeño son los electrones que tiene (máximo 2). ' +
+            "Los <b>azules</b> unen los átomos y los <b>rojos</b> los separan. Si alguna píldora tiene <b>1 solo e⁻</b> (halo naranja), hay electrones " +
+            "desapareados y la molécula es <b>paramagnética</b>; si todas tienen 2, es <b>diamagnética</b>. <b>KK</b> son las capas internas, que no cuentan.</div></section>";
+
+        /* 3 · Diagrama estático dentro de un acordeón */
+        out += '<section class="card tom-cardacc"><details class="tom-paso" data-d="1"' + (est.dopen ? " open" : "") + "><summary>" +
+            '<span class="tom-num"><i class="fa-solid fa-chart-simple"></i></span><span>Diagrama de niveles de energía</span></summary>' +
+            '<div class="tom-cuerpo">' + svgDiagrama(r) +
+            '<div class="tom-guia"><div><span class="tom-lg anti">▲ Antienlazantes</span> Van arriba: tienen más energía y <b>restan estabilidad</b>.</div>' +
+            '<div><span class="tom-lg enl">▼ Enlazantes</span> Van abajo: tienen menos energía y <b>dan estabilidad</b>.</div></div>' +
+            '<p class="tom-p tom-suave">Orden en este diagrama: ' + ordenTexto(r) + ". Los orbitales atómicos están a los lados y los moleculares en el centro. " +
+            "Esquema cualitativo, no está a escala.</p></div></details></section>";
 
         /* 4 · Paso a paso */
         out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
@@ -411,11 +405,8 @@
     function pasoElectrones(r) {
 
         var filas = [r.e1, r.e2].map(function (e) {
-            var cfg = e.cfg.map(function (p) {
-                return '<span class="' + (+p[0].charAt(0) === e.n ? "tom-val" : "") + '">' + p[0] + sup(p[1]) + "</span>";
-            }).join(" ");
             return '<div class="tom-fila"><b>' + e.sym + "</b> " + e.nom + " · Z = " + e.z +
-                '<div class="tom-cfg">' + cfg + "</div>Capa de valencia (n = " + e.n + "): <b>" + textoValencia(e) + " = " + e.v + " e⁻</b></div>";
+                '<div class="tom-cfg">' + cfgHtml(e) + "</div>Capa de valencia (n = " + e.n + "): <b>" + textoValencia(e) + " = " + e.v + " e⁻</b></div>";
         }).join("");
 
         var nota = r.c > 0 ? "La carga positiva <b>quita</b> " + r.c + " e⁻." : (r.c < 0 ? "La carga negativa <b>agrega</b> " + (-r.c) + " e⁻." : "La molécula es neutra: no se agregan ni se quitan e⁻.");
@@ -425,12 +416,15 @@
     }
 
     function pasoLlenado(r) {
-        return '<p class="tom-p">Orden de energía, de menor a mayor:</p>' +
-            '<div class="tom-formula">σ2s &lt; σ*2s &lt; π2p &lt; σ2px &lt; π*2p &lt; σ*2px</div>' +
+        return '<p class="tom-p">Orden de energía para esta molécula, de menor a mayor:</p>' +
+            '<div class="tom-formula">' + ordenTexto(r) + "</div>" +
+            '<p class="tom-p tom-suave">' + (r.sigmaPrimero
+                ? "Con N ≥ 12 (como O₂ y F₂) el σ2px queda por debajo de los π2p."
+                : "Con N ≤ 11 (como N₂, CO y CN⁻) los π2p quedan por debajo del σ2px.") + "</p>" +
             '<ul class="tom-lista"><li><b>Aufbau:</b> los e⁻ ocupan primero los niveles de menor energía.</li>' +
             "<li><b>Pauli:</b> máximo 2 e⁻ por orbital, con espines opuestos.</li>" +
             "<li><b>Hund:</b> en orbitales de igual energía (π o π*) se pone 1 e⁻ en cada uno antes de aparear.</li></ul>" +
-            '<p class="tom-p">Los <b>' + r.N + ' e⁻</b> quedan como en la notación KK[…]. Usa ▶ en el diagrama para verlos entrar uno a uno.</p>';
+            '<p class="tom-p">Los <b>' + r.N + " e⁻</b> quedan como en la notación KK[…].</p>";
     }
 
     function pasoOrden(r) {
@@ -456,7 +450,7 @@
 
         var t = r.para
             ? '<p class="tom-p"><b>' + r.des.length + " e⁻ desapareado" + (r.des.length > 1 ? "s" : "") + "</b> en " + r.des.join(" y ") +
-            ".</p><p class=\"tom-p\">Es <b>paramagnética</b>: un campo magnético la atrae.</p>"
+            '.</p><p class="tom-p">Es <b>paramagnética</b>: un campo magnético la atrae.</p>'
             : '<p class="tom-p">Todos los e⁻ están apareados.</p><p class="tom-p">Es <b>diamagnética</b>: un campo magnético la repele débilmente.</p>';
 
         if (ISO[r.N]) {
@@ -470,7 +464,15 @@
        7. INTERFAZ Y EVENTOS
        ========================================= */
 
-    var est = { t: ["N", "O"], c: 1, r: null, k: 0, nuevo: false, timer: null };
+    var CASOS = [
+        { t: "NO⁺", s: ["N", "O"], c: 1 }, { t: "SiCl⁻", s: ["Si", "Cl"], c: -1 }, { t: "PF⁻", s: ["P", "F"], c: -1 },
+        { t: "CN⁻", s: ["C", "N"], c: -1 }, { t: "BO⁺", s: ["B", "O"], c: 1 }, { t: "AsBr²⁺", s: ["As", "Br"], c: 2 },
+        { t: "PbI⁻", s: ["Pb", "I"], c: -1 }, { t: "NF²⁺", s: ["N", "F"], c: 2 }, { t: "HgF⁻", s: ["Hg", "F"], c: -1 },
+        { t: "SbH⁻", s: ["Sb", "H"], c: -1 }, { t: "N₂", s: ["N", "N"], c: 0 }, { t: "O₂", s: ["O", "O"], c: 0 },
+        { t: "F₂", s: ["F", "F"], c: 0 }
+    ];
+
+    var est = { t: ["N", "O"], c: 1, r: null, dopen: false };
     var raiz;
 
     function shell() {
@@ -482,7 +484,11 @@
         }).join("");
 
         var cargas = [-3, -2, -1, 0, 1, 2, 3].map(function (v) {
-            return '<button type="button" class="tom-chip" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0")) + "</button>";
+            return '<button type="button" class="tom-chip" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0 neutro")) + "</button>";
+        }).join("");
+
+        var casos = CASOS.map(function (c, i) {
+            return '<button type="button" class="tom-caso" data-a="caso" data-i="' + i + '">' + c.t + "</button>";
         }).join("");
 
         var lista = ELEMENTOS.map(function (e) { return '<option value="' + e.sym + '">' + e.nom + " · Z = " + e.z + "</option>"; }).join("");
@@ -490,10 +496,12 @@
         return '<section class="card">' + cab("fa-atom", "ENLACES · CALCULADORA TOM") +
             '<p class="tom-p">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula. ' +
             "Elige los elementos y la carga: el resultado es inmediato y cada paso se explica abajo.</p></section>" +
-            '<section class="card"><div class="tom-campos">' + campos + "</div>" +
+            '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
             '<div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
-            '<div id="tom-res" aria-live="polite"></div><datalist id="tom-lista">' + lista + "</datalist>";
+            '<div id="tom-res" aria-live="polite"></div>' +
+            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips">' + casos + "</div></section>" +
+            '<datalist id="tom-lista">' + lista + "</datalist>";
     }
 
     function marcarCarga() {
@@ -508,7 +516,8 @@
         var d = $("tom-i" + i);
         if (e) {
             d.className = "tom-info ok";
-            d.innerHTML = "Z = " + e.z + " · valencia <b>" + e.v + " e⁻</b> · " + textoValencia(e);
+            d.innerHTML = '<div class="tom-z"><span class="tom-zv">Z = ' + e.z + '</span><span class="tom-sep">|</span>Valencia: <b>' + e.v + "</b> e⁻</div>" +
+                '<div class="tom-cfgl">' + cfgHtml(e) + "</div>";
         } else if (!texto.trim()) {
             d.className = "tom-info";
             d.textContent = "Escribe un elemento";
@@ -518,31 +527,7 @@
         }
     }
 
-    function detener() {
-        if (est.timer) { clearInterval(est.timer); est.timer = null; }
-        var p = raiz.querySelector('[data-a="play"]');
-        if (p) { p.innerHTML = '<i class="fa-solid fa-play"></i> Reproducir'; }
-    }
-
-    function pintarDiagrama() {
-
-        var r = est.r;
-        if (!r || r.err || !$("tom-dg")) { return; }
-
-        $("tom-dg").innerHTML = svgDiagrama(r, est.k, est.nuevo);
-        $("tom-k").textContent = est.k;
-        $("tom-regla").textContent = regla(r, est.k);
-
-        raiz.querySelector('[data-a="menos"]').disabled = (est.k === 0);
-        raiz.querySelector('[data-a="mas"]').disabled = (est.k >= r.N);
-
-        var p = raiz.querySelector('[data-a="play"]');
-        p.innerHTML = est.timer ? '<i class="fa-solid fa-pause"></i> Pausa' : '<i class="fa-solid fa-play"></i> Reproducir';
-    }
-
     function calcular() {
-
-        detener();
 
         var els = [0, 1].map(function (i) {
             var e = buscar(est.t[i]);
@@ -560,8 +545,6 @@
 
         var r = analizar(els[0], els[1], est.c);
         est.r = r;
-        est.k = r.err ? 0 : r.N;
-        est.nuevo = false;
 
         cont.innerHTML = r.err
             ? aviso("<b>No se puede calcular.</b> " + r.err + '<div class="tom-formula">' + formulaN(r) + "</div>", "err")
@@ -570,8 +553,6 @@
         cont.classList.remove("tom-in");
         void cont.offsetWidth;
         cont.classList.add("tom-in");
-
-        pintarDiagrama();
     }
 
     function alClick(ev) {
@@ -583,9 +564,9 @@
         }
 
         var b = ev.target.closest("[data-a]");
-        if (!b || b.disabled) { return; }
+        if (!b) { return; }
 
-        var a = b.dataset.a, r = est.r;
+        var a = b.dataset.a;
 
         if (a === "carga") {
             est.c = +b.dataset.v;
@@ -599,26 +580,15 @@
             marcarCarga();
             calcular();
             $("tom-e0").focus();
-        } else if (a === "mas" || a === "menos") {
-            detener();
-            est.k = Math.max(0, Math.min(r.N, est.k + (a === "mas" ? 1 : -1)));
-            est.nuevo = true;
-            pintarDiagrama();
-        } else if (a === "reset") {
-            detener();
-            est.k = 0;
-            est.nuevo = false;
-            pintarDiagrama();
-        } else if (a === "play") {
-            if (est.timer) { detener(); return; }
-            if (est.k >= r.N) { est.k = 0; }
-            est.nuevo = true;
-            est.timer = setInterval(function () {
-                if (est.k >= r.N) { detener(); pintarDiagrama(); return; }
-                est.k++;
-                pintarDiagrama();
-            }, 700);
-            pintarDiagrama();
+        } else if (a === "caso") {
+            var caso = CASOS[+b.dataset.i];
+            est.t = caso.s.slice();
+            est.c = caso.c;
+            $("tom-e0").value = est.t[0];
+            $("tom-e1").value = est.t[1];
+            marcarCarga();
+            calcular();
+            $("tom-e0").closest(".card").scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }
 
@@ -629,16 +599,16 @@
         }
     }
 
-    /* Un solo paso abierto a la vez; el diagrama resalta lo que se explica */
-    function alAbrirPaso(ev) {
+    /* Paso a paso: uno abierto a la vez. El diagrama recuerda si estaba abierto. */
+    function alAbrir(ev) {
 
         var d = ev.target;
-        if (!d.classList || !d.classList.contains("tom-paso") || !d.open) { return; }
+        if (!d.classList || !d.classList.contains("tom-paso")) { return; }
 
-        raiz.querySelectorAll(".tom-paso").forEach(function (o) { if (o !== d) { o.open = false; } });
+        if (d.dataset.d) { est.dopen = d.open; return; }
+        if (!d.open) { return; }
 
-        var dg = $("tom-dg");
-        if (dg) { dg.dataset.foco = ({ "3": "oe", "4": "mag" })[d.dataset.n] || ""; }
+        raiz.querySelectorAll(".tom-paso[data-n]").forEach(function (o) { if (o !== d) { o.open = false; } });
     }
 
     function iniciar() {
@@ -653,7 +623,7 @@
 
         raiz.addEventListener("click", alClick);
         raiz.addEventListener("input", alEscribir);
-        raiz.addEventListener("toggle", alAbrirPaso, true);
+        raiz.addEventListener("toggle", alAbrir, true);
 
         marcarCarga();
         calcular();
