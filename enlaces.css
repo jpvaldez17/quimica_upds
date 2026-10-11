@@ -71,15 +71,15 @@
     min-height: 40px;
     padding: 0 14px;
     border-radius: 20px;
-    border: 2px solid #d4d7da;
+    border: 2px solid var(--rj);
     background: #ffffff;
-    color: #2b2f36;
+    color: #b01040;
     font: 600 14px "Poppins", Arial, sans-serif;
     cursor: pointer;
-    transition: background .2s, border-color .2s;
+    transition: background .2s, color .2s;
 }
 
-.tom-chip.act { background: var(--ac); border-color: var(--ac); color: #2a1700; }
+.tom-chip.act { background: var(--rj); border-color: var(--rj); color: #ffffff; }
 
 .tom-borrar {
     margin-top: 16px;
@@ -93,7 +93,7 @@
     cursor: pointer;
 }
 
-.tom-chip:focus-visible, .tom-borrar:focus-visible, .tom-ctl button:focus-visible, .tom-paso summary:focus-visible {
+.tom-chip:focus-visible, .tom-borrar:focus-visible, .tom-paso summary:focus-visible {
     outline: 3px solid var(--az);
     outline-offset: 2px;
 }
@@ -143,15 +143,7 @@
 .tom-el { color: var(--rj); }
 .tom-pr { font-size: 20px; font-weight: 700; color: var(--az-o); }
 
-.tom-est { display: block; width: 100%; max-width: 340px; height: auto; margin: 0 auto; }
 
-.tom-est .at { fill: var(--ac-s); stroke: var(--ac); stroke-width: 3; }
-.tom-est .t-at { font: 700 22px "Poppins", Arial, sans-serif; fill: var(--ac-o); text-anchor: middle; }
-.tom-est .b-s { stroke: var(--ac); stroke-width: 5; stroke-linecap: round; }
-.tom-est .b-p { stroke: var(--az); stroke-width: 4; stroke-linecap: round; fill: none; }
-.tom-est .b-x { stroke: #9aa3ab; stroke-width: 4; stroke-dasharray: 6 7; stroke-linecap: round; }
-.tom-est .br { stroke: #4b5563; stroke-width: 3; fill: none; stroke-linecap: round; }
-.tom-est .t-q { font: 700 20px "Poppins", Arial, sans-serif; fill: var(--rj); }
 
 .tom-leyenda { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; justify-content: center; }
 
@@ -209,33 +201,6 @@
 .tom-svg .lv.enl .nm { fill: var(--az-o); }
 .tom-svg .lv.anti .nm { fill: #b01040; }
 .tom-svg .t-e { font: 400 18px Arial, sans-serif; fill: #1c2026; text-anchor: middle; }
-.tom-svg .t-e.nuevo { fill: #E07B00; animation: tom-pop .45s ease; }
-
-/* Foco según el paso abierto */
-.tom-dg[data-foco="oe"] .ao, .tom-dg[data-foco="oe"] .cx { opacity: 0.2; }
-.tom-dg[data-foco="mag"] .lv:not(.des) { opacity: 0.25; }
-.tom-dg[data-foco="mag"] .lv.des .ln { stroke-width: 7; }
-
-.tom-ctl { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-
-.tom-ctl button {
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 22px;
-    border: 2px solid var(--ac);
-    background: #ffffff;
-    color: var(--ac-o);
-    font: 700 18px "Poppins", Arial, sans-serif;
-    cursor: pointer;
-    transition: background .2s;
-}
-
-.tom-ctl button:hover:not(:disabled) { background: var(--ac-s); }
-.tom-ctl button:disabled { opacity: 0.35; cursor: default; }
-.tom-ctl .tom-play { background: var(--ac); color: #2a1700; font-size: 14px; padding: 0 16px; }
-.tom-cnt { font-size: 14px; color: #3a424c; min-width: 70px; text-align: center; }
-.tom-regla { text-align: center; font-size: 13.5px; line-height: 1.5; color: #3a424c; min-height: 42px; margin: 10px 0 0; }
-
 
 /* ---------- Notación ---------- */
 
@@ -329,13 +294,92 @@
 
 @keyframes tom-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes tom-desp { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-@keyframes tom-pop { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-    .tom-in, .tom-paso[open] .tom-cuerpo, .tom-svg .t-e.nuevo { animation: none; }
-    .tom * { transition: none !important; }
+    .tom-in, .tom-paso[open] .tom-cuerpo,     .tom * { transition: none !important; }
 }
 
 @media (min-width: 640px) {
     .tom-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+
+/* ---------- Entradas: Z | valencia + configuración ---------- */
+
+.tom-campos { align-items: start; }
+.tom-z { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; color: #3a424c; }
+.tom-zv { color: var(--vd); font-weight: 700; }
+.tom-sep { color: #b4bac1; }
+.tom-cfgl { margin-top: 4px; font-size: 13px; line-height: 1.5; color: #6b7280; word-spacing: 2px; }
+
+
+/* ---------- Resultados (tarjeta oscura) ---------- */
+
+.tom .card.tom-dark { background: #121212; color: #f2f3f5; }
+.tom-dark .card-header h2 { color: #ffffff; }
+.tom-dark .card-icon.tom-ic { background: rgba(242, 153, 74, 0.18); color: var(--ac); }
+.tom-dark .tom-rx { color: #e6e8eb; }
+.tom-dark .tom-at { background: #2a2118; color: var(--ac); }
+.tom-dark .tom-el { color: #ff7a9a; }
+.tom-dark .tom-pr { color: #7cc7f5; }
+.tom-dark .tom-lg { background: transparent; }
+.tom-dark .tom-lg.s { border-color: var(--ac); color: var(--ac); }
+.tom-dark .tom-lg.p { border-color: #7cc7f5; color: #7cc7f5; }
+.tom-dark .tom-tile-v, .tom-dark .tom-tile.gr .tom-tile-v { color: #ffffff; }
+.tom-dark .tom-tile-v small, .tom-dark .tom-tile-e { color: #aeb4bc; }
+.tom-dark .tom-tile.az { background: #0f2a3d; border-color: #1d4d70; }
+.tom-dark .tom-tile.az .tom-tile-v { color: #7cc7f5; }
+.tom-dark .tom-tile.na { background: #3a2410; border-color: #6b4318; }
+.tom-dark .tom-tile.na .tom-tile-v { color: var(--ac); }
+.tom-dark .tom-tile.rj { background: #3a141d; border-color: #6b2536; }
+.tom-dark .tom-tile.rj .tom-tile-v { color: #ff7a9a; }
+.tom-dark .tom-tile.vd { background: #0f2e20; border-color: #1f5a40; }
+.tom-dark .tom-tile.vd .tom-tile-v { color: #4fd39a; }
+.tom-dark .tom-tile.gr { background: #222222; border-color: #333333; }
+
+.tom-est { display: block; width: 100%; max-width: 340px; height: auto; margin: 0 auto; }
+.tom-est .at { fill: #262626; stroke: var(--ac); stroke-width: 3; }
+.tom-est .t-at { font: 700 22px "Poppins", Arial, sans-serif; fill: #ffffff; text-anchor: middle; }
+.tom-est .b-s { stroke: var(--ac); stroke-width: 5; stroke-linecap: round; }
+.tom-est .b-p { stroke: #7cc7f5; stroke-width: 3; stroke-linecap: round; fill: none; }
+.tom-est .b-x { stroke: #6b7280; stroke-width: 4; stroke-dasharray: 6 7; stroke-linecap: round; }
+.tom-est .br { stroke: #c9ced4; stroke-width: 3; fill: none; stroke-linecap: round; }
+.tom-est .t-q { font: 700 20px "Poppins", Arial, sans-serif; fill: #ff7a9a; }
+
+
+/* ---------- Notación: guía didáctica ---------- */
+
+.tom-mo.des { box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.45); }
+.tom-lg.des { border-color: var(--ac); color: var(--ac-o); box-shadow: 0 0 0 2px rgba(242, 153, 74, 0.35); }
+.tom-guia { margin-top: 10px; padding: 10px 12px; background: #f7f9fb; border-radius: 14px; font-size: 13.5px; line-height: 1.55; color: #333a44; }
+.tom-guia div + div { margin-top: 6px; }
+
+
+/* ---------- Diagrama dentro de acordeón ---------- */
+
+.tom .card.tom-cardacc { padding: 0; overflow: hidden; }
+.tom-cardacc .tom-paso { border: none; border-radius: 0; margin: 0; }
+.tom-cardacc .tom-paso summary { background: #ffffff; padding: 14px 16px; }
+.tom-cardacc .tom-cuerpo { padding: 4px 16px 16px; }
+
+
+/* ---------- Casos de práctica ---------- */
+
+.tom .tom-casos { background: #1c1f24; border-radius: 20px; padding: 14px 16px; margin-bottom: 14px; }
+.tom-casos h2 { margin: 0; color: #ffffff; font-size: 16px; font-weight: 600; }
+.tom-casos p { margin: 2px 0 10px; font-size: 12.5px; color: #aeb4bc; }
+.tom-casos .tom-chips { gap: 6px; }
+
+.tom-caso {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 18px;
+    border: 1.5px solid #3b414a;
+    background: #2a2e35;
+    color: #ffffff;
+    font: 600 13.5px "Poppins", Arial, sans-serif;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+
+.tom-caso:hover, .tom-caso:focus-visible { background: var(--ac); border-color: var(--ac); color: #2a1700; outline: none; }
