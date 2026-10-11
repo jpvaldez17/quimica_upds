@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 3.2 (rediseño: chips compactos, reacción completa en negro,
+   Versión 3.3 (rediseño: chips compactos, reacción completa en negro,
    ecuación balanceada en gris, acordeones de análisis llamativos)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
@@ -902,11 +902,10 @@
     raiz.appendChild(el('section', { class: 'rxn-card', id: 'rxn-analisis' }, [
       el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Análisis y estequiometría' })]),
       el('p', { class: 'rxn-analisis-guia', text: 'Toca cada botón de color para abrir su explicación.' }),
-      tarjetaNumerada(1, 'Tipo de reacción', '¿Qué clase de reacción es?', 'cuerpo-tipo', 'Se mostrará al determinar la reacción.'),
-      tarjetaNumerada(2, 'Análisis redox', 'Quién se oxida y quién se reduce', 'cuerpo-redox', 'Se mostrará al determinar la reacción.'),
-      tarjetaNumerada(3, 'Estados de oxidación', 'El número de oxidación de cada átomo', 'cuerpo-oxidacion', 'Agrega reactivos para ver sus números de oxidación.'),
-      tarjetaNumerada(4, 'Masas molares', 'Cuánto pesa un mol de cada sustancia', 'cuerpo-masas', 'Agrega reactivos para ver sus masas molares.'),
-      tarjetaNumerada(5, 'Cálculos estequiométricos', 'Limitante, exceso y producción teórica', 'cuerpo-estequio', 'Primero balancea la ecuación.')
+      tarjetaNumerada(1, 'Tipo de reacción', 'Clasificación y análisis redox', 'cuerpo-tipo', 'Se mostrará al determinar la reacción.'),
+      tarjetaNumerada(2, 'Estados de oxidación', 'El número de oxidación de cada átomo', 'cuerpo-oxidacion', 'Agrega reactivos para ver sus números de oxidación.'),
+      tarjetaNumerada(3, 'Masas molares', 'Cuánto pesa un mol de cada sustancia', 'cuerpo-masas', 'Agrega reactivos para ver sus masas molares.'),
+      tarjetaNumerada(4, 'Cálculos estequiométricos', 'Reactivo limitante, exceso y producción teórica', 'cuerpo-estequio', 'Primero balancea la ecuación.')
     ]));
 
     contenedor.appendChild(raiz);
@@ -1083,10 +1082,12 @@
       if (estado.origen === 'usuario') t.appendChild(parrafo('Los productos los escribiste tú; la app no los verificó contra una regla.', 'rxn-dato-sub'));
     }
 
-    /* 2. Redox */
-    var x = $['cuerpo-redox']; limpiar(x);
+    /* Análisis redox: ahora dentro del bloque 1 (Tipo de reacción) */
+    var x = el('div', { class: 'rxn-redox-bloque' });
+    x.appendChild(el('p', { class: 'rxn-subtitulo', text: 'Análisis redox' }));
+    t.appendChild(x);
     var rx = estado.redox;
-    if (!rx) x.appendChild(parrafo('Se mostrará al determinar la reacción.', 'rxn-pendiente'));
+    if (!rx) t.removeChild(x);
     else if (rx.estado !== 'ok') x.appendChild(parrafo(rx.mensaje, 'rxn-pendiente'));
     else if (!rx.esRedox) {
       x.appendChild(parrafo('No es una reacción redox: ningún elemento cambia su número de oxidación.'));
