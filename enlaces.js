@@ -379,9 +379,11 @@
         out += '<section class="card">' + cab("fa-atom", "Notación de orbitales moleculares") +
             '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
             '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span><span class="tom-lg des">1 e⁻ solo</span></div>' +
-            '<div class="tom-guia"><b>Cómo leerla:</b> cada píldora es un orbital molecular y el número pequeño son los electrones que tiene (máximo 2). ' +
+            '<details class="tom-mini"' + (est.gopen ? " open" : "") + '><summary>Cómo leerla</summary><div class="tom-guia">' +
+            "Cada píldora es un orbital molecular y el número pequeño son los electrones que tiene (máximo 2). " +
             "Los <b>azules</b> unen los átomos y los <b>rojos</b> los separan. Si alguna píldora tiene <b>1 solo e⁻</b> (halo naranja), hay electrones " +
-            "desapareados y la molécula es <b>paramagnética</b>; si todas tienen 2, es <b>diamagnética</b>. <b>KK</b> son las capas internas, que no cuentan.</div></section>";
+            "desapareados y la molécula es <b>paramagnética</b>; si todas tienen 2, es <b>diamagnética</b>. <b>KK</b> son las capas internas, que no cuentan." +
+            "</div></details></section>";
 
         /* 3 · Diagrama estático dentro de un acordeón */
         out += '<section class="card tom-cardacc"><details class="tom-paso" data-d="1"' + (est.dopen ? " open" : "") + "><summary>" +
@@ -472,7 +474,7 @@
         { t: "F₂", s: ["F", "F"], c: 0 }
     ];
 
-    var est = { t: ["N", "O"], c: 1, r: null, dopen: false };
+    var est = { t: ["N", "O"], c: 1, r: null, dopen: false, gopen: false };
     var raiz;
 
     function shell() {
@@ -484,7 +486,7 @@
         }).join("");
 
         var cargas = [-3, -2, -1, 0, 1, 2, 3].map(function (v) {
-            return '<button type="button" class="tom-chip" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0 neutro")) + "</button>";
+            return '<button type="button" class="tom-chip" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0")) + "</button>";
         }).join("");
 
         var casos = CASOS.map(function (c, i) {
@@ -493,9 +495,8 @@
 
         var lista = ELEMENTOS.map(function (e) { return '<option value="' + e.sym + '">' + e.nom + " · Z = " + e.z + "</option>"; }).join("");
 
-        return '<section class="card">' + cab("fa-atom", "ENLACES · CALCULADORA TOM") +
-            '<p class="tom-p">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula. ' +
-            "Elige los elementos y la carga: el resultado es inmediato y cada paso se explica abajo.</p></section>" +
+        return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora TOM</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
+            '<p class="tom-p">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p></section>' +
             '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
             '<div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
@@ -516,7 +517,7 @@
         var d = $("tom-i" + i);
         if (e) {
             d.className = "tom-info ok";
-            d.innerHTML = '<div class="tom-z"><span class="tom-zv">Z = ' + e.z + '</span><span class="tom-sep">|</span>Valencia: <b>' + e.v + "</b> e⁻</div>" +
+            d.innerHTML = '<div class="tom-z"><span>Z = <b class="tom-zv">' + e.z + '</b></span><span class="tom-sep">|</span><span>Valencia: <b class="tom-vv">' + e.v + "</b> e⁻</span></div>" +
                 '<div class="tom-cfgl">' + cfgHtml(e) + "</div>";
         } else if (!texto.trim()) {
             d.className = "tom-info";
@@ -603,6 +604,7 @@
     function alAbrir(ev) {
 
         var d = ev.target;
+        if (d.classList && d.classList.contains("tom-mini")) { est.gopen = d.open; return; }
         if (!d.classList || !d.classList.contains("tom-paso")) { return; }
 
         if (d.dataset.d) { est.dopen = d.open; return; }
