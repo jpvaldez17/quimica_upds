@@ -1423,3 +1423,43 @@ button, input, select, textarea {
 .challenge-card {
     background: #f1f5f9;
 }
+
+
+/* ---------- DESAFÍO RÁPIDO: CONTADOR ---------- */
+.challenge-card .card-header {
+    flex-wrap: nowrap;
+}
+
+.challenge-card .card-header h2 {
+    min-width: 0;
+}
+
+.challenge-score {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.challenge-score span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.challenge-score .score-ok {
+    color: #14773f;
+}
+
+.challenge-score .score-no {
+    color: #a8201a;
+}
