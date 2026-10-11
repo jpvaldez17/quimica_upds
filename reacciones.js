@@ -1,6 +1,7 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 2.0
+   Versión 3.0 (rediseño: chips compactos, reacción completa en negro,
+   ecuación balanceada en gris, acordeones de análisis llamativos)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
    No usa Internet ni librerías externas. No modifica otras pestañas.
@@ -795,11 +796,18 @@
     nodo.scrollIntoView({ behavior: reducir ? 'auto' : 'smooth', block: 'start' });
   }
 
-  function tarjetaNumerada(num, titulo, clave, pendiente) {
+  function tarjetaNumerada(num, titulo, subtitulo, clave, pendiente) {
     var cuerpo = el('div', { class: 'rxn-acordeon-cuerpo' }, [el('p', { class: 'rxn-pendiente', text: pendiente })]);
     $[clave] = cuerpo;
-    var det = el('details', { class: 'rxn-acordeon' }, [
-      el('summary', {}, [el('span', { class: 'rxn-num', text: String(num) }), el('span', { class: 'rxn-acordeon-titulo', text: titulo })]),
+    var det = el('details', { class: 'rxn-acordeon rxn-acc-' + num }, [
+      el('summary', {}, [
+        el('span', { class: 'rxn-num', text: String(num) }),
+        el('span', { class: 'rxn-acordeon-textos' }, [
+          el('span', { class: 'rxn-acordeon-titulo', text: titulo }),
+          el('span', { class: 'rxn-acordeon-sub', text: subtitulo })
+        ]),
+        el('span', { class: 'rxn-acordeon-mas', 'aria-hidden': 'true' })
+      ]),
       cuerpo
     ]);
     $[clave + '-det'] = det;
@@ -843,26 +851,35 @@
       $.pastillas, $.msgEntrada, $.chips, $.vacioR, $.ejemplos, $.btnDeterminar
     ]));
 
-    /* --- 2. Productos --- */
-    $.contadorP = el('span', { class: 'rxn-contador' });
+    /* --- 2. Reacción completa (fondo negro) --- */
+    $.contadorP = el('span', { class: 'rxn-contador rxn-contador--oscuro' });
     $.msgProductos = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
-    $.chipsP = el('ul', { class: 'rxn-chips' });
-    $.vacioP = el('p', { class: 'rxn-vacio', text: 'Los productos aparecerán aquí al pulsar \u201cDeterminar reacción\u201d.' });
-    $.btnBalancear = el('button', { type: 'button', class: 'rxn-btn rxn-btn--primario rxn-btn--ancho', onclick: balancear }, ['\u2696\ufe0f Balancear ecuación']);
-    raiz.appendChild(el('section', { class: 'rxn-card' }, [
-      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Productos propuestos' }), $.contadorP]),
-      $.msgProductos, $.chipsP, $.vacioP, $.btnBalancear
-    ]));
+    $.reaccion = el('div', { class: 'rxn-reaccion rxn-reaccion--vacia', text: 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.' });
+    $.leyenda = el('div', { class: 'rxn-leyenda', hidden: true });
+    $.btnBalancear = el('button', { type: 'button', class: 'rxn-btn rxn-btn--balancear rxn-btn--ancho', onclick: balancear }, ['\u2696\ufe0f Balancear ecuación']);
+    $.cardReaccion = el('section', { class: 'rxn-card rxn-card--oscura', id: 'rxn-reaccion' }, [
+      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Reacción completa' }), $.contadorP]),
+      $.msgProductos, $.reaccion, $.leyenda, $.btnBalancear
+    ]);
+    raiz.appendChild($.cardReaccion);
 
-    /* --- 3. Ecuación balanceada (fondo negro) --- */
+    /* --- 3. Ecuación balanceada (fondo gris) + botón rojo de semirreacciones --- */
     $.medio = el('span', { class: 'rxn-medio', hidden: true });
     $.ecuacion = el('div', { class: 'rxn-ecuacion rxn-ecuacion--vacia', text: 'Aquí verás tu ecuación balanceada.' });
-    $.msgEcuacion = el('div', { class: 'rxn-msg rxn-msg--oscuro', role: 'status', hidden: true });
+    $.msgEcuacion = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
     $.cuerpoSemi = el('div', { class: 'rxn-semi-cuerpo' }, [el('p', { class: 'rxn-pendiente', text: 'Balancea una ecuación para ver las semirreacciones.' })]);
     $.detSemi = el('details', { class: 'rxn-semi' }, [
-      el('summary', { text: '\ud83d\udcdd Ver Semirreacciones (Reducción / Oxidación con electrones)' }), $.cuerpoSemi
+      el('summary', { class: 'rxn-semi-btn' }, [
+        el('span', { class: 'rxn-semi-icono', 'aria-hidden': 'true' }),
+        el('span', { class: 'rxn-semi-textos' }, [
+          el('span', { class: 'rxn-semi-ver', text: 'Ver semirreacciones' }),
+          el('span', { class: 'rxn-semi-ocultar', text: 'Ocultar semirreacciones' }),
+          el('span', { class: 'rxn-semi-sub', text: 'Oxidación y reducción con electrones' })
+        ])
+      ]),
+      $.cuerpoSemi
     ]);
-    $.cardResultado = el('section', { class: 'rxn-card rxn-card--oscura', id: 'rxn-resultado' }, [
+    $.cardResultado = el('section', { class: 'rxn-card rxn-card--gris', id: 'rxn-resultado' }, [
       el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Ecuación balanceada' }), $.medio]),
       $.ecuacion, $.msgEcuacion, $.detSemi
     ]);
@@ -871,11 +888,12 @@
     /* --- 4. Análisis (acordeones numerados, orden fijo) --- */
     raiz.appendChild(el('section', { class: 'rxn-card', id: 'rxn-analisis' }, [
       el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Análisis y estequiometría' })]),
-      tarjetaNumerada(1, 'Tipo de reacción', 'cuerpo-tipo', 'Se mostrará al determinar la reacción.'),
-      tarjetaNumerada(2, 'Análisis redox', 'cuerpo-redox', 'Se mostrará al determinar la reacción.'),
-      tarjetaNumerada(3, 'Estados de oxidación', 'cuerpo-oxidacion', 'Agrega reactivos para ver sus números de oxidación.'),
-      tarjetaNumerada(4, 'Masas molares', 'cuerpo-masas', 'Agrega reactivos para ver sus masas molares.'),
-      tarjetaNumerada(5, 'Cálculos estequiométricos', 'cuerpo-estequio', 'Primero balancea la ecuación.')
+      el('p', { class: 'rxn-analisis-guia', text: 'Toca cada botón de color para abrir su explicación.' }),
+      tarjetaNumerada(1, 'Tipo de reacción', '¿Qué clase de reacción es?', 'cuerpo-tipo', 'Se mostrará al determinar la reacción.'),
+      tarjetaNumerada(2, 'Análisis redox', 'Quién se oxida y quién se reduce', 'cuerpo-redox', 'Se mostrará al determinar la reacción.'),
+      tarjetaNumerada(3, 'Estados de oxidación', 'El número de oxidación de cada átomo', 'cuerpo-oxidacion', 'Agrega reactivos para ver sus números de oxidación.'),
+      tarjetaNumerada(4, 'Masas molares', 'Cuánto pesa un mol de cada sustancia', 'cuerpo-masas', 'Agrega reactivos para ver sus masas molares.'),
+      tarjetaNumerada(5, 'Cálculos estequiométricos', 'Limitante, exceso y producción teórica', 'cuerpo-estequio', 'Primero balancea la ecuación.')
     ]));
 
     contenedor.appendChild(raiz);
@@ -896,7 +914,6 @@
     return el('div', { class: 'rxn-pastillas', role: 'group', 'aria-label': 'Entrada rápida' }, [
       pastilla('+', 'Insertar signo más', function () { insertarEnCursor(' + ', 0); }),
       pastilla('\u2192', 'Insertar flecha', function () { insertarEnCursor(' \u2192 ', 0); }),
-      pastilla('( )', 'Insertar paréntesis', function () { insertarEnCursor('()', 1); }),
       pastilla('Borrar', 'Borrar todo', function () { $.input.value = ''; alEscribir(); $.input.focus(); })
     ]);
   }
@@ -905,8 +922,10 @@
   function crearChip(tk, indice, lado, quitable) {
     var s = tk.sustancia;
     var chip = el('li', { class: 'rxn-chip' + (s ? '' : ' rxn-chip--error') });
-    chip.appendChild(el('span', { class: 'rxn-chip-formula' }, s ? [formulaNodos(s)] : [tk.texto]));
-    chip.appendChild(el('span', { class: 'rxn-chip-nombre', text: s ? s.nombre : 'no reconocido' }));
+    chip.appendChild(el('span', { class: 'rxn-chip-textos' }, [
+      el('span', { class: 'rxn-chip-formula' }, s ? [formulaNodos(s)] : [tk.texto]),
+      el('span', { class: 'rxn-chip-nombre', text: s ? s.nombre : 'no reconocido' })
+    ]));
     if (quitable) {
       chip.appendChild(el('button', {
         type: 'button', class: 'rxn-chip-x', 'aria-label': 'Quitar ' + (s ? s.nombre : tk.texto),
@@ -927,13 +946,27 @@
     $.btnDeterminar.disabled = e.estado !== 'ok';
   }
 
-  function renderProductos() {
-    limpiar($.chipsP);
-    productosActuales().forEach(function (s) { $.chipsP.appendChild(crearChip({ sustancia: s, texto: s.formula }, 0, 'P', false)); });
-    $.vacioP.hidden = estado.productos.length > 0;
-    $.chipsP.hidden = estado.productos.length === 0;
-    $.contadorP.textContent = estado.productos.length + ' / ' + CONFIG.limiteProductos;
-    $.btnBalancear.disabled = estado.productos.length === 0;
+  function lineaNombres(titulo, lista) {
+    return el('p', {}, [el('b', { text: titulo + ': ' }), lista.map(function (s) { return s.nombre; }).join(' \u00b7 ')]);
+  }
+
+  /* Reacción completa SIN balancear: todos los reactivos \u2192 todos los productos. */
+  function renderReaccion() {
+    var R = reactivosActuales(), P = productosActuales();
+    limpiar($.reaccion); limpiar($.leyenda);
+    if (P.length) {
+      $.reaccion.className = 'rxn-reaccion';
+      $.reaccion.appendChild(nodoEcuacion(R, null, P, null));
+      $.leyenda.appendChild(lineaNombres('Reactivos', R));
+      $.leyenda.appendChild(lineaNombres('Productos', P));
+      $.leyenda.hidden = false;
+    } else {
+      $.reaccion.className = 'rxn-reaccion rxn-reaccion--vacia';
+      $.reaccion.textContent = 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.';
+      $.leyenda.hidden = true;
+    }
+    $.contadorP.textContent = 'Productos ' + P.length + ' / ' + CONFIG.limiteProductos;
+    $.btnBalancear.disabled = P.length === 0;
   }
 
   function renderEjemplos() {
@@ -951,20 +984,22 @@
   }
 
   /* ---------- Ecuación ---------- */
+  /* Cada especie lleva pegado su "+" (o la flecha, si es el último reactivo):
+     así, al saltar de línea en el celular, un "+" nunca queda solo al inicio. */
   function nodoEcuacion(R, coefR, P, coefP) {
     var frag = document.createDocumentFragment();
-    function lado(lista, coefs) {
+    function lado(lista, coefs, cierraConFlecha) {
       lista.forEach(function (s, i) {
-        if (i > 0) frag.appendChild(el('span', { class: 'rxn-eq-signo', text: '+' }));
         var grupo = el('span', { class: 'rxn-eq-esp' });
-        if (coefs[i] !== 1) grupo.appendChild(el('span', { class: 'rxn-eq-coef', text: String(coefs[i]) }));
+        if (coefs && coefs[i] !== 1) grupo.appendChild(el('span', { class: 'rxn-eq-coef', text: String(coefs[i]) }));
         grupo.appendChild(el('span', {}, [formulaNodos(s)]));
+        if (i < lista.length - 1) grupo.appendChild(el('span', { class: 'rxn-eq-signo', text: '+' }));
+        else if (cierraConFlecha) grupo.appendChild(el('span', { class: 'rxn-eq-flecha', text: '\u2192' }));
         frag.appendChild(grupo);
       });
     }
-    lado(R, coefR);
-    frag.appendChild(el('span', { class: 'rxn-eq-flecha', text: '\u2192' }));
-    lado(P, coefP);
+    lado(R, coefR, true);
+    lado(P, coefP, false);
     return frag;
   }
 
@@ -978,14 +1013,14 @@
       $.medio.textContent = '\u270f\ufe0f Medio: ' + estado.medio;
       $.medio.hidden = false;
       var hayCarga = R.concat(P).some(function (s) { return s.carga; });
-      mostrarMensajes($.msgEcuacion, 'oscuro', ['\u2713 Conservación verificada: los átomos' + (hayCarga ? ' y las cargas' : '') + ' son iguales a ambos lados.']);
+      mostrarMensajes($.msgEcuacion, 'exito', ['\u2713 Conservación verificada: los átomos' + (hayCarga ? ' y las cargas' : '') + ' son iguales a ambos lados.']);
     } else {
       $.ecuacion.className = 'rxn-ecuacion rxn-ecuacion--vacia';
       $.ecuacion.textContent = 'Aquí verás tu ecuación balanceada.';
       $.medio.hidden = true;
-      if (b && b.estado !== 'ok') mostrarMensajes($.msgEcuacion, 'oscuro', [b.mensaje]);
-      else if (b) mostrarMensajes($.msgEcuacion, 'oscuro', ['El balanceo no superó la verificación de conservación, por eso no se muestra.']);
-      else mostrarMensajes($.msgEcuacion, 'oscuro', []);
+      if (b && b.estado !== 'ok') mostrarMensajes($.msgEcuacion, 'error', [b.mensaje]);
+      else if (b) mostrarMensajes($.msgEcuacion, 'error', ['El balanceo no superó la verificación de conservación, por eso no se muestra.']);
+      else mostrarMensajes($.msgEcuacion, 'exito', []);
     }
     renderSemirreacciones();
   }
@@ -1026,9 +1061,12 @@
   }
 
   /* ---------- Acordeones de análisis ---------- */
-  function badgeOx(simbolo, n) {
+  function badgeOx(simbolo, n, marca) {
     var cls = n > 0 ? 'rxn-ox--pos' : (n < 0 ? 'rxn-ox--neg' : 'rxn-ox--cero');
-    return el('span', { class: 'rxn-ox ' + cls }, [simbolo + ' ', el('b', { text: formatoSigno(n) })]);
+    if (marca) cls += ' rxn-ox--cambia rxn-ox--' + marca;
+    var hijos = [simbolo + ' ', el('b', { text: formatoSigno(n) })];
+    if (marca) hijos.push(el('span', { class: 'rxn-ox-marca', text: marca === 'oxidacion' ? '\u2191 se oxida' : '\u2193 se reduce' }));
+    return el('span', { class: 'rxn-ox ' + cls }, hijos);
   }
 
   function renderAnalisis() {
@@ -1038,6 +1076,7 @@
     var t = $['cuerpo-tipo']; limpiar(t);
     if (!estado.tipo) t.appendChild(parrafo('Se mostrará al determinar la reacción.', 'rxn-pendiente'));
     else {
+      t.appendChild(el('p', { class: 'rxn-etiqueta', text: 'Esta reacción es de tipo:' }));
       t.appendChild(el('p', { class: 'rxn-dato-fuerte', text: estado.tipo.nombre }));
       t.appendChild(parrafo(estado.tipo.texto));
       if (estado.tipo.nota) t.appendChild(parrafo(estado.tipo.nota, 'rxn-nota'));
@@ -1072,6 +1111,12 @@
     var o = $['cuerpo-oxidacion']; limpiar(o);
     if (!R.length) o.appendChild(parrafo('Agrega reactivos para ver sus números de oxidación.', 'rxn-pendiente'));
     else {
+      var cambia = {};
+      if (estado.redox && estado.redox.estado === 'ok') {
+        estado.redox.cambios.forEach(function (c) {
+          c.reactivos.concat(c.productos).forEach(function (s) { cambia[s.id + '|' + c.elemento] = c.tipo; });
+        });
+      }
       function listaOx(titulo, lista) {
         if (!lista.length) return;
         o.appendChild(el('p', { class: 'rxn-subtitulo', text: titulo }));
@@ -1079,11 +1124,12 @@
           var fila = el('div', { class: 'rxn-ox-fila' }, [el('div', { class: 'rxn-ox-esp' }, [el('strong', {}, [formulaNodos(s)]), ' ' + s.nombre])]);
           var badges = el('div', { class: 'rxn-ox-lista' });
           if (!s.estadosAsignados) badges.appendChild(el('span', { class: 'rxn-dato-sub', text: 'sin datos en el catálogo' }));
-          else Object.keys(s.composicion).forEach(function (sim) { badges.appendChild(badgeOx(sim, s.estadosAsignados[sim])); });
+          else Object.keys(s.composicion).forEach(function (sim) { badges.appendChild(badgeOx(sim, s.estadosAsignados[sim], cambia[s.id + '|' + sim])); });
           fila.appendChild(badges); o.appendChild(fila);
         });
       }
       listaOx('Reactivos', R); listaOx('Productos', P);
+      if (Object.keys(cambia).length) o.appendChild(parrafo('Los átomos marcados con \u2191 o \u2193 son los que cambian de número de oxidación durante la reacción.', 'rxn-nota'));
       o.appendChild(parrafo('Son los números asignados dentro de cada sustancia (no todos los que el elemento podría tener).', 'rxn-dato-sub'));
     }
 
@@ -1147,11 +1193,22 @@
     var exc = r.reactivos.filter(function (f) { return !f.limitante; });
     function nombres(l) { return l.map(function (f) { return formulaPlana(f.sustancia); }).join(', '); }
 
+    function tarjetaRes(clase, titulo, principal, detalle) {
+      return el('div', { class: 'rxn-res rxn-res--' + clase }, [
+        el('span', { class: 'rxn-res-tit', text: titulo }),
+        el('span', { class: 'rxn-res-val', text: principal }),
+        detalle ? el('span', { class: 'rxn-res-det', text: detalle }) : null
+      ]);
+    }
     var resumen = el('div', { class: 'rxn-resumen' });
-    resumen.appendChild(el('p', {}, [el('b', { text: 'Reactivo limitante: ' }), nombres(lim) || '\u2014', el('span', { class: 'rxn-dato-sub', text: ' \u2014 se acaba primero y detiene la reacción.' })]));
-    resumen.appendChild(el('p', {}, [el('b', { text: 'Reactivo en exceso: ' }), exc.length ? exc.map(function (f) { return formulaPlana(f.sustancia) + ' (sobran ' + formatoNum(f.gSobrantes, 3) + ' g)'; }).join(', ') : 'ninguno: las cantidades son exactamente proporcionales.']));
+    resumen.appendChild(tarjetaRes('lim', 'Reactivo limitante', nombres(lim) || '\u2014', 'Se acaba primero y detiene la reacción.'));
+    resumen.appendChild(tarjetaRes('exc', 'Reactivo en exceso',
+      exc.length ? nombres(exc) : 'Ninguno',
+      exc.length ? exc.map(function (f) { return formulaPlana(f.sustancia) + ': sobran ' + formatoNum(f.gSobrantes, 3) + ' g'; }).join(' \u00b7 ')
+                 : 'Las cantidades son exactamente proporcionales.'));
     r.productos.forEach(function (p) {
-      resumen.appendChild(el('p', { class: 'rxn-prod-max' }, [el('b', { text: 'Producción teórica de ' }), el('b', {}, [formulaNodos(p.sustancia)]), ': ' + (p.gramos === null ? 'sin datos' : formatoNum(p.gramos, 3) + ' g') + ' (' + formatoNum(p.moles, 4) + ' mol)']));
+      resumen.appendChild(tarjetaRes('prod', 'Producción teórica de ' + formulaPlana(p.sustancia),
+        p.gramos === null ? 'sin datos' : formatoNum(p.gramos, 3) + ' g', formatoNum(p.moles, 4) + ' mol'));
     });
     $.resEstequio.appendChild(resumen);
 
@@ -1173,7 +1230,7 @@
   }
 
   function renderTodo() {
-    renderChips(); renderProductos(); renderEcuacion(); renderAnalisis();
+    renderChips(); renderReaccion(); renderEcuacion(); renderAnalisis();
   }
 
   /* ---------- Entrada, validación y sugerencias ---------- */
@@ -1282,11 +1339,11 @@
     }
     recalcularAnalisis();
     renderTodo();
-    desplazarA($.chipsP.parentNode);
+    desplazarA($.cardReaccion);
   }
 
   function balancear() {
-    mostrarMensajes($.msgEcuacion, 'oscuro', []);
+    mostrarMensajes($.msgEcuacion, 'exito', []);
     if (!estado.productos.length) {
       estado.balanceo = { estado: 'invalida', mensaje: 'Primero determina los productos: no hay nada que balancear.' };
       renderEcuacion(); desplazarA($.cardResultado); return;
