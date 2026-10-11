@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 /* =========================================
    QUÍMICA UPDS
    Diseño principal
@@ -1327,4 +1329,103 @@ body {
         padding: 0 12px;
     }
 
+}
+
+
+/* =========================================
+   AJUSTES PANTALLA INICIO · QuímicApp UPDS
+   ========================================= */
+
+/* ---------- 1. TIPOGRAFÍA GLOBAL ---------- */
+:root {
+    --fuente-app: "Plus Jakarta Sans", "Nunito", "Poppins", system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+body,
+*:not(i):not([class*="fa-"]) {
+    font-family: var(--fuente-app) !important;
+}
+
+button, input, select, textarea {
+    font-family: var(--fuente-app) !important;
+}
+
+
+/* ---------- 2. BUSCADOR ---------- */
+.search-box {
+    background: #1e293b;
+    border: 1px solid #ffffff;
+    padding: 0 8px 0 16px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+}
+
+.search-box .search-icon {
+    color: #e2e8f0;
+}
+
+.search-box input {
+    color: #ffffff;
+}
+
+.search-box input::placeholder {
+    color: #e2e8f0;
+    opacity: 1;
+}
+
+.search-box .search-settings {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 17px;
+}
+
+.search-box .search-settings:hover {
+    background: #e11d48;
+}
+
+
+/* ---------- 3. DATO DEL DÍA: BOTÓN A LA DERECHA ---------- */
+.daily-card .outline-red {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
+    margin-left: auto;
+    padding: 7px 16px;
+    border: 2px solid #111827;
+    background: #111827;
+    color: #f3f4f6;
+    box-shadow: 0 3px 8px rgba(17, 24, 39, 0.35);
+
+    font-size: 0;
+}
+
+.daily-card .outline-red::before {
+    content: "Más información";
+    font-size: 13px;
+    font-weight: 700;
+    color: #f3f4f6;
+}
+
+.daily-card .outline-red i {
+    margin-left: 10px;
+    font-size: 13px;
+    color: #f97316;
+}
+
+.daily-card .outline-red:hover {
+    background: #1f2937;
+    color: #f3f4f6;
+}
+
+
+/* ---------- 4. DESAFÍO RÁPIDO ---------- */
+.challenge-card {
+    background: #f1f5f9;
 }
