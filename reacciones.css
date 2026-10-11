@@ -1,5 +1,5 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.2
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.3
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
@@ -95,13 +95,13 @@
 #reacciones .rxn-entrada-wrap { position: relative; }
 #reacciones .rxn-campo {
   position: relative;
-  border: 2px solid var(--rxn-naranja);
+  border: 2px solid var(--rxn-rojo-btn);
   border-radius: 14px;
   background: #fff;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-#reacciones .rxn-campo--ok { border-color: var(--rxn-naranja); box-shadow: 0 0 0 3px rgba(255, 140, 0, .22); }
-#reacciones .rxn-campo--error { border-color: var(--rxn-rojo); box-shadow: 0 0 0 3px rgba(214, 69, 65, .12); }
+#reacciones .rxn-campo--ok { border-color: var(--rxn-rojo-btn); }
+#reacciones .rxn-campo--error { border-color: var(--rxn-rojo-btn); box-shadow: 0 0 0 3px rgba(211, 47, 47, .28); }
 
 #reacciones .rxn-input {
   display: block;
@@ -118,7 +118,7 @@
   border-radius: 12px;
 }
 #reacciones .rxn-campo .rxn-input { position: relative; z-index: 1; color: transparent; caret-color: #000; }
-#reacciones .rxn-campo .rxn-input::selection { background: rgba(255, 140, 0, .3); }
+#reacciones .rxn-campo .rxn-input::selection { background: rgba(211, 47, 47, .25); }
 #reacciones .rxn-input:focus { outline: none; }
 
 /* Capa con el mismo texto (negro, negrita; los + en verde) */
@@ -182,21 +182,21 @@
 #reacciones .rxn-sug-nombre { flex: 1 1 auto; font-size: 0.88rem; }
 #reacciones .rxn-sug-tipo { font-size: 0.7rem; color: var(--rxn-suave); }
 
-/* ---- Barra de entrada rápida: + → Borrar (sin paréntesis) ------------------------- */
+/* ---- Barra de entrada rápida: + → Borrar (planos, centrados) ---------------------- */
 #reacciones .rxn-pastillas {
   position: sticky;
   bottom: calc(var(--rxn-nav) + 8px);
   z-index: 10;
   display: flex;
+  justify-content: center;
   gap: 8px;
-  margin: 10px 0;
+  width: 100%;
+  max-width: 420px;
+  margin: 10px auto;
   padding: 6px;
-  background: rgba(255, 255, 255, .92);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: #fff;
   border: 1px solid var(--rxn-borde);
   border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(20, 35, 55, .1);
 }
 #reacciones .rxn-pastilla {
   flex: 1 1 0;
@@ -206,17 +206,21 @@
   font-size: 1.15rem;
   font-weight: 800;
   color: #fff;
-  border: 0;
+  border: 2px solid;               /* el color del borde es el mismo tono, más oscuro */
   border-radius: 999px;
+  box-shadow: none;                /* sin brillos ni sombras */
+  background-image: none;          /* sin degradados */
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .1s ease, box-shadow .1s ease, filter .15s ease;
+  transition: transform .1s ease, background-color .1s ease;
 }
-#reacciones .rxn-pastilla--mas    { background: #1e8e4e; box-shadow: 0 4px 10px rgba(30, 142, 78, .45); }   /* = acordeón 1 */
-#reacciones .rxn-pastilla--flecha { font-size: 1.6rem; line-height: 1; background: #1d63d6; box-shadow: 0 4px 10px rgba(29, 99, 214, .45); }   /* = acordeón 2 */
-#reacciones .rxn-pastilla--borrar { background: var(--rxn-rojo-btn); box-shadow: 0 4px 10px rgba(211, 47, 47, .45); font-size: 1rem; } /* = botón de semirreacciones */
-#reacciones .rxn-pastilla:hover { filter: brightness(1.06); }
-#reacciones .rxn-pastilla:active { transform: translateY(2px) scale(.96); box-shadow: 0 1px 3px rgba(0, 0, 0, .3); filter: brightness(.92); }
+#reacciones .rxn-pastilla--mas    { background-color: #1e8e4e; border-color: #14532d; }   /* = acordeón 1 */
+#reacciones .rxn-pastilla--flecha { background-color: #1d63d6; border-color: #123f8c; font-size: 1.6rem; line-height: 1; }   /* = acordeón 2 */
+#reacciones .rxn-pastilla--borrar { background-color: #D32F2F; border-color: #8f1d1d; font-size: 1rem; }   /* = botón de semirreacciones */
+#reacciones .rxn-pastilla:active { transform: scale(.95); }
+#reacciones .rxn-pastilla--mas:active    { background-color: #176f3d; }
+#reacciones .rxn-pastilla--flecha:active { background-color: #174fab; }
+#reacciones .rxn-pastilla--borrar:active { background-color: #b32323; }
 #reacciones .rxn-pastilla:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
 
 /* ---- Mensajes -------------------------------------------------------------------- */
@@ -464,11 +468,10 @@
   border-radius: 16px;
   overflow: hidden;
 }
-#reacciones .rxn-acc-1 { --acc: #1e8e4e; --acc-fondo: #e8f7ee; }   /* verde  */
-#reacciones .rxn-acc-2 { --acc: #1d63d6; --acc-fondo: #e6efff; }   /* azul   */
-#reacciones .rxn-acc-3 { --acc: #7c3aed; --acc-fondo: #f0e9ff; }   /* violeta */
-#reacciones .rxn-acc-4 { --acc: #c2570a; --acc-fondo: #fff0e1; }   /* naranja */
-#reacciones .rxn-acc-5 { --acc: #0f766e; --acc-fondo: #dcf6f3; }   /* turquesa */
+#reacciones .rxn-acc-1 { --acc: #1e8e4e; --acc-fondo: #e8f7ee; }   /* verde: tipo de reacción + redox */
+#reacciones .rxn-acc-2 { --acc: #1d63d6; --acc-fondo: #e6efff; }   /* azul: estados de oxidación */
+#reacciones .rxn-acc-3 { --acc: #c2570a; --acc-fondo: #fff0e1; }   /* naranja: masas molares */
+#reacciones .rxn-acc-4 { --acc: #0f766e; --acc-fondo: #dcf6f3; }   /* turquesa: estequiometría */
 
 #reacciones .rxn-acordeon > summary {
   display: flex;
@@ -544,13 +547,15 @@
 #reacciones .rxn-subtitulo { margin: 10px 0 4px !important; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--acc); }
 
 /* Redox */
-#reacciones .rxn-redox-linea { padding: 8px 10px; background: var(--acc-fondo); border-radius: 10px; }
+#reacciones .rxn-redox-bloque { margin-top: 14px; padding-top: 12px; border-top: 2px dashed #cdd5df; }
+#reacciones .rxn-redox-bloque .rxn-subtitulo { margin-top: 0 !important; font-size: 0.82rem; color: #1d63d6; }
+#reacciones .rxn-redox-linea { padding: 8px 10px; background: #e6efff; border-radius: 10px; }
 #reacciones .rxn-agente { padding: 10px 12px; border-radius: 12px; border-left: 5px solid; }
 #reacciones .rxn-agente--ox { background: #e6efff; border-color: #1d63d6; }
 #reacciones .rxn-agente--re { background: #fff0e1; border-color: #c2570a; }
 
 /* Números de oxidación */
-#reacciones .rxn-ox-fila { margin: 0 0 8px; padding: 8px 10px; background: #faf7ff; border: 1px solid #e4d9fb; border-radius: 12px; }
+#reacciones .rxn-ox-fila { margin: 0 0 8px; padding: 8px 10px; background: #f6f9ff; border: 1px solid #cfe0fb; border-radius: 12px; }
 #reacciones .rxn-ox-esp { margin-bottom: 6px; font-size: 0.86rem; }
 #reacciones .rxn-ox-lista { display: flex; flex-wrap: wrap; gap: 6px; }
 #reacciones .rxn-ox { padding: 3px 10px; font-size: 0.84rem; border-radius: 999px; background: #eef1f5; }
@@ -576,8 +581,8 @@
 #reacciones .rxn-masa-et { flex: 1 1 auto; min-width: 0; }
 #reacciones .rxn-masa-fila .rxn-input--masa { flex: 0 0 120px; width: 120px; }
 #reacciones .rxn-masa-u { width: 14px; font-size: 0.85rem; color: var(--rxn-suave); }
-#reacciones .rxn-acc-5 .rxn-btn--primario { background: var(--acc); box-shadow: 0 4px 12px rgba(15, 118, 110, .3); }
-#reacciones .rxn-acc-5 .rxn-btn--primario:hover:not(:disabled) { background: #0b5f58; }
+#reacciones .rxn-acc-4 .rxn-btn--primario { background: var(--acc); box-shadow: 0 4px 12px rgba(15, 118, 110, .3); }
+#reacciones .rxn-acc-4 .rxn-btn--primario:hover:not(:disabled) { background: #0b5f58; }
 
 #reacciones .rxn-resumen { display: grid; gap: 8px; margin: 12px 0 0; }
 #reacciones .rxn-res {
@@ -618,7 +623,7 @@
   #reacciones .rxn-card { padding: 18px; }
   #reacciones .rxn-chip-nombre { max-width: 170px; }
   #reacciones .rxn-btn--ancho { width: auto; min-width: 260px; }
-  #reacciones .rxn-pastillas { position: static; max-width: 420px; }
+  #reacciones .rxn-pastillas { position: static; }
   #reacciones .rxn-reaccion,
   #reacciones .rxn-ecuacion { font-size: 1.5rem; }
   #reacciones .rxn-resumen { grid-template-columns: repeat(2, 1fr); }
