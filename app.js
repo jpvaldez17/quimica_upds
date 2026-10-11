@@ -65,6 +65,16 @@ function mostrarPagina(pagina) {
         behavior: "smooth"
     });
 
+
+    /* Si se fue de Inicio, el Desafío rápido cambia de pregunta
+       (solo si ya había sido respondida) */
+
+    if (pagina !== "inicio" && window.Desafios) {
+
+        window.Desafios.alSalirDeInicio();
+
+    }
+
 }
 
 
@@ -89,6 +99,18 @@ document.addEventListener("DOMContentLoaded", function() {
    ========================================= */
 
 function iniciarDesafio() {
+
+    /* Con desafios.js: banco de preguntas, contador y cambio de pregunta */
+
+    if (window.Desafios) {
+
+        window.Desafios.iniciar();
+
+        return;
+
+    }
+
+    /* Respaldo: si desafios.js no está, funciona la pregunta fija del HTML */
 
     const tarjeta = document.querySelector(".challenge-card");
 
