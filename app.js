@@ -169,14 +169,28 @@ function iniciarDesafio() {
 /* =========================================
    DATO DEL DÍA
    Conectado con la pestaña Compuestos.
-   Cada día se muestra un compuesto distinto
-   (tomado de compuestosinformacion.js) y el
-   botón «Más información» abre su ficha.
+   Funciona sin internet: usa el reloj del
+   dispositivo y los datos locales de
+   compuestosinformacion.js.
+
+   El dato cambia:
+   1) cada cierto número de horas (HORAS_POR_DATO)
+   2) cuando la persona toca «Más información»
+      (al volver a Inicio ya hay otro dato)
+
+   El compuesto nunca se repite hasta haber
+   recorrido todos los de la lista.
    ========================================= */
 
+/* Cada cuántas horas cambia el dato (4, 6, 12, 24...) */
+
+const HORAS_POR_DATO = 4;
+
+const CLAVE_ADELANTO = "quimica_upds_dato_adelanto";
+
+
 /* Generador pseudoaleatorio con semilla fija:
-   el orden "mezclado" es siempre el mismo,
-   así todos los usuarios ven el mismo dato cada día */
+   el orden "mezclado" es siempre el mismo */
 
 function generadorConSemilla(semilla) {
 
@@ -196,20 +210,17 @@ function generadorConSemilla(semilla) {
 }
 
 
-/* Elige el compuesto del día:
-   - cambia a la medianoche (hora local)
-   - recorre los 200 compuestos sin repetir
-     hasta completar el ciclo */
+/* Orden mezclado (siempre el mismo) de todos los compuestos */
 
-function elegirCompuestoDelDia(lista, fecha) {
+function mezclarCompuestos(cantidad) {
 
-    const hoy = fecha || new Date();
+    const orden = [];
 
-    const numeroDeDia = Math.floor(
-        Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()) / 86400000
-    );
+    for (let i = 0; i < cantidad; i++) {
 
-    const orden = lista.map(function(_, i) { return i; });
+        orden.push(i);
+
+    }
 
     const azar = generadorConSemilla(2026);
 
@@ -223,14 +234,69 @@ function elegirCompuestoDelDia(lista, fecha) {
 
     }
 
-    return lista[orden[numeroDeDia % orden.length]];
+    return orden;
+
+}
+
+
+/* Cuántos datos se han "adelantado" tocando «Más información».
+   Solo crece, así no se repite un compuesto ya visto. */
+
+function leerAdelanto() {
+
+    try {
+
+        return parseInt(localStorage.getItem(CLAVE_ADELANTO), 10) || 0;
+
+    } catch (e) {
+
+        return 0;
+
+    }
+
+}
+
+let adelantoEnMemoria = leerAdelanto();
+
+function sumarAdelanto() {
+
+    adelantoEnMemoria++;
+
+    try {
+
+        localStorage.setItem(CLAVE_ADELANTO, String(adelantoEnMemoria));
+
+    } catch (e) {
+
+        /* sin almacenamiento: se queda solo en memoria */
+
+    }
+
+}
+
+
+/* Posición del compuesto actual dentro del orden mezclado:
+   bloque de horas actual (hora local) + adelantos */
+
+function indiceDelDato(cantidad, fecha) {
+
+    const ahora = fecha || new Date();
+
+    const milisegundosLocales =
+        ahora.getTime() - ahora.getTimezoneOffset() * 60000;
+
+    const bloque = Math.floor(
+        milisegundosLocales / (HORAS_POR_DATO * 3600000)
+    );
+
+    return (bloque + adelantoEnMemoria) % cantidad;
 
 }
 
 
 /* Pinta el compuesto en la tarjeta de Inicio */
 
-function pintarDatoDelDia(compuesto) {
+function pintarDatoDelDia(compuesto, alTocarBoton) {
 
     const tarjeta = document.querySelector(".daily-card");
 
@@ -265,6 +331,8 @@ function pintarDatoDelDia(compuesto) {
 
         boton.onclick = function() {
 
+            /* 1. Abrir la ficha del compuesto mostrado */
+
             if (window.Compuestos && typeof window.Compuestos.abrir === "function") {
 
                 window.Compuestos.abrir(compuesto.id);
@@ -272,6 +340,14 @@ function pintarDatoDelDia(compuesto) {
             } else {
 
                 mostrarPagina("compuestos");
+
+            }
+
+            /* 2. Pasar al siguiente dato para cuando vuelva a Inicio */
+
+            if (alTocarBoton) {
+
+                alTocarBoton();
 
             }
 
@@ -283,35 +359,77 @@ function pintarDatoDelDia(compuesto) {
 
 
 /* Espera a que compuestosinformacion.js esté cargado
-   (lo carga compuestos.js) y luego pinta el dato.
-   Si tarda o falla, se deja el texto que ya trae el HTML. */
+   (lo carga compuestos.js), pinta el dato y lo
+   mantiene al día mientras la app está abierta.
+   Si los datos fallan, se deja el texto del HTML. */
 
 function iniciarDatoDelDia() {
 
     let intentos = 0;
 
-    function revisar() {
+    function arrancar() {
 
         const lista = window.CMP_DATOS;
 
-        if (Array.isArray(lista) && lista.length > 0) {
+        if (!Array.isArray(lista) || lista.length === 0) {
 
-            pintarDatoDelDia(elegirCompuestoDelDia(lista));
+            intentos++;
+
+            if (intentos < 50) {
+
+                setTimeout(arrancar, 200);
+
+            }
 
             return;
 
         }
 
-        intentos++;
+        const orden = mezclarCompuestos(lista.length);
 
-        if (intentos < 50) {
+        let mostrado = -1;
 
-            setTimeout(revisar, 200);
+        function actualizar() {
+
+            const indice = indiceDelDato(lista.length);
+
+            if (indice === mostrado) {
+
+                return;
+
+            }
+
+            mostrado = indice;
+
+            pintarDatoDelDia(lista[orden[indice]], function() {
+
+                sumarAdelanto();
+
+                actualizar();
+
+            });
 
         }
 
+        actualizar();
+
+        /* Si la app queda abierta, revisa cada minuto si ya
+           toca cambiar de dato por el paso de las horas */
+
+        setInterval(actualizar, 60000);
+
+        document.addEventListener("visibilitychange", function() {
+
+            if (!document.hidden) {
+
+                actualizar();
+
+            }
+
+        });
+
     }
 
-    revisar();
+    arrancar();
 
 }
