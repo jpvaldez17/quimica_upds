@@ -1,5 +1,5 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.1
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v3.2
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
@@ -94,12 +94,13 @@
 /* ---- Campo de entrada -------------------------------------------------------- */
 #reacciones .rxn-entrada-wrap { position: relative; }
 #reacciones .rxn-campo {
-  border: 2px solid #000;
+  position: relative;
+  border: 2px solid var(--rxn-naranja);
   border-radius: 14px;
   background: #fff;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-#reacciones .rxn-campo--ok { border-color: #000; box-shadow: 0 0 0 3px rgba(0, 0, 0, .14); }
+#reacciones .rxn-campo--ok { border-color: var(--rxn-naranja); box-shadow: 0 0 0 3px rgba(255, 140, 0, .22); }
 #reacciones .rxn-campo--error { border-color: var(--rxn-rojo); box-shadow: 0 0 0 3px rgba(214, 69, 65, .12); }
 
 #reacciones .rxn-input {
@@ -110,14 +111,34 @@
   padding: 0 14px;
   font: inherit;
   font-size: 1rem;                /* 16px: evita el zoom automático en iPhone */
-  color: var(--rxn-texto);
+  font-weight: 700;
+  color: #000;
   background: transparent;
   border: 0;
   border-radius: 12px;
 }
+#reacciones .rxn-campo .rxn-input { position: relative; z-index: 1; color: transparent; caret-color: #000; }
+#reacciones .rxn-campo .rxn-input::selection { background: rgba(255, 140, 0, .3); }
 #reacciones .rxn-input:focus { outline: none; }
-#reacciones .rxn-input::placeholder { color: #9aa5b4; }
+
+/* Capa con el mismo texto (negro, negrita; los + en verde) */
+#reacciones .rxn-espejo {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 42px;
+  color: #000;
+  white-space: pre;
+  overflow: hidden;
+  pointer-events: none;
+}
+#reacciones .rxn-espejo-mas { color: #1e8e4e; }
+#reacciones .rxn-input::placeholder { color: #9aa5b4; font-weight: 400; }
 #reacciones .rxn-input--masa {
+  font-weight: 600;
   height: 40px;
   border: 1px solid var(--rxn-borde);
   background: #fff;
@@ -191,9 +212,9 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform .1s ease, box-shadow .1s ease, filter .15s ease;
 }
-#reacciones .rxn-pastilla--mas    { background: #10B981; box-shadow: 0 4px 10px rgba(16, 185, 129, .45); }  /* verde esmeralda vibrante */
-#reacciones .rxn-pastilla--flecha { font-size: 1.6rem; line-height: 1; background: #2563EB; box-shadow: 0 4px 10px rgba(37, 99, 235, .45); }   /* azul eléctrico */
-#reacciones .rxn-pastilla--borrar { background: #F43F5E; box-shadow: 0 4px 10px rgba(244, 63, 94, .45); font-size: 1rem; } /* rojo coral intenso */
+#reacciones .rxn-pastilla--mas    { background: #1e8e4e; box-shadow: 0 4px 10px rgba(30, 142, 78, .45); }   /* = acordeón 1 */
+#reacciones .rxn-pastilla--flecha { font-size: 1.6rem; line-height: 1; background: #1d63d6; box-shadow: 0 4px 10px rgba(29, 99, 214, .45); }   /* = acordeón 2 */
+#reacciones .rxn-pastilla--borrar { background: var(--rxn-rojo-btn); box-shadow: 0 4px 10px rgba(211, 47, 47, .45); font-size: 1rem; } /* = botón de semirreacciones */
 #reacciones .rxn-pastilla:hover { filter: brightness(1.06); }
 #reacciones .rxn-pastilla:active { transform: translateY(2px) scale(.96); box-shadow: 0 1px 3px rgba(0, 0, 0, .3); filter: brightness(.92); }
 #reacciones .rxn-pastilla:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
@@ -245,7 +266,7 @@
 }
 #reacciones .rxn-chip--error { background: var(--rxn-rojo-fondo); border-color: #f2b8b4; }
 #reacciones .rxn-chip-textos { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
-#reacciones .rxn-chip-formula { font-size: 0.98rem; font-weight: 700; white-space: nowrap; }
+#reacciones .rxn-chip-formula { font-size: 0.98rem; font-weight: 800; color: #000; white-space: nowrap; }
 #reacciones .rxn-chip-nombre {
   max-width: 128px;
   font-size: 0.66rem;
@@ -269,21 +290,6 @@
 #reacciones .rxn-chip-x:hover,
 #reacciones .rxn-chip-x:active { color: var(--rxn-rojo); background: rgba(214, 69, 65, .14); }
 #reacciones .rxn-chip-x:focus-visible { outline: 2px solid var(--rxn-verde); }
-
-/* ---- Ejemplos ------------------------------------------------------------------------ */
-#reacciones .rxn-ejemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
-#reacciones .rxn-ejemplos-et { font-size: 0.76rem; color: var(--rxn-suave); }
-#reacciones .rxn-ejemplo {
-  padding: 5px 10px;
-  font: inherit;
-  font-size: 0.76rem;
-  color: var(--rxn-texto);
-  background: #fff;
-  border: 1px solid var(--rxn-borde);
-  border-radius: 999px;
-  cursor: pointer;
-}
-#reacciones .rxn-ejemplo:hover { border-color: var(--rxn-verde); color: var(--rxn-verde-osc); }
 
 /* ---- Botones ------------------------------------------------------------------------------ */
 #reacciones .rxn-btn {
