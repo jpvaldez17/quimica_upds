@@ -1,30 +1,28 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 3.4 (usa el motor de formulas.js v1.0; rediseño: chips compactos, reacción completa en negro,
-   ecuación balanceada en gris, acordeones de análisis llamativos)
+   Versión 4.0 · SIMULADOR DIDÁCTICO PASO A PASO (usa el motor de formulas.js v1.1)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
    No usa Internet ni librerías externas. No modifica otras pestañas.
 
-   Todas las fórmulas, masas atómicas y estados de oxidación se leen del
-   catálogo. Aquí no se escribe ningún dato químico "a mano": solo reglas de
-   comportamiento (qué productos se forman con qué reactivos) que refieren a
-   sustancias del catálogo por su identificador.
+   FLUJO (todo sale del BANCO_REACCIONES; la app no inventa reacciones)
+    1. Reactivo 1  →  el Reactivo 2 solo ofrece lo que reacciona con él en el banco
+                      (si hace falta, aparece un Reactivo 3; si hay varias variantes, se elige).
+    2. 🟢 Determinar reacción  →  productos esperados, categoría y nota del banco
+                      (la ecuación completa todavía NO se muestra).
+    3. ⚖️ Balancear ecuación  →  ecuación sin balancear y, después, la balanceada con
+                      coeficientes destacados (coeficientes del banco verificados con el
+                      balanceador matricial y la conservación de átomos y carga).
+    4. Análisis y estequiometría  →  tipo/redox, números de oxidación, masas molares,
+                      moles y reactivo limitante.
 
    SECCIONES
-    1. Configuración
-    2. Utilidades
-    3. Catálogo (índice, búsqueda, verificación)
-    4. Fórmulas y lectura de la entrada del usuario
-    5. Masas molares
-    6. Reglas de predicción de productos
-    7. Balanceo (independiente de la predicción)
-    8. Análisis: medio, redox, tipo de reacción
-    9. Estequiometría (reactivo limitante)
-   10. Estado de la pestaña
-   11. Vista (DOM)
-   12. Acciones del usuario
-   13. Inicio y API pública
+    1. Configuración           8. Análisis: medio, redox, tipo
+    2. Utilidades              9. Estequiometría (reactivo limitante)
+    3. Catálogo               10. Estado del simulador
+    4. Fórmulas y especies    11. Vista (DOM)
+    5. Masas molares          12. Acciones del usuario (pasos 1 a 4)
+    7. Balanceo               13. Inicio y API pública
    ========================================================================== */
 
 (function (global) {
@@ -34,10 +32,8 @@
      1. CONFIGURACIÓN
      ======================================================================== */
   var CONFIG = {
-    limiteReactivos: 5,
-    limiteProductos: 5,
-    maxSugerencias: 6,
-    idContenedor: 'reacciones'
+    idContenedor: 'reacciones',
+    retrasoAnalisis: 1500        // ms que tarda en activarse el paso 4 tras balancear
   };
   if (global.REACCIONES_CONFIG) {
     Object.keys(global.REACCIONES_CONFIG).forEach(function (k) {
@@ -191,7 +187,7 @@
   }
 
   /* ===========================================================================
-     4. FÓRMULAS Y ENTRADA DEL USUARIO
+     4. FÓRMULAS Y ESPECIES DEL BANCO
      ======================================================================== */
   function parsearFormula(texto) {
     var s = String(texto || '').replace(/\s+/g, '');
@@ -238,85 +234,36 @@
     return { ok: true, composicion: p.composicion };
   }
 
-  /* Divide un lado de la ecuación en términos. Un "+" separa términos cuando
-     tiene espacios alrededor ("A + B"); también se acepta "A+B" si el texto
-     completo no es una especie del catálogo (así "Na+" sigue siendo un ion). */
-  function dividirTerminos(lado) {
-    var out = [];
-    lado.split(/\s+\+\s+/).forEach(function (p) {
-      p = p.trim();
-      if (!p) return;
-      if (resolverToken(p) || p.indexOf('+') < 0) { out.push(p); return; }
-      p.split('+').forEach(function (q) { q = q.trim(); if (q) out.push(q); });
-    });
-    return out;
-  }
-
-  /* Lee lo que escribió la persona: "A + B" o "A + B → C + D".
-     Devuelve los términos, qué sustancia es cada uno y los errores didácticos. */
-  function parsearEntrada(texto) {
-    var t = limpiarEntrada(texto);
-    var res = { reactivos: [], productos: [], flecha: false, errores: [], avisos: [], estado: 'vacio' };
-    if (!t.trim()) return res;
-
-    var partes = t.split('\u2192');
-    if (partes.length > 2) {
-      res.errores.push('Solo puede haber una flecha (\u2192) en la ecuación.');
-    }
-    res.flecha = partes.length > 1;
-
-    function leer(lado) {
-      return dividirTerminos(lado || '').map(function (txt) {
-        var r = resolverToken(txt);
-        return { texto: txt, sustancia: r ? r.sustancia : null, interpretado: r ? r.interpretado : false };
-      });
-    }
-    res.reactivos = leer(partes[0]);
-    res.productos = res.flecha ? leer(partes.slice(1).join(' ')) : [];
-
-    function revisarLado(lista, nombreLado, limite) {
-      var vistos = [];
-      lista.forEach(function (tk) {
-        if (!tk.sustancia) {
-          var v = validarFormula(tk.texto);
-          if (v.ok) {
-            res.errores.push('\u00ab' + tk.texto + '\u00bb es una fórmula bien escrita, pero todavía no está en el catálogo.');
-          } else if (v.desconocidos) {
-            res.errores.push('\u00ab' + tk.texto + '\u00bb: ' + v.error);
-          } else {
-            res.errores.push('\u00ab' + tk.texto + '\u00bb no se reconoce. ' + v.error +
-              ' Recuerda: la primera letra de cada elemento va en mayúscula (Co es cobalto, CO es monóxido de carbono).');
-          }
-        } else {
-          if (vistos.indexOf(tk.sustancia.id) >= 0) {
-            res.errores.push(tk.sustancia.nombre + ' está repetido en los ' + nombreLado + '. Escríbelo una sola vez.');
-          }
-          vistos.push(tk.sustancia.id);
-          if (tk.interpretado) {
-            res.avisos.push('\u00ab' + tk.texto + '\u00bb se interpretó como ' + tk.sustancia.formula + ' (' + tk.sustancia.nombre + ').');
-          }
-        }
-      });
-      if (lista.length > limite) {
-        res.errores.push('Máximo ' + limite + ' ' + nombreLado + '. Quita ' + (lista.length - limite) + '.');
+  /* Convierte una fórmula del banco ("Fe^2+", "MnO4-", "CH2=CH2"...) en una sustancia.
+     Primero busca en el catálogo; si no está, calcula su composición con el parser;
+     si ni así se puede (polímeros con "n"), queda como sustancia sin composición:
+     se muestra igual, pero sin masa molar ni estados de oxidación. */
+  var CACHE_ESPECIES = {};
+  function especie(id) {
+    if (CACHE_ESPECIES[id]) return CACHE_ESPECIES[id];
+    var r = resolverToken(id), s = r ? r.sustancia : null;
+    if (!s) {
+      var base = id, carga = 0, m = /^(.*?)(\^\d+[+-]|[+-])$/.exec(id);
+      if (m) {
+        base = m[1];
+        var n = /^\^(\d+)([+-])$/.exec(m[2]);
+        carga = n ? (n[2] === '-' ? -1 : 1) * parseInt(n[1], 10) : (m[2] === '-' ? -1 : 1);
       }
+      var p = parsearFormula(base.replace(/\[/g, '(').replace(/\]/g, ')').replace(/=/g, ''));
+      s = { id: id, tipo: carga ? 'ion' : 'compuesto', formula: id, nombre: id,
+            composicion: p.ok ? p.composicion : null, carga: carga, clasificacion: null,
+            estadosAsignados: null, sinCatalogo: true };
     }
-    revisarLado(res.reactivos, 'reactivos', CONFIG.limiteReactivos);
-    if (res.flecha) {
-      if (!res.productos.length) res.errores.push('Escribe los productos después de la flecha \u2192, o quítala para que la app los proponga.');
-      revisarLado(res.productos, 'productos', CONFIG.limiteProductos);
-    }
-    if (!res.reactivos.length && res.flecha) res.errores.push('Falta escribir al menos un reactivo antes de la flecha.');
-
-    res.estado = res.errores.length ? 'error' : 'ok';
-    return res;
+    CACHE_ESPECIES[id] = s;
+    return s;
   }
+
 
   /* ===========================================================================
      5. MASAS MOLARES
      ======================================================================== */
   function calcularMasaMolar(composicion) {
-    if (!CATALOGO) return null;
+    if (!CATALOGO || !composicion) return null;
     var total = 0, claves = Object.keys(composicion);
     for (var k = 0; k < claves.length; k++) {
       var e = CATALOGO.elementos[claves[k]];
@@ -326,110 +273,13 @@
     return total;
   }
 
-  /* ===========================================================================
-     6. REGLAS DE PREDICCIÓN
-     Solo se proponen productos cuando una regla los respalda. Nunca se inventan.
-     Forma: { id, nombre, aplica(reactivos), productos(reactivos) → [ids] }.
-     Para añadir una reacción fija, agrega una línea con reglaFija(...).
-     ======================================================================== */
-  function mismosIds(R, ids) {
-    if (R.length !== ids.length) return false;
-    var a = R.map(function (s) { return s.id; }).sort().join('|');
-    return a === ids.slice().sort().join('|');
-  }
 
-  function reglaFija(id, nombre, rIds, pIds) {
-    return { id: id, nombre: nombre,
-             aplica: function (R) { return mismosIds(R, rIds); },
-             productos: function () { return pIds.slice(); } };
-  }
-
-  /* Sal de una neutralización: se busca en el catálogo la sal cuyos elementos
-     son los del catión de la base + los del anión del ácido. */
-  function buscarSal(acido, base) {
-    if (!base.composicion.O || !base.composicion.H || !acido.composicion.H) return null;
-    var cat = Object.keys(base.composicion).filter(function (e) { return e !== 'O' && e !== 'H'; });
-    var an = Object.keys(acido.composicion).filter(function (e) { return e !== 'H'; });
-    if (!cat.length || !an.length) return null;
-    var objetivo = unicos(cat.concat(an)).sort().join(',');
-    var hallados = ORDEN.filter(function (id) {
-      var s = INDICE[id];
-      return s.tipo === 'compuesto' && s.clasificacion === 'sal' &&
-             Object.keys(s.composicion).sort().join(',') === objetivo;
-    });
-    return hallados.length === 1 ? hallados[0] : null;
-  }
-
+  /* Usada por la clasificación de la reacción (sección 8). */
   function parAcidoBase(R) {
     if (R.length !== 2) return null;
     var ac = R.filter(function (s) { return s.clasificacion === 'acido'; });
     var ba = R.filter(function (s) { return s.clasificacion === 'base'; });
     return (ac.length === 1 && ba.length === 1) ? { acido: ac[0], base: ba[0] } : null;
-  }
-
-  var REGLAS_INTERNAS = [
-    reglaFija('permanganato-yoduro-acido', 'Permanganato + yoduro en medio ácido',
-              ['KMnO4', 'KI', 'H2SO4'], ['MnSO4', 'I2', 'K2SO4', 'H2O']),
-    reglaFija('sintesis-agua', 'Síntesis del agua', ['H2', 'O2'], ['H2O']),
-    reglaFija('sintesis-hcl', 'Síntesis del cloruro de hidrógeno', ['H2', 'Cl2'], ['HCl']),
-    reglaFija('descomposicion-peroxido', 'Descomposición del peróxido de hidrógeno', ['H2O2'], ['H2O', 'O2']),
-    reglaFija('descomposicion-carbonato', 'Descomposición térmica del carbonato de calcio', ['CaCO3'], ['CaO', 'CO2']),
-    reglaFija('electrolisis-agua', 'Electrólisis del agua', ['H2O'], ['H2', 'O2']),
-    reglaFija('oxido-basico-agua', 'Óxido básico + agua', ['CaO', 'H2O'], ['Ca(OH)2']),
-    {
-      id: 'neutralizacion', nombre: 'Neutralización (ácido + base → sal + agua)',
-      aplica: function (R) {
-        var p = parAcidoBase(R);
-        return !!(p && buscarSal(p.acido, p.base) && obtenerSustancia('H2O'));
-      },
-      productos: function (R) {
-        var p = parAcidoBase(R);
-        return [buscarSal(p.acido, p.base), 'H2O'];
-      }
-    },
-    {
-      id: 'combustion-hidrocarburo', nombre: 'Combustión completa de un hidrocarburo',
-      aplica: function (R) {
-        return R.length === 2 && R.some(function (s) { return s.id === 'O2'; }) &&
-               R.some(function (s) { return s.clasificacion === 'hidrocarburo'; }) &&
-               !!obtenerSustancia('CO2') && !!obtenerSustancia('H2O');
-      },
-      productos: function () { return ['CO2', 'H2O']; }
-    }
-  ];
-
-  /* Si formulas.js trae sus propias reglas (catálogo v1.0+), se usan esas;
-     las internas quedan solo como respaldo para catálogos antiguos. */
-  var REGLAS_PREDICCION = (CATALOGO && CATALOGO.reglas && CATALOGO.reglas.length) ? CATALOGO.reglas : REGLAS_INTERNAS;
-
-  function proponerProductos(R) {
-    if (!R.length) return { estado: 'sin-reactivos', productos: [], mensaje: 'Agrega al menos un reactivo.' };
-    var aplicables = REGLAS_PREDICCION.filter(function (r) {
-      try { return !!r.aplica(R); } catch (e) { return false; }
-    });
-    if (!aplicables.length) {
-      return { estado: 'no-reconocida', productos: [],
-        mensaje: 'Reacción no reconocida: todavía no hay una regla para estos reactivos y la app no inventa productos. ' +
-                 'Puedes escribirlos tú: \u201cA + B \u2192 C + D\u201d y balancearla igualmente.' };
-    }
-    var conj = {};
-    aplicables.forEach(function (r) {
-      var ids = r.productos(R) || [];
-      conj[ids.slice().sort().join('|')] = { regla: r, ids: ids };
-    });
-    var claves = Object.keys(conj);
-    if (claves.length > 1) {
-      return { estado: 'ambigua', productos: [],
-        mensaje: 'Caso ambiguo: varias reglas aplican con resultados distintos (' +
-          claves.map(function (k) { return conj[k].regla.nombre; }).join('; ') +
-          '). Escribe los productos tú con la flecha \u2192.' };
-    }
-    var u = conj[claves[0]];
-    var falt = u.ids.filter(function (id) { return !obtenerSustancia(id); });
-    if (falt.length) return { estado: 'error', productos: [], mensaje: 'La regla "' + u.regla.nombre + '" usa sustancias que no están en el catálogo: ' + falt.join(', ') + '.' };
-    if (u.ids.length > CONFIG.limiteProductos) return { estado: 'error', productos: [], mensaje: 'La regla produce más de ' + CONFIG.limiteProductos + ' productos.' };
-    return { estado: 'propuesta', productos: u.ids, regla: u.regla.nombre,
-             mensaje: 'Regla aplicada: ' + u.regla.nombre + '.' };
   }
 
   /* ===========================================================================
@@ -544,6 +394,36 @@
     var els = Object.keys(a.atomos).concat(Object.keys(b.atomos));
     return { atomos: els.every(function (e) { return (a.atomos[e] || 0) === (b.atomos[e] || 0); }),
              carga: a.carga === b.carga, izquierda: a, derecha: b };
+  }
+
+
+  /* Ecuación balanceada para una reacción del banco. Los coeficientes son los del banco;
+     se verifican con la conservación de átomos y carga y se comparan con el balanceador
+     matricial. Si el banco no cerrara, se usa la matriz. Las especies sin composición fija
+     (polímeros) no se pueden verificar: se muestran los coeficientes del banco tal cual. */
+  function obtenerBalanceo(rx, R, P) {
+    var banco = { estado: 'ok', coeficientesReactivos: rx.coeficientesR.slice(), coeficientesProductos: rx.coeficientesP.slice() };
+    var completo = R.concat(P).every(function (s) { return !!s.composicion; });
+    if (!completo) {
+      banco.conservacion = { atomos: true, carga: true, sinVerificar: true };
+      banco.fuente = 'banco-sin-verificar';
+      return banco;
+    }
+    var v = verificarConservacion(R, P, banco.coeficientesReactivos, banco.coeficientesProductos);
+    var m = balancearEcuacion(R, P);
+    if (v.atomos && v.carga) {
+      banco.conservacion = v;
+      banco.fuente = (m.estado === 'ok' &&
+        m.coeficientesReactivos.join() === banco.coeficientesReactivos.join() &&
+        m.coeficientesProductos.join() === banco.coeficientesProductos.join()) ? 'banco+matriz' : 'banco';
+      return banco;
+    }
+    if (m.estado === 'ok') {
+      m.conservacion = verificarConservacion(R, P, m.coeficientesReactivos, m.coeficientesProductos);
+      m.fuente = 'matriz';
+      return m;
+    }
+    return { estado: 'imposible', mensaje: 'Los coeficientes del banco no conservan los átomos y el balanceador matricial tampoco encontró solución.' };
   }
 
   /* ===========================================================================
@@ -710,44 +590,65 @@
   }
 
   /* ===========================================================================
-     10. ESTADO
+     10. ESTADO DEL SIMULADOR
+     r1 / r2 / r3: null = sin elegir · '' = "ninguno" · otro = fórmula del banco.
+     paso: 0 eligiendo · 1 reacción determinada · 2 ecuación balanceada.
      ======================================================================== */
   var estado = {
-    entrada: parsearEntradaVacia(),
-    productos: [],       // ids
-    origen: null,        // 'regla' | 'usuario'
-    nombreRegla: '',
-    balanceo: null,
-    redox: null,
-    tipo: null,
-    medio: null,
-    estequio: null
+    r1: null, r2: null, r3: null,
+    opciones: [], variante: 0,
+    paso: 0, reaccion: null, R: [], P: [],
+    balanceo: null, redox: null, tipo: null, medio: null, estequio: null,
+    temporizador: null
   };
 
-  function parsearEntradaVacia() {
-    return { reactivos: [], productos: [], flecha: false, errores: [], avisos: [], estado: 'vacio' };
-  }
-
-  function invalidarResultados() {
-    estado.productos = []; estado.origen = null; estado.nombreRegla = '';
+  function limpiarResultados() {
+    if (estado.temporizador) { clearTimeout(estado.temporizador); estado.temporizador = null; }
+    estado.paso = 0; estado.reaccion = null; estado.R = []; estado.P = [];
     estado.balanceo = null; estado.redox = null; estado.tipo = null;
     estado.medio = null; estado.estequio = null;
   }
 
-  function reactivosActuales() {
-    return estado.entrada.reactivos.filter(function (t) { return t.sustancia; })
-      .map(function (t) { return t.sustancia; });
-  }
-  function productosActuales() { return estado.productos.map(obtenerSustancia); }
+  function reactivosActuales() { return estado.R; }
+  function productosActuales() { return estado.P; }
 
   function recalcularAnalisis() {
-    var R = reactivosActuales(), P = productosActuales();
+    var R = estado.R, P = estado.P;
     if (!P.length) { estado.redox = null; estado.tipo = null; estado.medio = null; return; }
     var b = estado.balanceo && estado.balanceo.estado === 'ok' ? estado.balanceo : null;
     estado.redox = analizarRedox(R, P, b ? b.coeficientesReactivos : null, b ? b.coeficientesProductos : null);
     estado.tipo = clasificarReaccion(R, P, estado.redox);
     estado.medio = detectarMedio(R);
   }
+
+  function terceros() {
+    return estado.r1 && estado.r2 ? CATALOGO.tercerosPosibles(estado.r1, estado.r2) : [];
+  }
+
+  /* Reacciones del banco que corresponden a lo elegido (varias = variantes). */
+  function calcularOpciones() {
+    var t = terceros();
+    if (!estado.r1 || estado.r2 === null || (t.length && estado.r3 === null)) return [];
+    return CATALOGO.buscarReaccion(estado.r1, estado.r2 || null, estado.r3 || null);
+  }
+
+  function porNombre(a, b) { return especie(a.id).nombre.localeCompare(especie(b.id).nombre, 'es'); }
+  function aOpciones(lista) {
+    return lista.map(function (o) { return { id: o.id, n: o.reacciones }; }).sort(porNombre);
+  }
+  function opcionesR1() { return aOpciones(CATALOGO.reactivosDisponibles()); }
+  function opcionesR2() {
+    var c = CATALOGO.reactivosCompatibles(estado.r1), l = aOpciones(c.companeros);
+    if (c.soloUno) l.unshift({ id: '', n: c.soloUno });
+    return l;
+  }
+  function opcionesR3() {
+    var l = aOpciones(CATALOGO.tercerosPosibles(estado.r1, estado.r2));
+    var directas = CATALOGO.buscarReaccion(estado.r1, estado.r2 || null).length;
+    if (directas) l.unshift({ id: '', n: directas });
+    return l;
+  }
+
 
   /* ===========================================================================
      11. VISTA
@@ -857,56 +758,146 @@
     return el('span', { class: 'rxn-logo', 'aria-hidden': 'true' }, [svg]);
   }
 
+  function mostrar(nodo) {
+    nodo.hidden = false;
+    nodo.classList.remove('rxn-aparece');
+    void nodo.offsetWidth;                       // reinicia la animación de entrada
+    nodo.classList.add('rxn-aparece');
+  }
+
+  function ocultarEtapas() {
+    [$.cardRx, $.cardEcuacion, $.cardAnalisis].forEach(function (n) { if (n) n.hidden = true; });
+  }
+
+  /* ---------- Selector flotante (hoja inferior con búsqueda; no abre el teclado solo) ---------- */
+  function crearSelector(clave, etiqueta, pista, opciones) {
+    var valorEl = el('span', { class: 'rxn-sel-valor' });
+    var btn = el('button', { type: 'button', class: 'rxn-sel', 'aria-haspopup': 'dialog' }, [
+      el('span', { class: 'rxn-sel-et', text: etiqueta }), valorEl,
+      el('span', { class: 'rxn-sel-flecha', 'aria-hidden': 'true', text: '\u25BE' })
+    ]);
+    var sel = { clave: clave, etiqueta: etiqueta, pista: pista, opciones: opciones, btn: btn, valorEl: valorEl };
+    btn.addEventListener('click', function () { abrirHoja(sel); });
+    return sel;
+  }
+
+  function pintarSelector(sel) {
+    var v = estado[sel.clave];
+    limpiar(sel.valorEl);
+    sel.btn.classList.toggle('rxn-sel--lleno', v !== null);
+    if (v === null) { sel.valorEl.appendChild(el('span', { class: 'rxn-sel-ph', text: sel.pista })); return; }
+    if (v === '') { sel.valorEl.appendChild(el('span', { class: 'rxn-sel-nombre', text: 'Ninguno' })); return; }
+    var s = especie(v);
+    sel.valorEl.appendChild(el('strong', { class: 'rxn-sel-formula' }, [formulaNodos(s)]));
+    if (s.nombre !== s.formula) sel.valorEl.appendChild(el('span', { class: 'rxn-sel-nombre', text: s.nombre }));
+  }
+
+  function abrirHoja(sel) {
+    if (sel.btn.disabled) return;
+    $.selActivo = sel;
+    $.hojaOps = sel.opciones();
+    $.hojaTit.textContent = sel.etiqueta;
+    $.buscar.value = '';
+    pintarLista('');
+    $.hoja.hidden = false;
+    $.panel.focus({ preventScroll: true });      // sin enfocar el buscador: el teclado no se abre solo
+    $.lista.scrollTop = 0;
+  }
+
+  function cerrarHoja() {
+    if ($.hoja.hidden) return;
+    $.hoja.hidden = true;
+    if ($.selActivo) $.selActivo.btn.focus({ preventScroll: true });
+  }
+
+  function pintarLista(texto) {
+    var q = normalizar(limpiarEntrada(texto)), sel = $.selActivo, vistos = [];
+    limpiar($.lista);
+    /* Orden: coincidencia exacta, luego empieza por lo escrito, luego lo contiene (y el orden alfabético). */
+    $.hojaOps.forEach(function (o, i) {
+      var s = o.id === '' ? null : especie(o.id);
+      var f = s ? normalizar(s.formula) : '', nm = s ? normalizar(s.nombre) : '';
+      var todo = s ? f + ' ' + nm : 'ninguno sin segundo reactivo reacciona solo';
+      if (q && todo.indexOf(q) < 0) return;
+      var rango = !q ? 0 : (f === q || nm === q ? 0 : (f.indexOf(q) === 0 || nm.indexOf(q) === 0 ? 1 : 2));
+      vistos.push({ o: o, s: s, r: rango, i: i });
+    });
+    vistos.sort(function (a, b) { return a.r - b.r || a.i - b.i; });
+    vistos.forEach(function (v) {
+      var o = v.o, s = v.s;
+      $.lista.appendChild(el('li', {}, [el('button', {
+        type: 'button', class: 'rxn-op' + (estado[sel.clave] === o.id ? ' rxn-op--sel' : ''),
+        onclick: function () { cerrarHoja(); elegir(sel.clave, o.id); }
+      }, [
+        el('span', { class: 'rxn-op-formula' }, s ? [formulaNodos(s)] : ['\u2205']),
+        el('span', { class: 'rxn-op-nombre', text: s ? (s.nombre !== s.formula ? s.nombre : '') : 'Ninguno: reacciona solo (calor, catalizador\u2026)' }),
+        el('span', { class: 'rxn-op-n', text: o.n + (o.n === 1 ? ' reacción' : ' reacciones') })
+      ])]));
+    });
+    if (!vistos.length) $.lista.appendChild(el('li', { class: 'rxn-op-vacio', text: 'Sin resultados. Prueba con otra fórmula o nombre.' }));
+  }
+
+  /* ---------- Indicador de pasos ---------- */
+  var NOMBRES_PASOS = ['Reactivos', 'Reacción', 'Balanceo', 'Cálculos'];
+  function renderPasos() {
+    var p = !estado.opciones.length ? 0 : (estado.paso === 0 ? 1 : (estado.paso === 1 ? 2 :
+            (estado.balanceo && estado.balanceo.estado === 'ok' ? (estado.estequio ? 4 : 3) : 2)));
+    limpiar($.pasos);
+    NOMBRES_PASOS.forEach(function (n, i) {
+      $.pasos.appendChild(el('li', { class: 'rxn-paso' + (i < p ? ' rxn-paso--hecho' : (i === p && !(estado.reaccion && !estado.P.length) ? ' rxn-paso--actual' : '')) }, [
+        el('span', { class: 'rxn-paso-num', text: i < p ? '\u2713' : String(i + 1) }),
+        el('span', { class: 'rxn-paso-nom', text: n })
+      ]));
+    });
+  }
+
   function construirVista(contenedor) {
     var raiz = el('div', { class: 'rxn-root' });
 
-    /* --- Encabezado: solo título + icono verde de la pestaña --- */
     raiz.appendChild(el('header', { class: 'rxn-encabezado' }, [
       el('h2', { class: 'rxn-titulo', text: 'Reacciones y estequiometría' }),
       iconoMatraz()
     ]));
+    $.pasos = el('ol', { class: 'rxn-pasos', 'aria-label': 'Progreso del simulador' });
+    raiz.appendChild($.pasos);
 
-    /* --- 1. Reactivos --- */
-    $.contadorR = el('span', { class: 'rxn-contador' });
-    $.input = el('input', {
-      type: 'text', id: 'rxn-entrada', class: 'rxn-input', autocomplete: 'off', autocapitalize: 'off',
-      autocorrect: 'off', spellcheck: 'false', enterkeyhint: 'go',
-      placeholder: 'Ej.: KMnO4 + KI + H2SO4', 'aria-controls': 'rxn-sugerencias',
-      oninput: alEscribir, onkeydown: alTecla, onfocus: alEscribir,
-      onscroll: sincronizarEspejo, onkeyup: sincronizarEspejo, onclick: sincronizarEspejo
-    });
-    $.espejo = el('div', { class: 'rxn-espejo', 'aria-hidden': 'true' });
-    $.campo = el('div', { class: 'rxn-campo' }, [$.espejo, $.input]);
-    $.sugerencias = el('ul', { class: 'rxn-sugerencias', id: 'rxn-sugerencias', role: 'listbox', hidden: true });
-    $.pastillas = construirPastillas();
-    $.msgEntrada = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
-    $.chips = el('ul', { class: 'rxn-chips', 'aria-label': 'Reactivos agregados' });
-    $.vacioR = el('p', { class: 'rxn-vacio', text: 'Aún no hay reactivos. Escribe una fórmula o un nombre (ej. HCl, agua).' });
-    $.btnDeterminar = el('button', { type: 'button', class: 'rxn-btn rxn-btn--primario rxn-btn--ancho', onclick: determinarReaccion }, ['Determinar reacción']);
-
-    raiz.appendChild(el('section', { class: 'rxn-card' }, [
-      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Reactivos' }), $.contadorR]),
-      el('label', { class: 'rxn-solo-lector', for: 'rxn-entrada', text: 'Escribe los reactivos separados por +' }),
-      el('div', { class: 'rxn-entrada-wrap' }, [$.campo, $.sugerencias]),
-      $.pastillas, $.msgEntrada, $.chips, $.vacioR, $.btnDeterminar
+    /* --- Paso 1: elegir reactivos --- */
+    $.selR1 = crearSelector('r1', 'Reactivo 1', 'Elegir\u2026', opcionesR1);
+    $.selR2 = crearSelector('r2', 'Reactivo 2', 'Elegir\u2026', opcionesR2);
+    $.selR3 = crearSelector('r3', 'Reactivo 3', 'Elegir\u2026', opcionesR3);
+    $.pistaR2 = el('p', { class: 'rxn-pista' });
+    $.filaR3 = el('div', { class: 'rxn-fila-r3', hidden: true }, [
+      el('p', { class: 'rxn-pista', text: 'Esta reacción necesita un tercer reactivo.' }), $.selR3.btn
+    ]);
+    $.variantes = el('div', { class: 'rxn-variantes', hidden: true });
+    $.btnDeterminar = el('button', { type: 'button', class: 'rxn-btn rxn-btn--determinar rxn-btn--ancho', onclick: determinar, disabled: true },
+      ['\uD83D\uDFE2 Determinar reacción']);
+    raiz.appendChild(el('section', { class: 'rxn-card', id: 'rxn-reactivos' }, [
+      el('div', { class: 'rxn-card-cab' }, [
+        el('h3', { class: 'rxn-card-titulo', text: '1 \u00b7 Elige los reactivos' }),
+        el('button', { type: 'button', class: 'rxn-btn-texto', onclick: limpiarTodo }, ['\u21BA Limpiar'])
+      ]),
+      el('div', { class: 'rxn-sels' }, [$.selR1.btn, el('span', { class: 'rxn-mas', 'aria-hidden': 'true', text: '+' }), $.selR2.btn]),
+      $.pistaR2, $.filaR3, $.variantes, $.btnDeterminar
     ]));
 
-    /* --- 2. Reacción completa (fondo negro) --- */
-    $.contadorP = el('span', { class: 'rxn-contador rxn-contador--oscuro' });
-    $.msgProductos = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
-    $.reaccion = el('div', { class: 'rxn-reaccion rxn-reaccion--vacia', text: 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.' });
-    $.leyenda = el('div', { class: 'rxn-leyenda', hidden: true });
-    $.btnBalancear = el('button', { type: 'button', class: 'rxn-btn rxn-btn--balancear rxn-btn--ancho', onclick: balancear }, ['\u2696\ufe0f Balancear ecuación']);
-    $.cardReaccion = el('section', { class: 'rxn-card rxn-card--oscura', id: 'rxn-reaccion' }, [
-      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Reacción completa' }), $.contadorP]),
-      $.msgProductos, $.reaccion, $.leyenda, $.btnBalancear
+    /* --- Paso 2: reacción determinada (productos, categoría, nota) --- */
+    $.cuerpoRx = el('div', { class: 'rxn-rx-cuerpo' });
+    $.cardRx = el('section', { class: 'rxn-card rxn-card--rx', id: 'rxn-reaccion', hidden: true }, [
+      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: '2 \u00b7 Reacción determinada' })]),
+      $.cuerpoRx
     ]);
-    raiz.appendChild($.cardReaccion);
+    raiz.appendChild($.cardRx);
 
-    /* --- 3. Ecuación balanceada (fondo gris) + botón rojo de semirreacciones --- */
+    /* --- Paso 3: ecuación sin balancear → balanceada + semirreacciones --- */
     $.medio = el('span', { class: 'rxn-medio', hidden: true });
-    $.ecuacion = el('div', { class: 'rxn-ecuacion rxn-ecuacion--vacia', text: 'Aquí verás tu ecuación balanceada.' });
+    $.eqSin = el('div', { class: 'rxn-reaccion' });
+    $.eqBal = el('div', { class: 'rxn-ecuacion' });
+    $.conteo = el('div', { class: 'rxn-conteo' });
     $.msgEcuacion = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
+    $.bloqueBal = el('div', { class: 'rxn-eq-bloque rxn-aparece', style: '--i:3' }, [
+      el('span', { class: 'rxn-etiqueta', text: 'Balanceada' }), $.eqBal, $.conteo
+    ]);
     $.cuerpoSemi = el('div', { class: 'rxn-semi-cuerpo' }, [el('p', { class: 'rxn-pendiente', text: 'Balancea una ecuación para ver las semirreacciones.' })]);
     $.detSemi = el('details', { class: 'rxn-semi' }, [
       el('summary', { class: 'rxn-semi-btn' }, [
@@ -919,94 +910,126 @@
       ]),
       $.cuerpoSemi
     ]);
-    $.cardResultado = el('section', { class: 'rxn-card rxn-card--gris', id: 'rxn-resultado' }, [
-      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Ecuación balanceada' }), $.medio]),
-      $.ecuacion, $.msgEcuacion, $.detSemi
+    $.cardEcuacion = el('section', { class: 'rxn-card rxn-card--gris', id: 'rxn-resultado', hidden: true }, [
+      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: '3 \u00b7 Ecuación química' }), $.medio]),
+      el('div', { class: 'rxn-eq-bloque rxn-aparece', style: '--i:0' }, [
+        el('span', { class: 'rxn-etiqueta', text: 'Sin balancear' }), $.eqSin,
+        el('p', { class: 'rxn-dato-sub', text: 'Solo fórmulas: todavía no sabemos cuántas unidades de cada sustancia intervienen.' })
+      ]),
+      $.bloqueBal, $.msgEcuacion, $.detSemi
     ]);
-    raiz.appendChild($.cardResultado);
+    raiz.appendChild($.cardEcuacion);
 
-    /* --- 4. Análisis (acordeones numerados, orden fijo) --- */
-    raiz.appendChild(el('section', { class: 'rxn-card', id: 'rxn-analisis' }, [
-      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Análisis y estequiometría' })]),
-      el('p', { class: 'rxn-analisis-guia', text: 'Toca cada botón de color para abrir su explicación.' }),
+    /* --- Paso 4: análisis y estequiometría (se activa al balancear) --- */
+    $.cardAnalisis = el('section', { class: 'rxn-card rxn-card--analisis', id: 'rxn-analisis', hidden: true }, [
+      el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: '4 \u00b7 Análisis y estequiometría' })]),
+      el('p', { class: 'rxn-analisis-guia', text: 'Con la ecuación balanceada ya puedes calcular. Toca cada botón de color para abrirlo.' }),
       tarjetaNumerada(1, 'Tipo de reacción', 'Clasificación y análisis redox', 'cuerpo-tipo', 'Se mostrará al determinar la reacción.'),
-      tarjetaNumerada(2, 'Estados de oxidación', 'El número de oxidación de cada átomo', 'cuerpo-oxidacion', 'Agrega reactivos para ver sus números de oxidación.'),
-      tarjetaNumerada(3, 'Masas molares', 'Cuánto pesa un mol de cada sustancia', 'cuerpo-masas', 'Agrega reactivos para ver sus masas molares.'),
-      tarjetaNumerada(4, 'Cálculos estequiométricos', 'Reactivo limitante, exceso y producción teórica', 'cuerpo-estequio', 'Primero balancea la ecuación.')
-    ]));
+      tarjetaNumerada(2, 'Estados de oxidación', 'El número de oxidación de cada átomo', 'cuerpo-oxidacion', 'Aún sin datos.'),
+      tarjetaNumerada(3, 'Masas molares', 'Cuánto pesa un mol de cada sustancia', 'cuerpo-masas', 'Aún sin datos.'),
+      tarjetaNumerada(4, 'Moles y reactivo limitante', 'Gramos \u2192 moles, exceso y producción teórica', 'cuerpo-estequio', 'Primero balancea la ecuación.')
+    ]);
+    raiz.appendChild($.cardAnalisis);
+
+    /* --- Hoja flotante de selección --- */
+    $.hojaTit = el('h3', { class: 'rxn-hoja-titulo' });
+    $.buscar = el('input', {
+      type: 'search', class: 'rxn-buscar', placeholder: 'Buscar por fórmula o nombre\u2026', autocomplete: 'off',
+      autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false', 'aria-label': 'Buscar sustancia',
+      oninput: function () { pintarLista($.buscar.value); }
+    });
+    $.lista = el('ul', { class: 'rxn-lista' });
+    $.panel = el('div', { class: 'rxn-hoja-panel', tabindex: '-1' }, [
+      el('div', { class: 'rxn-hoja-cab' }, [
+        $.hojaTit,
+        el('button', { type: 'button', class: 'rxn-hoja-x', 'aria-label': 'Cerrar', onclick: cerrarHoja }, ['\u00d7'])
+      ]),
+      $.buscar, $.lista
+    ]);
+    $.hoja = el('div', { class: 'rxn-hoja', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Elegir sustancia', hidden: true }, [
+      el('div', { class: 'rxn-hoja-fondo', onclick: cerrarHoja }), $.panel
+    ]);
+    raiz.appendChild($.hoja);
 
     contenedor.appendChild(raiz);
-
-    document.addEventListener('click', function (ev) {
-      if (!ev.target.closest || !ev.target.closest('#' + CONFIG.idContenedor + ' .rxn-entrada-wrap')) ocultarSugerencias();
-    });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrarHoja(); });
   }
 
-  function construirPastillas() {
-    function pastilla(texto, etiqueta, clase, accion) {
-      return el('button', {
-        type: 'button', class: 'rxn-pastilla ' + clase, 'aria-label': etiqueta,
-        onmousedown: function (ev) { ev.preventDefault(); },
-        onclick: accion
-      }, [texto]);
+  /* ---------- Paso 1: refresco de los selectores ---------- */
+  function actualizar() {
+    var r1 = estado.r1, c = r1 ? CATALOGO.reactivosCompatibles(r1) : null;
+    [$.selR1, $.selR2, $.selR3].forEach(pintarSelector);
+    $.selR2.btn.disabled = !r1;
+    $.pistaR2.textContent = !r1
+      ? 'Elige el Reactivo 1: el Reactivo 2 mostrará solo lo que reacciona con él.'
+      : c.companeros.length + (c.companeros.length === 1 ? ' sustancia reacciona' : ' sustancias reaccionan') +
+        ' con ' + formulaPlana(especie(r1)) + (c.soloUno ? ' (también hay una reacción sin segundo reactivo)' : '') + '.';
+    $.filaR3.hidden = !terceros().length;
+
+    estado.opciones = calcularOpciones();
+    if (estado.variante >= estado.opciones.length) estado.variante = 0;
+    limpiar($.variantes);
+    if (estado.opciones.length > 1) {
+      $.variantes.appendChild(el('p', { class: 'rxn-pista', text: 'Hay ' + estado.opciones.length + ' reacciones posibles con estos reactivos. Elige una:' }));
+      estado.opciones.forEach(function (o, i) {
+        $.variantes.appendChild(el('button', {
+          type: 'button', class: 'rxn-variante' + (i === estado.variante ? ' rxn-variante--sel' : ''), 'aria-pressed': i === estado.variante ? 'true' : 'false',
+          onclick: function () { estado.variante = i; limpiarResultados(); ocultarEtapas(); actualizar(); }
+        }, [o.titulo]));
+      });
     }
-    return el('div', { class: 'rxn-pastillas', role: 'group', 'aria-label': 'Entrada rápida' }, [
-      pastilla('+', 'Insertar signo más', 'rxn-pastilla--mas', function () { insertarEnCursor(' + ', 0); }),
-      pastilla('\u2192', 'Insertar flecha', 'rxn-pastilla--flecha', function () { insertarEnCursor(' \u2192 ', 0); }),
-      pastilla('Borrar', 'Borrar todo', 'rxn-pastilla--borrar', function () { $.input.value = ''; alEscribir(); $.input.focus(); })
-    ]);
+    $.variantes.hidden = estado.opciones.length < 2;
+    $.btnDeterminar.disabled = !estado.opciones.length;
+    renderPasos();
   }
 
-  /* ---------- Chips ---------- */
-  function crearChip(tk, indice, lado, quitable) {
-    var s = tk.sustancia;
-    var chip = el('li', { class: 'rxn-chip' + (s ? '' : ' rxn-chip--error') });
-    chip.appendChild(el('span', { class: 'rxn-chip-textos' }, [
-      el('span', { class: 'rxn-chip-formula' }, s ? [formulaNodos(s)] : [tk.texto]),
-      el('span', { class: 'rxn-chip-nombre', text: s ? s.nombre : 'no reconocido' })
-    ]));
-    if (quitable) {
-      chip.appendChild(el('button', {
-        type: 'button', class: 'rxn-chip-x', 'aria-label': 'Quitar ' + (s ? s.nombre : tk.texto),
-        onclick: function () { quitarTermino(lado, indice); }
-      }, ['\u00d7']));
-    }
-    return chip;
+  function elegir(clave, id) {
+    estado[clave] = id;
+    if (clave === 'r1') { estado.r2 = null; estado.r3 = null; }
+    if (clave === 'r2') estado.r3 = null;
+    estado.variante = 0;
+    limpiarResultados(); ocultarEtapas(); actualizar();
   }
 
-  function renderChips() {
-    var e = estado.entrada;
-    limpiar($.chips);
-    e.reactivos.forEach(function (tk, i) { $.chips.appendChild(crearChip(tk, i, 'R', true)); });
-    $.vacioR.hidden = e.reactivos.length > 0;
-    $.chips.hidden = e.reactivos.length === 0;
-    $.contadorR.textContent = e.reactivos.length + ' / ' + CONFIG.limiteReactivos;
-    $.contadorR.className = 'rxn-contador' + (e.reactivos.length > CONFIG.limiteReactivos ? ' rxn-contador--error' : '');
-    $.btnDeterminar.disabled = e.estado !== 'ok';
+  function limpiarTodo() {
+    estado.r1 = null; estado.r2 = null; estado.r3 = null; estado.variante = 0;
+    limpiarResultados(); ocultarEtapas(); actualizar();
   }
 
-  function lineaNombres(titulo, lista) {
-    return el('p', {}, [el('b', { text: titulo + ': ' }), lista.map(function (s) { return s.nombre; }).join(' \u00b7 ')]);
-  }
-
-  /* Reacción completa SIN balancear: todos los reactivos \u2192 todos los productos. */
+  /* ---------- Paso 2: reacción determinada ---------- */
   function renderReaccion() {
-    var R = reactivosActuales(), P = productosActuales();
-    limpiar($.reaccion); limpiar($.leyenda);
-    if (P.length) {
-      $.reaccion.className = 'rxn-reaccion';
-      $.reaccion.appendChild(nodoEcuacion(R, null, P, null));
-      $.leyenda.appendChild(lineaNombres('Reactivos', R));
-      $.leyenda.appendChild(lineaNombres('Productos', P));
-      $.leyenda.hidden = false;
-    } else {
-      $.reaccion.className = 'rxn-reaccion rxn-reaccion--vacia';
-      $.reaccion.textContent = 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.';
-      $.leyenda.hidden = true;
+    var rx = estado.reaccion, P = estado.P, i = 0;
+    limpiar($.cuerpoRx);
+    function bloque(clase, hijos) {
+      var n = el('div', { class: 'rxn-bloque rxn-aparece ' + clase, style: '--i:' + (i++) }, hijos);
+      $.cuerpoRx.appendChild(n);
+      return n;
     }
-    $.contadorP.textContent = 'Productos ' + P.length + ' / ' + CONFIG.limiteProductos;
-    $.btnBalancear.disabled = P.length === 0;
+    bloque('rxn-b-titulo', [el('span', { class: 'rxn-etiqueta', text: 'Reacción identificada' }), el('p', { class: 'rxn-rx-titulo', text: rx.titulo })]);
+    if (P.length) {
+      bloque('rxn-b-prod', [
+        el('span', { class: 'rxn-etiqueta', text: 'Productos esperados' }),
+        el('ul', { class: 'rxn-prods' }, P.map(function (s) {
+          return el('li', { class: 'rxn-prod' }, [
+            el('strong', { class: 'rxn-prod-formula' }, [formulaNodos(s)]),
+            s.nombre !== s.formula ? el('span', { class: 'rxn-prod-nombre', text: s.nombre }) : null
+          ]);
+        }))
+      ]);
+    } else {
+      bloque('rxn-b-sinrx', [el('span', { class: 'rxn-etiqueta', text: 'Resultado' }), el('p', { class: 'rxn-rx-sin', text: 'No hay reacción neta: las sustancias no reaccionan entre sí.' })]);
+    }
+    bloque('rxn-b-cat', [el('span', { class: 'rxn-etiqueta', text: 'Clasificación' }), el('span', { class: 'rxn-categoria', text: rx.categoria })]);
+    bloque('rxn-b-nota', [
+      el('span', { class: 'rxn-nota-icono', 'aria-hidden': 'true', text: '\uD83D\uDCA1' }),
+      el('div', {}, [el('span', { class: 'rxn-etiqueta', text: 'Observación' }), el('p', { text: rx.nota })])
+    ]);
+    if (P.length) {
+      $.btnBalancear = el('button', { type: 'button', class: 'rxn-btn rxn-btn--balancear rxn-btn--ancho', onclick: balancear }, ['\u2696\uFE0F Balancear ecuación']);
+      bloque('rxn-b-accion', [$.btnBalancear]);
+    }
   }
+
 
   /* ---------- Ecuación ---------- */
   /* Cada especie lleva pegado su "+" (o la flecha, si es el último reactivo):
@@ -1028,27 +1051,43 @@
     return frag;
   }
 
+
+  /* ---------- Paso 3: ecuaciones ---------- */
+  var FUENTES = {
+    'banco+matriz': ['exito', '\u2713 Coeficientes del banco de reacciones, confirmados por el balanceador matricial.'],
+    'banco': ['exito', '\u2713 Coeficientes del banco de reacciones; átomos y cargas verificados.'],
+    'matriz': ['aviso', 'Los coeficientes del banco no cerraban; se muestran los calculados por el balanceador matricial.'],
+    'banco-sin-verificar': ['aviso', 'Coeficientes tomados del banco. Esta ecuación incluye una especie sin composición fija (por ejemplo un polímero con \u201cn\u201d), así que no se pudo verificar con la matriz.']
+  };
+
   function renderEcuacion() {
-    limpiar($.ecuacion);
-    var b = estado.balanceo;
-    if (b && b.estado === 'ok' && b.conservacion && b.conservacion.atomos && b.conservacion.carga) {
-      var R = reactivosActuales(), P = productosActuales();
-      $.ecuacion.className = 'rxn-ecuacion';
-      $.ecuacion.appendChild(nodoEcuacion(R, b.coeficientesReactivos, P, b.coeficientesProductos));
+    var b = estado.balanceo, R = estado.R, P = estado.P;
+    limpiar($.eqSin); limpiar($.eqBal); limpiar($.conteo);
+    $.eqSin.appendChild(nodoEcuacion(R, null, P, null));
+    var ok = !!(b && b.estado === 'ok' && b.conservacion && b.conservacion.atomos && b.conservacion.carga);
+    $.bloqueBal.hidden = !ok;
+    if (ok) {
+      $.eqBal.appendChild(nodoEcuacion(R, b.coeficientesReactivos, P, b.coeficientesProductos));
       $.medio.textContent = '\u270f\ufe0f Medio: ' + estado.medio;
       $.medio.hidden = false;
-      var hayCarga = R.concat(P).some(function (s) { return s.carga; });
-      mostrarMensajes($.msgEcuacion, 'exito', ['\u2713 Conservación verificada: los átomos' + (hayCarga ? ' y las cargas' : '') + ' son iguales a ambos lados.']);
+      var c = b.conservacion;
+      if (c.izquierda) {
+        Object.keys(c.izquierda.atomos).forEach(function (e) {
+          $.conteo.appendChild(el('span', { class: 'rxn-at' }, [e + ' ', el('b', { text: String(c.izquierda.atomos[e]) }), ' = ', el('b', { text: String(c.derecha.atomos[e] || 0) }), ' \u2713']));
+        });
+        if (c.izquierda.carga || c.derecha.carga) {
+          $.conteo.appendChild(el('span', { class: 'rxn-at' }, ['carga ', el('b', { text: formatoSigno(c.izquierda.carga) }), ' = ', el('b', { text: formatoSigno(c.derecha.carga) }), ' \u2713']));
+        }
+      }
+      var f = FUENTES[b.fuente] || FUENTES.banco;
+      mostrarMensajes($.msgEcuacion, f[0], [f[1]]);
     } else {
-      $.ecuacion.className = 'rxn-ecuacion rxn-ecuacion--vacia';
-      $.ecuacion.textContent = 'Aquí verás tu ecuación balanceada.';
       $.medio.hidden = true;
-      if (b && b.estado !== 'ok') mostrarMensajes($.msgEcuacion, 'error', [b.mensaje]);
-      else if (b) mostrarMensajes($.msgEcuacion, 'error', ['El balanceo no superó la verificación de conservación, por eso no se muestra.']);
-      else mostrarMensajes($.msgEcuacion, 'exito', []);
+      mostrarMensajes($.msgEcuacion, 'error', [b && b.mensaje ? b.mensaje : 'El balanceo no superó la verificación de conservación, por eso no se muestra.']);
     }
     renderSemirreacciones();
   }
+
 
   function textoCambio(c) {
     var at = c.atomos === null ? '' : (c.atomos === 1 ? '' : c.atomos + ' ');
@@ -1105,8 +1144,7 @@
       t.appendChild(el('p', { class: 'rxn-dato-fuerte', text: estado.tipo.nombre }));
       t.appendChild(parrafo(estado.tipo.texto));
       if (estado.tipo.nota) t.appendChild(parrafo(estado.tipo.nota, 'rxn-nota'));
-      if (estado.origen === 'regla') t.appendChild(parrafo('Productos propuestos por la regla: ' + estado.nombreRegla + '.', 'rxn-dato-sub'));
-      if (estado.origen === 'usuario') t.appendChild(parrafo('Los productos los escribiste tú; la app no los verificó contra una regla.', 'rxn-dato-sub'));
+      if (estado.reaccion) t.appendChild(parrafo('Categoría en el banco de reacciones: ' + estado.reaccion.categoria + '.', 'rxn-dato-sub'));
     }
 
     /* Análisis redox: ahora dentro del bloque 1 (Tipo de reacción) */
@@ -1168,7 +1206,7 @@
       var cuerpo = el('tbody');
       function filaMasa(s, rol) {
         var M = calcularMasaMolar(s.composicion);
-        var desglose = Object.keys(s.composicion).map(function (sim) {
+        var desglose = !s.composicion ? 'sin composición fija en el catálogo' : Object.keys(s.composicion).map(function (sim) {
           var e = CATALOGO.elementos[sim];
           return sim + ' ' + formatoNum(e.masaAtomica, 3) + ' \u00d7 ' + s.composicion[sim];
         }).join(' + ');
@@ -1256,148 +1294,44 @@
     $.resEstequio.appendChild(parrafo('Cómo se decide: moles = gramos \u00f7 masa molar. El que tenga el menor valor de (moles \u00f7 coeficiente) es el limitante.', 'rxn-dato-sub'));
   }
 
-  function renderTodo() {
-    renderChips(); renderReaccion(); renderEcuacion(); renderAnalisis();
-  }
-
-  /* ---------- Entrada, validación y sugerencias ---------- */
-  function ocultarSugerencias() { if ($.sugerencias) { $.sugerencias.hidden = true; limpiar($.sugerencias); } }
-
-  function tokenActual(valor) {
-    var m = /([^+\u2192]*)$/.exec(limpiarEntrada(valor));
-    return { texto: m[1].trim(), inicio: limpiarEntrada(valor).length - m[1].length };
-  }
-
-  function mostrarSugerencias() {
-    var valor = $.input.value, tk = tokenActual(valor);
-    limpiar($.sugerencias);
-    if (!tk.texto || document.activeElement !== $.input) { $.sugerencias.hidden = true; return; }
-    var lista = buscarSustancias(tk.texto).slice(0, CONFIG.maxSugerencias);
-    /* Sin lista si no hay coincidencias o si lo escrito ya es, exactamente, la única opción:
-       así el desplegable no tapa la barra de entrada rápida sin necesidad. */
-    if (!lista.length || (lista.length === 1 && lista[0].id === limpiarEntrada(tk.texto))) {
-      $.sugerencias.hidden = true; return;
-    }
-    lista.forEach(function (s) {
-      $.sugerencias.appendChild(el('li', { role: 'option' }, [
-        el('button', { type: 'button', class: 'rxn-sug',
-          onmousedown: function (ev) { ev.preventDefault(); },
-          onclick: function () { elegirSugerencia(s, tk.inicio); } }, [
-          el('span', { class: 'rxn-sug-formula' }, [formulaNodos(s)]),
-          el('span', { class: 'rxn-sug-nombre', text: s.nombre }),
-          el('span', { class: 'rxn-sug-tipo', text: s.tipo })
-        ])
-      ]));
-    });
-    $.sugerencias.hidden = false;
-  }
-
-  function elegirSugerencia(s, inicio) {
-    var v = limpiarEntrada($.input.value), prefijo = v.slice(0, inicio);
-    if (prefijo && !/\s$/.test(prefijo)) prefijo += ' ';
-    $.input.value = prefijo + s.id;
-    ocultarSugerencias();
-    alEscribir(true);
-    $.input.focus();
-  }
-
-  /* La barra de entrada es un <input>, que no permite colorear letras sueltas.
-     Por eso se dibuja el mismo texto en una capa detrás (con los "+" en verde)
-     y el texto real del input se vuelve transparente. */
-  function sincronizarEspejo() { if ($.espejo) $.espejo.scrollLeft = $.input.scrollLeft; }
-  function actualizarEspejo() {
-    if (!$.espejo) return;
-    limpiar($.espejo);
-    String($.input.value).split('+').forEach(function (t, i) {
-      if (i > 0) $.espejo.appendChild(el('span', { class: 'rxn-espejo-mas', text: '+' }));
-      if (t) $.espejo.appendChild(document.createTextNode(t));
-    });
-    sincronizarEspejo();
-  }
-
-  function alEscribir(sinSugerencias) {
-    actualizarEspejo();
-    estado.entrada = parsearEntrada($.input.value);
-    invalidarResultados();
-    var e = estado.entrada;
-    $.campo.className = 'rxn-campo' + (e.estado === 'ok' ? ' rxn-campo--ok' : (e.estado === 'error' ? ' rxn-campo--error' : ''));
-    var tipoMsg = e.estado === 'error' ? 'error' : 'info';
-    mostrarMensajes($.msgEntrada, tipoMsg, e.errores.concat(e.errores.length ? [] : e.avisos));
-    mostrarMensajes($.msgProductos, 'info', []);
-    renderTodo();
-    if (sinSugerencias === true) ocultarSugerencias(); else mostrarSugerencias();
-  }
-
-  function alTecla(ev) {
-    if (ev.key === 'Enter') { ev.preventDefault(); ocultarSugerencias(); if (!$.btnDeterminar.disabled) determinarReaccion(); }
-    else if (ev.key === 'Escape') ocultarSugerencias();
-  }
-
-  function insertarEnCursor(texto, retroceder) {
-    var inp = $.input, ini = inp.selectionStart, fin = inp.selectionEnd, v = inp.value;
-    if (ini === null || ini === undefined) { ini = fin = v.length; }
-    inp.value = v.slice(0, ini) + texto + v.slice(fin);
-    var pos = ini + texto.length - (retroceder || 0);
-    inp.focus();
-    try { inp.setSelectionRange(pos, pos); } catch (e) { /* no crítico */ }
-    alEscribir();
-  }
-
-  function quitarTermino(lado, indice) {
-    var e = estado.entrada;
-    var izq = e.reactivos.filter(function (_, i) { return !(lado === 'R' && i === indice); }).map(function (t) { return t.texto; });
-    var der = e.productos.map(function (t) { return t.texto; });
-    var texto = izq.join(' + ');
-    if (e.flecha && der.length) texto += ' \u2192 ' + der.join(' + ');
-    $.input.value = texto;
-    alEscribir(true);
-  }
-
   /* ===========================================================================
      12. ACCIONES DEL USUARIO
      ======================================================================== */
-  function determinarReaccion() {
-    var e = estado.entrada;
-    if (e.estado !== 'ok') {
-      mostrarMensajes($.msgEntrada, 'error', e.errores.length ? e.errores : ['Escribe al menos un reactivo.']);
-      $.campo.className = 'rxn-campo rxn-campo--error';
-      return;
-    }
-    var R = reactivosActuales();
-    invalidarResultados();
-
-    if (e.flecha) {
-      estado.productos = e.productos.map(function (t) { return t.sustancia.id; });
-      estado.origen = 'usuario';
-      mostrarMensajes($.msgProductos, 'info', ['Usaste los productos que escribiste después de la flecha \u2192.']);
-    } else {
-      var r = proponerProductos(R);
-      if (r.estado === 'propuesta') {
-        estado.productos = r.productos.slice(); estado.origen = 'regla'; estado.nombreRegla = r.regla;
-        mostrarMensajes($.msgProductos, 'info', [r.mensaje]);
-      } else {
-        mostrarMensajes($.msgProductos, r.estado === 'error' ? 'error' : 'aviso', [r.mensaje]);
-      }
-    }
+  /* Paso 2: 🟢 Determinar reacción (sin mostrar todavía la ecuación completa). */
+  function determinar() {
+    var rx = estado.opciones[estado.variante];
+    if (!rx) return;
+    limpiarResultados(); ocultarEtapas();
+    estado.reaccion = rx;
+    estado.R = rx.reactivos.map(especie);
+    estado.P = rx.productos.map(especie);
+    estado.paso = 1;
     recalcularAnalisis();
-    renderTodo();
-    desplazarA($.cardReaccion);
+    renderReaccion();
+    mostrar($.cardRx);
+    renderPasos();
+    desplazarA($.cardRx);
   }
 
+  /* Paso 3: ⚖️ Balancear ecuación → sin balancear, luego balanceada; después se activa el paso 4. */
   function balancear() {
-    mostrarMensajes($.msgEcuacion, 'exito', []);
-    if (!estado.productos.length) {
-      estado.balanceo = { estado: 'invalida', mensaje: 'Primero determina los productos: no hay nada que balancear.' };
-      renderEcuacion(); desplazarA($.cardResultado); return;
-    }
-    var R = reactivosActuales(), P = productosActuales();
-    var res = balancearEcuacion(R, P);
-    if (res.estado === 'ok') res.conservacion = verificarConservacion(R, P, res.coeficientesReactivos, res.coeficientesProductos);
-    estado.balanceo = res; estado.estequio = null;
+    if (!estado.reaccion || !estado.P.length) return;
+    estado.balanceo = obtenerBalanceo(estado.reaccion, estado.R, estado.P);
+    estado.estequio = null; estado.paso = 2;
     recalcularAnalisis();
-    renderTodo();
-    desplazarA($.cardResultado);
+    renderEcuacion(); renderAnalisis();
+    mostrar($.cardEcuacion);
+    $.btnBalancear.disabled = true;
+    $.btnBalancear.textContent = '\u2713 Ecuación balanceada';
+    if (estado.temporizador) clearTimeout(estado.temporizador);
+    if (estado.balanceo.estado === 'ok') {
+      var reducir = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      estado.temporizador = setTimeout(function () { estado.temporizador = null; mostrar($.cardAnalisis); }, reducir ? 0 : CONFIG.retrasoAnalisis);
+    }
+    renderPasos();
+    desplazarA($.cardEcuacion);
   }
+
 
   function calcularLimitante() {
     var b = estado.balanceo;
@@ -1426,7 +1360,7 @@
   function iniciar() {
     var contenedor = document.getElementById(CONFIG.idContenedor);
     if (!contenedor) { console.warn('[Reacciones] No se encontró #' + CONFIG.idContenedor + '.'); return; }
-    if (!CATALOGO) { console.error('[Reacciones] formulas.js no está cargado; se conserva el contenido original.'); return; }
+    if (!CATALOGO || !CATALOGO.buscarReaccion) { console.error('[Reacciones] formulas.js (v1.1 con el banco de reacciones) no está cargado; se conserva el contenido original.'); return; }
     try {
       construirIndice();
       var problemas = verificarCatalogo();
@@ -1435,7 +1369,7 @@
       construirVista(temporal);
       limpiar(contenedor);
       while (temporal.firstChild) contenedor.appendChild(temporal.firstChild);
-      renderTodo();
+      actualizar();
     } catch (err) {
       console.error('[Reacciones] Error al construir la pestaña:', err);
     }
@@ -1446,10 +1380,10 @@
     config: CONFIG,
     iniciarIndice: construirIndice,
     parsearFormula: parsearFormula, validarFormula: validarFormula,
-    parsearEntrada: parsearEntrada, resolverToken: resolverToken,
+    resolverToken: resolverToken, especie: especie,
     calcularMasaMolar: calcularMasaMolar,
-    proponerProductos: proponerProductos, reglas: REGLAS_PREDICCION,
     balancearEcuacion: balancearEcuacion, verificarConservacion: verificarConservacion,
+    obtenerBalanceo: obtenerBalanceo,
     analizarRedox: analizarRedox, clasificarReaccion: clasificarReaccion, detectarMedio: detectarMedio,
     calcularEstequiometria: calcularEstequiometria,
     verificarCatalogo: verificarCatalogo, buscarSustancias: buscarSustancias,
