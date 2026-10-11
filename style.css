@@ -245,6 +245,7 @@ body {
     padding: 0 12px;
 }
 
+
 /* =========================================
    BUSCADOR
    ========================================= */
@@ -350,6 +351,7 @@ body {
 
     border-color: #ef4444;
 }
+
 
 /* =========================================
    TARJETAS
@@ -1367,7 +1369,7 @@ body {
    AJUSTES PANTALLA INICIO · QuímicApp UPDS
    ========================================= */
 
-/* ---------- 1. TIPOGRAFÍA GLOBAL ---------- */
+/* ---------- TIPOGRAFÍA GLOBAL ---------- */
 :root {
     --fuente-app: "Plus Jakarta Sans", "Nunito", "Poppins", system-ui, "Segoe UI", Roboto, sans-serif;
 }
@@ -1382,46 +1384,7 @@ button, input, select, textarea {
 }
 
 
-/* ---------- 2. BUSCADOR ---------- */
-.search-box {
-    background: #1e293b;
-    border: 1px solid #ffffff;
-    padding: 0 8px 0 16px;
-    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
-}
-
-.search-box .search-icon {
-    color: #e2e8f0;
-}
-
-.search-box input {
-    color: #ffffff;
-}
-
-.search-box input::placeholder {
-    color: #e2e8f0;
-    opacity: 1;
-}
-
-.search-box .search-settings {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    background: #ef4444;
-    color: #ffffff;
-    font-size: 17px;
-}
-
-.search-box .search-settings:hover {
-    background: #e11d48;
-}
-
-
-/* ---------- 3. DATO DEL DÍA: BOTÓN A LA DERECHA ---------- */
+/* ---------- DATO DEL DÍA: BOTÓN A LA DERECHA ---------- */
 .daily-card .outline-red {
     display: flex;
     align-items: center;
@@ -1456,7 +1419,7 @@ button, input, select, textarea {
 }
 
 
-/* ---------- 4. DESAFÍO RÁPIDO ---------- */
+/* ---------- DESAFÍO RÁPIDO ---------- */
 .challenge-card {
     background: #f1f5f9;
 }
