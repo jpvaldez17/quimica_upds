@@ -1,409 +1,464 @@
 /* =============================================================================
-   reacciones.css — Estilos exclusivos de la pestaña Reacciones · Fase 1
-   Todos los selectores empiezan por #reacciones, así no afectan a otras
-   pestañas ni a style.css. Colores y detalles son PROVISIONALES.
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v2.0
+   Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
+   ni a style.css. Mobile-first: lo base es para celular; @media amplía.
+   Para cambiar colores, edita solo las variables de .rxn-root.
    ========================================================================== */
 
-/* ---- Variables provisionales (solo dentro de Reacciones) ------------------ */
 #reacciones .rxn-root {
-  --rxn-fondo: #f5f6f8;
-  --rxn-superficie: #ffffff;
-  --rxn-borde: #d6dbe2;
-  --rxn-borde-suave: #e6e9ee;
-  --rxn-texto: #1f2933;
-  --rxn-texto-suave: #5f6b7a;
-  --rxn-primario: #3b6a8f;
-  --rxn-primario-oscuro: #2f5675;
-  --rxn-primario-fondo: #e8f0f6;
-  --rxn-inactivo-fondo: #eceff3;
-  --rxn-inactivo-texto: #9aa4b1;
-  --rxn-error-fondo: #fbefed;
-  --rxn-error-borde: #e2b4ac;
-  --rxn-error-texto: #8a2f22;
-  --rxn-info-fondo: #eef2f6;
-  --rxn-info-borde: #cfd8e1;
-  --rxn-aviso-fondo: #fbf6e8;
-  --rxn-aviso-borde: #e6d9ab;
-  --rxn-aviso-texto: #6d5a14;
-  --rxn-radio: 8px;
+  --rxn-fondo: #F4F6F9;
+  --rxn-card: #FFFFFF;
+  --rxn-texto: #1c2733;
+  --rxn-suave: #637083;
+  --rxn-borde: #dfe4ea;
+  --rxn-verde: #27AE60;
+  --rxn-verde-osc: #1e8e4e;
+  --rxn-verde-fondo: #e8f7ee;
+  --rxn-rojo: #d64541;
+  --rxn-rojo-fondo: #fdecea;
+  --rxn-ambar-fondo: #fff7e0;
+  --rxn-ambar-borde: #ecd9a0;
+  --rxn-ambar-texto: #70580f;
+  --rxn-negro: #121212;
+  --rxn-radio: 16px;
+  --rxn-sombra: 0 2px 10px rgba(20, 35, 55, 0.07);
+  --rxn-nav: 76px;             /* alto aproximado de la barra inferior de la app */
 
   box-sizing: border-box;
-  max-width: 880px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 4px 0 16px;
+  padding: 12px 12px 24px;
   color: var(--rxn-texto);
-  line-height: 1.4;
+  background: var(--rxn-fondo);
+  border-radius: 20px;
+  line-height: 1.45;
 }
 
 #reacciones .rxn-root *,
 #reacciones .rxn-root *::before,
-#reacciones .rxn-root *::after {
-  box-sizing: border-box;
-}
+#reacciones .rxn-root *::after { box-sizing: border-box; }
+
+#reacciones .rxn-root p { margin: 0 0 6px; }
+#reacciones .rxn-root p:last-child { margin-bottom: 0; }
+#reacciones .rxn-root [hidden] { display: none !important; }
 
 /* ---- Encabezado ----------------------------------------------------------- */
-#reacciones .rxn-encabezado { margin: 0 0 12px; }
-
-#reacciones .rxn-titulo {
-  margin: 0 0 6px;
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--rxn-texto);
-}
-
+#reacciones .rxn-encabezado { margin: 4px 2px 12px; }
+#reacciones .rxn-titulo { margin: 0 0 4px; font-size: 1.35rem; font-weight: 700; }
+#reacciones .rxn-lead { font-size: 0.88rem; color: var(--rxn-suave); }
 #reacciones .rxn-aviso {
-  margin: 0;
-  padding: 8px 10px;
-  font-size: 0.8rem;
-  color: var(--rxn-aviso-texto);
-  background: var(--rxn-aviso-fondo);
-  border: 1px solid var(--rxn-aviso-borde);
-  border-radius: var(--rxn-radio);
+  margin-top: 8px !important;
+  padding: 7px 10px;
+  font-size: 0.76rem;
+  color: var(--rxn-ambar-texto);
+  background: var(--rxn-ambar-fondo);
+  border: 1px solid var(--rxn-ambar-borde);
+  border-radius: 10px;
 }
 
-/* ---- Secciones ------------------------------------------------------------ */
-#reacciones .rxn-seccion {
+/* ---- Tarjetas -------------------------------------------------------------- */
+#reacciones .rxn-card {
   margin: 0 0 12px;
-  padding: 12px;
-  background: var(--rxn-superficie);
-  border: 1px solid var(--rxn-borde);
+  padding: 14px;
+  background: var(--rxn-card);
   border-radius: var(--rxn-radio);
+  box-shadow: var(--rxn-sombra);
 }
-
-#reacciones .rxn-seccion-cabecera {
+#reacciones .rxn-card-cab {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   margin: 0 0 10px;
 }
-
-#reacciones .rxn-seccion-titulo {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--rxn-texto);
-}
-
+#reacciones .rxn-card-titulo { margin: 0; font-size: 1.02rem; font-weight: 700; }
 #reacciones .rxn-contador {
-  font-size: 0.8rem;
-  color: var(--rxn-texto-suave);
+  padding: 2px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--rxn-verde-osc);
+  background: var(--rxn-verde-fondo);
+  border-radius: 999px;
   white-space: nowrap;
 }
+#reacciones .rxn-contador--error { color: var(--rxn-rojo); background: var(--rxn-rojo-fondo); }
 
-/* ---- Buscador ------------------------------------------------------------- */
-#reacciones .rxn-buscador {
-  position: relative;
-  display: flex;
-  gap: 8px;
-  margin: 0 0 8px;
+/* ---- Campo de entrada ------------------------------------------------------- */
+#reacciones .rxn-entrada-wrap { position: relative; }
+#reacciones .rxn-campo {
+  border: 2px solid var(--rxn-borde);
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
+#reacciones .rxn-campo--ok { border-color: var(--rxn-verde); box-shadow: 0 0 0 3px rgba(39, 174, 96, .14); }
+#reacciones .rxn-campo--error { border-color: var(--rxn-rojo); box-shadow: 0 0 0 3px rgba(214, 69, 65, .12); }
 
 #reacciones .rxn-input {
-  flex: 1 1 auto;
+  display: block;
+  width: 100%;
   min-width: 0;
-  height: 40px;
-  padding: 0 10px;
+  height: 46px;
+  padding: 0 14px;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;                /* 16px: evita el zoom automático en iPhone */
   color: var(--rxn-texto);
-  background: var(--rxn-superficie);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+}
+#reacciones .rxn-input:focus { outline: none; }
+#reacciones .rxn-input::placeholder { color: #9aa5b4; }
+#reacciones .rxn-input--masa {
+  height: 40px;
   border: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio);
+  background: #fff;
+  text-align: right;
 }
+#reacciones .rxn-input--masa:focus { border-color: var(--rxn-verde); outline: 2px solid rgba(39, 174, 96, .25); }
 
-#reacciones .rxn-input:focus {
-  outline: 2px solid var(--rxn-primario);
-  outline-offset: 1px;
-  border-color: var(--rxn-primario);
-}
-
-#reacciones .rxn-resultados {
+/* ---- Sugerencias ------------------------------------------------------------- */
+#reacciones .rxn-sugerencias {
   position: absolute;
-  top: 44px;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  margin: 0;
-  padding: 4px;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  z-index: 20;
+  margin: 0; padding: 4px;
   list-style: none;
   max-height: 260px;
   overflow-y: auto;
-  background: var(--rxn-superficie);
+  background: #fff;
   border: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(20, 35, 55, .16);
 }
-
-#reacciones .rxn-resultados[hidden] { display: none; }
-
-#reacciones .rxn-resultado {
+#reacciones .rxn-sug {
   display: flex;
   align-items: baseline;
   gap: 8px;
   width: 100%;
-  padding: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
   font: inherit;
   text-align: left;
   color: var(--rxn-texto);
   background: transparent;
   border: 0;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
 }
+#reacciones .rxn-sug:hover,
+#reacciones .rxn-sug:focus-visible { background: var(--rxn-verde-fondo); outline: none; }
+#reacciones .rxn-sug-formula { min-width: 3.6em; font-weight: 700; }
+#reacciones .rxn-sug-nombre { flex: 1 1 auto; font-size: 0.88rem; }
+#reacciones .rxn-sug-tipo { font-size: 0.7rem; color: var(--rxn-suave); }
 
-#reacciones .rxn-resultado:hover,
-#reacciones .rxn-resultado:focus-visible {
-  background: var(--rxn-primario-fondo);
-  outline: none;
+/* ---- Barra de entrada rápida (píldoras) ---------------------------------------- */
+#reacciones .rxn-pastillas {
+  position: sticky;
+  bottom: calc(var(--rxn-nav) + 8px);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 6px;
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--rxn-borde);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(20, 35, 55, .1);
 }
-
-#reacciones .rxn-resultado-formula { font-weight: 700; min-width: 3.5em; }
-#reacciones .rxn-resultado-nombre { flex: 1 1 auto; font-size: 0.9rem; }
-#reacciones .rxn-resultado-tipo { font-size: 0.72rem; color: var(--rxn-texto-suave); }
-#reacciones .rxn-resultado-vacio { padding: 8px; font-size: 0.85rem; color: var(--rxn-texto-suave); }
-
-/* ---- Botones -------------------------------------------------------------- */
-#reacciones .rxn-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  padding: 0 14px;
+#reacciones .rxn-pastilla {
+  flex: 1 1 0;
+  min-height: 42px;
+  padding: 0 10px;
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: var(--rxn-radio);
-  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rxn-verde-osc);
+  background: var(--rxn-verde-fondo);
+  border: 0;
+  border-radius: 999px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+#reacciones .rxn-pastilla:active { background: #cfeedb; transform: scale(.97); }
+#reacciones .rxn-pastilla:last-child { color: var(--rxn-rojo); background: var(--rxn-rojo-fondo); font-size: .88rem; }
+#reacciones .rxn-pastilla:focus-visible { outline: 2px solid var(--rxn-verde); outline-offset: 2px; }
 
-#reacciones .rxn-btn:focus-visible {
-  outline: 2px solid var(--rxn-primario);
-  outline-offset: 2px;
-}
-
-#reacciones .rxn-btn--primario {
-  color: #ffffff;
-  background: var(--rxn-primario);
-  border-color: var(--rxn-primario);
-}
-#reacciones .rxn-btn--primario:hover:not(:disabled) { background: var(--rxn-primario-oscuro); }
-
-#reacciones .rxn-btn--secundario {
-  color: var(--rxn-primario);
-  background: var(--rxn-superficie);
-  border-color: var(--rxn-primario);
-}
-#reacciones .rxn-btn--secundario:hover:not(:disabled) { background: var(--rxn-primario-fondo); }
-
-#reacciones .rxn-btn:disabled {
-  color: var(--rxn-inactivo-texto);
-  background: var(--rxn-inactivo-fondo);
-  border-color: var(--rxn-borde-suave);
-  cursor: not-allowed;
-}
-
-#reacciones .rxn-btn--ancho { width: 100%; margin-top: 10px; }
-
-/* ---- Mensajes y estados vacíos -------------------------------------------- */
+/* ---- Mensajes ----------------------------------------------------------------- */
 #reacciones .rxn-msg {
-  margin: 0 0 8px;
-  padding: 8px 10px;
-  font-size: 0.85rem;
-  border-radius: var(--rxn-radio);
-  border: 1px solid var(--rxn-info-borde);
-  background: var(--rxn-info-fondo);
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  font-size: 0.84rem;
+  color: #2f4157;
+  background: #eef3f8;
+  border-radius: 12px;
 }
-#reacciones .rxn-msg[hidden] { display: none; }
-#reacciones .rxn-msg--error {
-  color: var(--rxn-error-texto);
-  background: var(--rxn-error-fondo);
-  border-color: var(--rxn-error-borde);
-}
-#reacciones .rxn-msg--aviso {
-  color: var(--rxn-aviso-texto);
-  background: var(--rxn-aviso-fondo);
-  border-color: var(--rxn-aviso-borde);
-}
+#reacciones .rxn-msg p { margin: 0 0 4px; }
+#reacciones .rxn-msg--error { color: #8c2a26; background: var(--rxn-rojo-fondo); }
+#reacciones .rxn-msg--aviso { color: var(--rxn-ambar-texto); background: var(--rxn-ambar-fondo); }
+#reacciones .rxn-msg--oscuro { color: #cfd6de; background: #1f1f1f; border: 1px solid #2d2d2d; }
 
 #reacciones .rxn-vacio {
-  margin: 0;
-  padding: 14px 10px;
-  font-size: 0.85rem;
+  padding: 12px 10px;
+  font-size: 0.84rem;
   text-align: center;
-  color: var(--rxn-texto-suave);
+  color: var(--rxn-suave);
   background: var(--rxn-fondo);
-  border: 1px dashed var(--rxn-borde);
-  border-radius: var(--rxn-radio);
+  border: 1px dashed #cdd5df;
+  border-radius: 12px;
 }
-#reacciones .rxn-vacio[hidden] { display: none; }
 
-/* ---- Cuadrícula y fichas cuadradas ---------------------------------------- */
-#reacciones .rxn-fichas {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));   /* móvil: 3 por fila */
+/* ---- Chips ---------------------------------------------------------------------- */
+#reacciones .rxn-chips {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
 }
-#reacciones .rxn-fichas:empty { display: none; }
-
-#reacciones .rxn-ficha {
+#reacciones .rxn-chip {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 2px;
-  aspect-ratio: 1 / 1;
-  padding: 18px 6px 6px;
-  overflow: hidden;
-  text-align: center;
-  background: var(--rxn-fondo);
-  border: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio);
-}
-
-#reacciones .rxn-ficha--elemento { background: #f1f4f1; }
-#reacciones .rxn-ficha--ion { background: #f4f1f6; }
-
-#reacciones .rxn-ficha-formula {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.1;
-  color: var(--rxn-texto);
+  min-width: 0;
+  flex: 1 1 calc(50% - 8px);
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 46px;
+  padding: 6px 30px 6px 12px;
+  background: var(--rxn-verde-fondo);
+  border: 1px solid #bfe6cf;
+  border-radius: 12px;
 }
-
-#reacciones .rxn-ficha-nombre {
-  font-size: 0.68rem;
-  line-height: 1.15;
-  color: var(--rxn-texto);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-width: 100%;
-}
-
-#reacciones .rxn-ficha-info {
-  font-size: 0.62rem;
-  line-height: 1.1;
-  color: var(--rxn-texto-suave);
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-#reacciones .rxn-ficha-prueba {
-  font-size: 0.55rem;
-  line-height: 1;
-  padding: 2px 4px;
-  color: var(--rxn-aviso-texto);
-  background: var(--rxn-aviso-fondo);
-  border: 1px solid var(--rxn-aviso-borde);
-  border-radius: 4px;
-}
-
-#reacciones .rxn-ficha-quitar {
+#reacciones .rxn-chip--error { background: var(--rxn-rojo-fondo); border-color: #f2b8b4; }
+#reacciones .rxn-chip-formula { font-size: 1.05rem; font-weight: 700; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#reacciones .rxn-chip-nombre { font-size: 0.7rem; color: var(--rxn-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#reacciones .rxn-chip-x {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 22px;
-  height: 22px;
+  top: 50%; right: 4px;
+  width: 30px; height: 30px;
+  margin-top: -15px;
   padding: 0;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   line-height: 1;
-  color: var(--rxn-texto-suave);
+  color: var(--rxn-suave);
   background: transparent;
   border: 0;
   border-radius: 50%;
   cursor: pointer;
 }
-#reacciones .rxn-ficha-quitar:hover { color: var(--rxn-error-texto); background: var(--rxn-error-fondo); }
-#reacciones .rxn-ficha-quitar:focus-visible { outline: 2px solid var(--rxn-primario); }
+#reacciones .rxn-chip-x:hover { color: var(--rxn-rojo); background: rgba(214, 69, 65, .12); }
+#reacciones .rxn-chip-x:focus-visible { outline: 2px solid var(--rxn-verde); }
 
-/* ---- Ecuación -------------------------------------------------------------- */
+/* ---- Ejemplos -------------------------------------------------------------------- */
+#reacciones .rxn-ejemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
+#reacciones .rxn-ejemplos-et { font-size: 0.76rem; color: var(--rxn-suave); }
+#reacciones .rxn-ejemplo {
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  color: var(--rxn-texto);
+  background: #fff;
+  border: 1px solid var(--rxn-borde);
+  border-radius: 999px;
+  cursor: pointer;
+}
+#reacciones .rxn-ejemplo:hover { border-color: var(--rxn-verde); color: var(--rxn-verde-osc); }
+
+/* ---- Botones ---------------------------------------------------------------------- */
+#reacciones .rxn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+#reacciones .rxn-btn--primario {
+  color: #fff;
+  background: var(--rxn-verde);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, .32);
+}
+#reacciones .rxn-btn--primario:hover:not(:disabled) { background: var(--rxn-verde-osc); }
+#reacciones .rxn-btn:active:not(:disabled) { transform: scale(.985); }
+#reacciones .rxn-btn:focus-visible { outline: 3px solid rgba(39, 174, 96, .4); outline-offset: 2px; }
+#reacciones .rxn-btn:disabled { color: #9aa5b4; background: #e6eaf0; box-shadow: none; cursor: not-allowed; }
+#reacciones .rxn-btn--ancho { width: 100%; margin-top: 12px; }
+
+/* ---- Tarjeta de resultado (fondo negro) -------------------------------------------- */
+#reacciones .rxn-card--oscura {
+  color: #fff;
+  background: var(--rxn-negro);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+}
+#reacciones .rxn-card--oscura .rxn-card-titulo { color: #fff; }
+#reacciones .rxn-medio {
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: #0b2e1a;
+  background: #5fe39a;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
 #reacciones .rxn-ecuacion {
-  min-height: 56px;
-  margin: 0 0 8px;
-  padding: 12px;
-  font-size: 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 4px;
+  min-height: 74px;
+  margin: 0 0 10px;
+  padding: 14px 8px;
+  font-size: 1.28rem;
+  font-weight: 600;
+  color: #fff;
   text-align: center;
-  overflow-x: auto;
-  background: var(--rxn-fondo);
-  border: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio);
+  background: #1b1b1b;
+  border-radius: 14px;
 }
-#reacciones .rxn-ecuacion-vacia {
-  font-size: 0.85rem;
-  color: var(--rxn-texto-suave);
-  border-style: dashed;
-}
-#reacciones .rxn-ecuacion-flecha { margin: 0 8px; color: var(--rxn-texto-suave); }
-#reacciones .rxn-ecuacion-signo  { margin: 0 6px; color: var(--rxn-texto-suave); }
-#reacciones .rxn-ecuacion-coef   { font-weight: 700; margin-right: 2px; color: var(--rxn-primario); }
+#reacciones .rxn-ecuacion--vacia { display: block; font-size: 0.85rem; font-weight: 400; color: #8f98a3; border: 1px dashed #3a3a3a; background: transparent; }
+#reacciones .rxn-eq-esp { display: inline-flex; align-items: baseline; white-space: nowrap; }
+#reacciones .rxn-eq-coef { margin-right: 3px; font-size: 1.45rem; font-weight: 800; color: #5fe39a; }
+#reacciones .rxn-eq-signo { margin: 0 6px; color: #8f98a3; }
+#reacciones .rxn-eq-flecha { margin: 0 8px; font-size: 1.4rem; color: #5fe39a; }
 
-/* ---- Tarjetas desplegables -------------------------------------------------- */
-#reacciones .rxn-tarjeta {
-  margin: 0 0 8px;
-  background: var(--rxn-superficie);
-  border: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio);
+/* ---- Semirreacciones --------------------------------------------------------------- */
+#reacciones .rxn-semi { background: #1b1b1b; border: 1px solid #2d2d2d; border-radius: 14px; }
+#reacciones .rxn-semi > summary {
+  padding: 13px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e9edf1;
+  cursor: pointer;
+  list-style: none;
 }
+#reacciones .rxn-semi > summary::-webkit-details-marker { display: none; }
+#reacciones .rxn-semi > summary:focus-visible { outline: 2px solid #5fe39a; outline-offset: -2px; }
+#reacciones .rxn-semi-cuerpo { padding: 2px 14px 14px; font-size: 0.88rem; color: #dfe5ea; }
+#reacciones .rxn-semi-tit { margin: 10px 0 4px !important; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+#reacciones .rxn-semi-ox { color: #ffb86b; }
+#reacciones .rxn-semi-re { color: #7cc4ff; }
+#reacciones .rxn-semi-eq { padding: 8px 10px; font-size: 1rem; background: #262626; border-radius: 10px; overflow-x: auto; white-space: nowrap; }
+#reacciones .rxn-semi-total { margin-top: 10px !important; color: #5fe39a; font-weight: 600; }
+#reacciones .rxn-semi-nota { margin-top: 8px !important; font-size: 0.76rem; color: #8f98a3; }
 
-#reacciones .rxn-tarjeta > summary {
+/* ---- Acordeones numerados -------------------------------------------------------------- */
+#reacciones .rxn-acordeon { margin: 0 0 8px; background: var(--rxn-fondo); border-radius: 14px; overflow: hidden; }
+#reacciones .rxn-acordeon > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
   padding: 10px 12px;
-  font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
-  color: var(--rxn-texto);
-  list-style-position: inside;
+  list-style: none;
 }
-#reacciones .rxn-tarjeta > summary:focus-visible {
-  outline: 2px solid var(--rxn-primario);
-  outline-offset: -2px;
+#reacciones .rxn-acordeon > summary::-webkit-details-marker { display: none; }
+#reacciones .rxn-acordeon > summary::after {
+  content: '';
+  width: 8px; height: 8px;
+  margin-left: auto;
+  border-right: 2px solid var(--rxn-suave);
+  border-bottom: 2px solid var(--rxn-suave);
+  transform: rotate(45deg);
+  transition: transform .2s ease;
 }
-#reacciones .rxn-tarjeta[open] > summary {
-  background: var(--rxn-primario-fondo);
-  border-bottom: 1px solid var(--rxn-borde);
-  border-radius: var(--rxn-radio) var(--rxn-radio) 0 0;
+#reacciones .rxn-acordeon[open] > summary::after { transform: rotate(-135deg); }
+#reacciones .rxn-acordeon > summary:focus-visible { outline: 2px solid var(--rxn-verde); outline-offset: -2px; }
+#reacciones .rxn-acordeon[open] > summary { background: var(--rxn-verde-fondo); }
+#reacciones .rxn-num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rxn-verde);
+  border-radius: 50%;
 }
+#reacciones .rxn-acordeon-titulo { font-size: 0.95rem; }
+#reacciones .rxn-acordeon-cuerpo { padding: 12px; font-size: 0.88rem; animation: rxn-abrir .22s ease; }
+@keyframes rxn-abrir { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
-#reacciones .rxn-tarjeta-cuerpo {
-  padding: 10px 12px;
-  font-size: 0.85rem;
-}
-#reacciones .rxn-tarjeta-cuerpo p { margin: 0 0 6px; }
-#reacciones .rxn-tarjeta-cuerpo p:last-child { margin-bottom: 0; }
-#reacciones .rxn-pendiente { color: var(--rxn-texto-suave); }
-#reacciones .rxn-dato-sub { color: var(--rxn-texto-suave); font-size: 0.8rem; }
+#reacciones .rxn-pendiente { color: var(--rxn-suave); }
+#reacciones .rxn-dato-sub { font-size: 0.78rem; color: var(--rxn-suave); }
+#reacciones .rxn-dato-fuerte { font-size: 1.02rem; font-weight: 700; color: var(--rxn-verde-osc); }
+#reacciones .rxn-nota { padding: 7px 10px; font-size: 0.82rem; background: #fff; border-left: 3px solid var(--rxn-verde); border-radius: 8px; }
+#reacciones .rxn-subtitulo { margin: 8px 0 4px !important; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--rxn-suave); }
 
-/* ---- Utilidad ---------------------------------------------------------------- */
+/* Redox */
+#reacciones .rxn-redox-linea { padding: 8px 10px; background: #fff; border-radius: 10px; }
+#reacciones .rxn-agente { padding: 8px 10px; border-radius: 10px; }
+#reacciones .rxn-agente--ox { background: #e8f2ff; }
+#reacciones .rxn-agente--re { background: #fff1e0; }
+
+/* Números de oxidación */
+#reacciones .rxn-ox-fila { margin: 0 0 8px; padding: 8px 10px; background: #fff; border-radius: 10px; }
+#reacciones .rxn-ox-esp { margin-bottom: 6px; font-size: 0.86rem; }
+#reacciones .rxn-ox-lista { display: flex; flex-wrap: wrap; gap: 6px; }
+#reacciones .rxn-ox { padding: 3px 10px; font-size: 0.82rem; border-radius: 999px; background: #eef1f5; }
+#reacciones .rxn-ox--pos { background: #e3f1ff; color: #12507f; }
+#reacciones .rxn-ox--neg { background: #ffeadb; color: #8a3d0c; }
+#reacciones .rxn-ox--cero { background: #eceff3; color: #44505f; }
+
+/* ---- Tablas --------------------------------------------------------------------------- */
+#reacciones .rxn-tabla-wrap { margin: 8px 0; overflow-x: auto; background: #fff; border-radius: 12px; }
+#reacciones .rxn-tabla { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+#reacciones .rxn-tabla th { padding: 8px 10px; font-size: 0.72rem; text-align: left; text-transform: uppercase; letter-spacing: .04em; color: var(--rxn-suave); background: #f0f3f7; }
+#reacciones .rxn-tabla td { padding: 8px 10px; vertical-align: top; border-top: 1px solid #edf0f4; }
+#reacciones .rxn-num-celda { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#reacciones .rxn-rol { margin-left: 6px; padding: 1px 7px; font-size: 0.66rem; color: var(--rxn-suave); background: #eef1f5; border-radius: 999px; }
+#reacciones .rxn-rol--lim { color: #fff; background: var(--rxn-verde); }
+#reacciones .rxn-fila-lim td { background: var(--rxn-verde-fondo); }
+
+/* ---- Estequiometría ------------------------------------------------------------------------ */
+#reacciones .rxn-masa-fila { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+#reacciones .rxn-masa-et { flex: 1 1 auto; min-width: 0; }
+#reacciones .rxn-masa-fila .rxn-input--masa { flex: 0 0 120px; width: 120px; }
+#reacciones .rxn-masa-u { width: 14px; font-size: 0.85rem; color: var(--rxn-suave); }
+#reacciones .rxn-resumen { margin: 12px 0 0; padding: 12px; background: var(--rxn-verde-fondo); border-radius: 12px; }
+#reacciones .rxn-resumen p { margin: 0 0 6px; }
+#reacciones .rxn-prod-max { font-size: 0.92rem; }
+
+/* ---- Utilidad ---------------------------------------------------------------------------------- */
 #reacciones .rxn-solo-lector {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
 }
 
-/* ---- Pantallas medianas y grandes -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  #reacciones .rxn-root * { animation: none !important; transition: none !important; }
+}
+
+/* ---- Pantallas medianas y grandes --------------------------------------------------------------- */
 @media (min-width: 600px) {
-  #reacciones .rxn-fichas {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-  }
-  #reacciones .rxn-ficha-formula { font-size: 1.45rem; }
-  #reacciones .rxn-ficha-nombre  { font-size: 0.75rem; }
-  #reacciones .rxn-ficha-info    { font-size: 0.68rem; }
-  #reacciones .rxn-btn--ancho    { width: auto; min-width: 220px; }
-  #reacciones .rxn-seccion       { padding: 16px; }
+  #reacciones .rxn-root { padding: 18px 18px 28px; }
+  #reacciones .rxn-card { padding: 18px; }
+  #reacciones .rxn-chip { flex: 0 1 210px; }
+  #reacciones .rxn-btn--ancho { width: auto; min-width: 260px; }
+  #reacciones .rxn-pastillas { position: static; max-width: 420px; }
+  #reacciones .rxn-ecuacion { font-size: 1.5rem; }
 }
