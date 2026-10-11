@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 3.0 (rediseño: chips compactos, reacción completa en negro,
+   Versión 3.1 (rediseño: chips compactos, reacción completa en negro,
    ecuación balanceada en gris, acordeones de análisis llamativos)
 
    Depende ÚNICAMENTE de formulas.js (window.FORMULAS_REACCIONES / CATALOGO).
@@ -814,18 +814,30 @@
     return det;
   }
 
+  /* Icono del matraz (SVG propio: no depende de Font Awesome ni de Internet). */
+  function iconoMatraz() {
+    var NS = 'http://www.w3.org/2000/svg';
+    function s(tag, attrs) {
+      var n = document.createElementNS(NS, tag);
+      Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+      return n;
+    }
+    var svg = s('svg', { viewBox: '0 0 48 48', width: '28', height: '28', 'aria-hidden': 'true', focusable: 'false' });
+    svg.appendChild(s('path', { d: 'M19 5h10v3h-2v11.4l10.6 17.5A4.5 4.5 0 0 1 33.8 43H14.2a4.5 4.5 0 0 1-3.8-6.1L21 19.4V8h-2z', fill: '#27AE60' }));
+    svg.appendChild(s('path', { d: 'M15.6 31h16.8l3.6 6a1.6 1.6 0 0 1-1.4 2.4H13.4A1.6 1.6 0 0 1 12 37z', fill: '#fff', opacity: '.9' }));
+    svg.appendChild(s('circle', { cx: '21', cy: '35', r: '1.8', fill: '#27AE60' }));
+    svg.appendChild(s('circle', { cx: '27.5', cy: '33.6', r: '1.3', fill: '#27AE60' }));
+    return el('span', { class: 'rxn-logo', 'aria-hidden': 'true' }, [svg]);
+  }
+
   function construirVista(contenedor) {
     var raiz = el('div', { class: 'rxn-root' });
 
-    /* --- Encabezado --- */
-    var hijosEnc = [
+    /* --- Encabezado: solo título + icono verde de la pestaña --- */
+    raiz.appendChild(el('header', { class: 'rxn-encabezado' }, [
       el('h2', { class: 'rxn-titulo', text: 'Reacciones y estequiometría' }),
-      el('p', { class: 'rxn-lead', text: 'Escribe los reactivos, deja que la app proponga los productos y balancea la ecuación paso a paso.' })
-    ];
-    if (CATALOGO && CATALOGO.meta && CATALOGO.meta.datosDePrueba) {
-      hijosEnc.push(el('p', { class: 'rxn-aviso', text: 'Catálogo de prueba: solo hay una selección de sustancias. Si no encuentras una, aún no está cargada.' }));
-    }
-    raiz.appendChild(el('header', { class: 'rxn-encabezado' }, hijosEnc));
+      iconoMatraz()
+    ]));
 
     /* --- 1. Reactivos --- */
     $.contadorR = el('span', { class: 'rxn-contador' });
@@ -904,17 +916,17 @@
   }
 
   function construirPastillas() {
-    function pastilla(texto, etiqueta, accion) {
+    function pastilla(texto, etiqueta, clase, accion) {
       return el('button', {
-        type: 'button', class: 'rxn-pastilla', 'aria-label': etiqueta,
+        type: 'button', class: 'rxn-pastilla ' + clase, 'aria-label': etiqueta,
         onmousedown: function (ev) { ev.preventDefault(); },
         onclick: accion
       }, [texto]);
     }
     return el('div', { class: 'rxn-pastillas', role: 'group', 'aria-label': 'Entrada rápida' }, [
-      pastilla('+', 'Insertar signo más', function () { insertarEnCursor(' + ', 0); }),
-      pastilla('\u2192', 'Insertar flecha', function () { insertarEnCursor(' \u2192 ', 0); }),
-      pastilla('Borrar', 'Borrar todo', function () { $.input.value = ''; alEscribir(); $.input.focus(); })
+      pastilla('+', 'Insertar signo más', 'rxn-pastilla--mas', function () { insertarEnCursor(' + ', 0); }),
+      pastilla('\u2192', 'Insertar flecha', 'rxn-pastilla--flecha', function () { insertarEnCursor(' \u2192 ', 0); }),
+      pastilla('Borrar', 'Borrar todo', 'rxn-pastilla--borrar', function () { $.input.value = ''; alEscribir(); $.input.focus(); })
     ]);
   }
 
