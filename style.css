@@ -1057,7 +1057,7 @@ body {
    ========================================= */
 
 .nav-red i {
-    color: #e02424;
+    color: #c1121f;
 }
 
 
@@ -1101,11 +1101,11 @@ body {
    ========================================= */
 
 .nav-red.active {
-    color: #e02424 !important;
+    color: #c1121f !important;
 }
 
 .nav-red.active i {
-    color: #e02424 !important;
+    color: #c1121f !important;
 }
 
 .nav-red.active::after {
@@ -1121,7 +1121,7 @@ body {
 
     height: 4px;
 
-    background: #e02424;
+    background: #c1121f;
 
     border-radius: 5px 5px 0 0;
 }
@@ -1500,4 +1500,17 @@ button, input, select, textarea {
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+
+/* Inicio: casita rellena en rojo oscuro */
+.nav-red i svg {
+    fill: currentColor;
+}
+
+
+/* Barra inferior: nombres completos (si no caben en una línea, bajan a dos) */
+.nav-item span {
+    text-align: center;
+    padding: 0 2px;
 }
