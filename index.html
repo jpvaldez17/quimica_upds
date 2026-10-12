@@ -11,6 +11,13 @@
     <!-- COLOR DE LA BARRA DEL NAVEGADOR (CELULAR) -->
     <meta name="theme-color" content="#e7e8e9">
 
+    <!-- APP INSTALABLE / MODO SIN INTERNET -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="QuímicApp">
+
     <!-- ICONOS -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -22,7 +29,7 @@
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
 
     <!-- ESTILOS -->
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=10">
     <link rel="stylesheet" href="tabla.css?v=8">
     <link rel="stylesheet" href="compuestos.css?v=13">
     <link rel="stylesheet" href="enlaces.css?v=7">
@@ -625,6 +632,15 @@ JAVASCRIPT
 <script src="formulas.js?v=5"></script>
 <script src="reacciones.js?v=10"></script>
 <script src="busqueda.js?v=1"></script>
+
+<!-- MODO SIN INTERNET -->
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+}
+</script>
 
 </body>
 </html>
