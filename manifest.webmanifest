@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Química UPDS",
+  "short_name": "QuímicApp",
+  "description": "Plataforma interactiva de química - UPDS. Funciona sin internet.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e7e8e9",
+  "theme_color": "#e7e8e9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
