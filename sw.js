@@ -15,7 +15,7 @@
 
 "use strict";
 
-var VERSION = "v1";
+var VERSION = "v2";
 var CACHE = "quimica-upds-" + VERSION;
 
 /* Hojas de estilo externas. Se guardan junto con sus fuentes (.woff2) */
@@ -33,6 +33,8 @@ var EXTRA_LOCAL = [
     "icon-192.png",
     "icon-512.png",
     "icon-maskable-512.png",
+    "apple-touch-icon.png",
+    "favicon.ico",
     "logo-quimica.svg",
     "logo-upds.svg"
 ];
