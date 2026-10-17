@@ -1,4 +1,4 @@
-   /* =========================================
+/* =========================================
    QUÍMICA UPDS
    ENLACES · Calculadora de Orbitales Moleculares (TOM)
    Developed by J. Poma · 2026
@@ -798,13 +798,13 @@
                 '<input type="text" id="tom-e' + i + '" class="tom-input" data-i="' + i + '" placeholder="Toca para elegir" readonly inputmode="none" autocomplete="off">' +
                 '<button type="button" class="tom-dd" data-a="dd" data-i="' + i + '" aria-label="Elegir elemento de la lista" aria-haspopup="dialog">' +
                 '<i class="fa-solid fa-chevron-down"></i></button></div>' +
-                '<div class="tom-cant solo-comp">Cantidad<span><button type="button" data-a="cant" data-i="' + i + '" data-d="-1" aria-label="Menos">−</button>' +
+                '<div class="tom-cant solo-comp"><div class="tom-cant-t">Cantidad de átomos <small>(subíndice)</small></div><span><button type="button" data-a="cant" data-i="' + i + '" data-d="-1" aria-label="Menos">−</button>' +
                 '<b id="tom-n' + i + '">1</b><button type="button" data-a="cant" data-i="' + i + '" data-d="1" aria-label="Más">+</button></span></div>' +
                 '<div class="tom-info" id="tom-i' + i + '"></div></div>';
         }).join("");
 
         var cargas = [-3, -2, -1, 0, 1, 2, 3].map(function (v) {
-            return '<button type="button" class="tom-chip" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0")) + "</button>";
+            return '<button type="button" class="tom-chip ' + (v > 0 ? "pos" : (v < 0 ? "neg" : "cero")) + '" data-a="carga" data-v="' + v + '">' + (v > 0 ? "+" + v : (v < 0 ? "−" + (-v) : "0")) + "</button>";
         }).join("");
 
         var casos = CASOS.map(function (c, i) {
@@ -819,13 +819,16 @@
         return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
             '<p class="tom-p solo-tom">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p>' +
             '<p class="tom-p solo-comp">Resuelve un compuesto: iónico (MgF₂, CaO…) o covalente de 3 átomos (H₂O, CO₂…).</p>' +
-            '<div class="tom-mod" role="group"><button type="button" data-a="modo" data-m="tom">Orbitales moleculares</button>' +
+            '<div class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p>' +
+            '<div class="tom-chips solo-tom">' + casos + '</div><div class="tom-chips solo-comp">' + casosC + "</div></div></section>" +
+            '<section class="card tom-modo"><div class="tom-mod" role="group" aria-label="Modo de cálculo">' +
+            '<button type="button" data-a="modo" data-m="tom">Orbitales moleculares</button>' +
             '<button type="button" data-a="modo" data-m="comp">Compuesto</button></div></section>' +
             '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
             '<div class="solo-tom"><div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div></div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
             '<div id="tom-res" aria-live="polite"></div>' +
-            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips solo-tom">' + casos + '</div><div class="tom-chips solo-comp">' + casosC + "</div></section>";
+            '<p class="tom-ver">Calculadora TOM · v10</p>';
     }
 
     function pintarModo() {
