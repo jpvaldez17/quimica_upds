@@ -348,6 +348,12 @@
             out += aviso("Con H o He el esquema 2s–2p es una simplificación: solo tienen orbital 1s.", "inf");
         }
 
+        var xa = EN[r.e1.sym], xb = EN[r.e2.sym];
+        if (xa !== undefined && xb !== undefined && Math.abs(xa - xb) > 1.7) {
+            out += aviso("ΔEN = " + coma(Math.abs(xa - xb)) + ": el enlace es de carácter <b>iónico</b> y la TOM covalente solo lo aproxima." +
+                '<button type="button" class="tom-ir" data-a="modo" data-m="comp">Resolver como compuesto</button>', "inf");
+        }
+
         var nombres = { 1: "Simple", 2: "Doble", 3: "Triple" };
         var tipo = r.existe ? (nombres[r.OE] || fmt(r.OE)) : "No existe";
         var det = r.existe ? desglose(r) : (r.impar ? "N impar" : "sin enlace");
@@ -463,6 +469,314 @@
 
 
     /* =========================================
+       6B. MODO COMPUESTO
+       Iónico (metal + no metal, ΔEN > 1,7) y covalente de 3 átomos AB₂.
+       Solo elementos representativos.
+       ========================================= */
+
+    var EN = {
+        H: 2.20, Li: 0.98, Be: 1.57, B: 2.04, C: 2.55, N: 3.04, O: 3.44, F: 3.98, Na: 0.93, Mg: 1.31, Al: 1.61, Si: 1.90,
+        P: 2.19, S: 2.58, Cl: 3.16, K: 0.82, Ca: 1.00, Ge: 2.01, As: 2.18, Se: 2.55, Br: 2.96, Rb: 0.82, Sr: 0.95,
+        Sn: 1.96, Sb: 2.05, Te: 2.10, I: 2.66, Cs: 0.79, Ba: 0.89, Pb: 2.33, Bi: 2.02
+    };
+
+    var CATIONES = "Li Na K Rb Cs Be Mg Ca Sr Ba Al".split(" ");
+    var ANIONES = "H N P As O S Se Te F Cl Br I".split(" ");
+    var GASES = { 2: "helio", 10: "neón", 18: "argón", 36: "kriptón", 54: "xenón" };
+    var GEOM = { 0: ["Lineal", "180°"], 1: ["Angular", "≈120°"], 2: ["Angular", "≈104,5°"], 3: ["Lineal", "180°"] };
+
+    var CASOS_C = [
+        { t: "MgF₂", s: ["Mg", "F"], n: [1, 2] }, { t: "CaO", s: ["Ca", "O"], n: [1, 1] }, { t: "NaCl", s: ["Na", "Cl"], n: [1, 1] },
+        { t: "BaO", s: ["Ba", "O"], n: [1, 1] }, { t: "AlF₃", s: ["Al", "F"], n: [1, 3] }, { t: "Na₂O", s: ["Na", "O"], n: [2, 1] },
+        { t: "H₂O", s: ["O", "H"], n: [1, 2] }, { t: "CO₂", s: ["C", "O"], n: [1, 2] }, { t: "SO₂", s: ["S", "O"], n: [1, 2] },
+        { t: "H₂S", s: ["S", "H"], n: [1, 2] }
+    ];
+
+    function coma(x) { return x.toFixed(2).replace(".", ","); }
+    function r1(v) { return Math.round(v * 10) / 10; }
+    function mcd(a, b) { return b ? mcd(b, a % b) : a; }
+
+    function sub(n) {
+        return n > 1 ? String(n).split("").map(function (d) { return "₀₁₂₃₄₅₆₇₈₉".charAt(+d); }).join("") : "";
+    }
+
+    function ionTxt(sym, c) {
+        return sym + (Math.abs(c) > 1 ? sup(Math.abs(c)) : "") + (c > 0 ? "⁺" : "⁻");
+    }
+
+    /* Configuración de un ion según su número de electrones (Madelung) */
+    function cfgIon(n) {
+        var r = n, s = [];
+        for (var i = 0; i < ORDEN.length && r > 0; i++) {
+            var e = Math.min(ORDEN[i][1], r);
+            s.push(ORDEN[i][0] + sup(e));
+            r -= e;
+        }
+        return s.join(" ");
+    }
+
+    function analizarComp(e1, e2, n1, n2) {
+
+        var r = { e1: e1, e2: e2, n1: n1, n2: n2 };
+
+        if (e1.sym === e2.sym) { r.err = "Elige dos elementos distintos."; return r; }
+
+        var x1 = EN[e1.sym], x2 = EN[e2.sym];
+        if (x1 === undefined || x2 === undefined) {
+            r.err = "No tengo la electronegatividad de " + (x1 === undefined ? e1.sym : e2.sym) + ". Este modo trabaja con elementos representativos.";
+            return r;
+        }
+
+        r.d = Math.abs(x1 - x2);
+
+        var c1 = CATIONES.indexOf(e1.sym) >= 0, c2 = CATIONES.indexOf(e2.sym) >= 0;
+        var a1 = ANIONES.indexOf(e1.sym) >= 0, a2 = ANIONES.indexOf(e2.sym) >= 0;
+
+        if (r.d > 1.7 && ((c1 && a2) || (c2 && a1))) { return ionico(r, c1 ? 0 : 1); }
+
+        if (r.d > 1.7) {
+            r.err = "ΔEN = " + coma(r.d) + ": el enlace es iónico, pero con estos elementos no puedo determinar los iones (por ejemplo, metales de transición).";
+            return r;
+        }
+
+        return covalente(r);
+    }
+
+    function ionico(r, ic) {
+
+        var cat = ic ? r.e2 : r.e1, ani = ic ? r.e1 : r.e2;
+        var c = cat.v, a = (ani.sym === "H") ? 1 : 8 - ani.v, g = mcd(c, a);
+
+        r.tipo = "ion";
+        r.cat = cat; r.ani = ani; r.c = c; r.a = a;
+        r.nc = a / g; r.na = c / g;
+        r.difiere = ((ic ? r.n2 : r.n1) !== r.nc) || ((ic ? r.n1 : r.n2) !== r.na);
+        r.enlaces = Math.max(r.nc, r.na);
+        r.ambos = r.nc > 1 && r.na > 1;
+        return r;
+    }
+
+    /* Covalente de 3 átomos: el elemento con cantidad 1 es el central */
+    function covalente(r) {
+
+        var n1 = r.n1, n2 = r.n2;
+
+        if (n1 + n2 === 2) { r.tipo = "dos"; return r; }
+        if (n1 + n2 !== 3) {
+            r.err = "Por ahora este modo resuelve compuestos de 2 átomos (usa Orbitales moleculares) y de 3 átomos, como H₂O o CO₂.";
+            return r;
+        }
+
+        var cen = (n1 === 1) ? r.e1 : r.e2, ter = (n1 === 1) ? r.e2 : r.e1;
+
+        if (cen.z <= 2) { r.err = "El H no puede ser el átomo central: solo forma un enlace. Pon el otro elemento con cantidad 1."; return r; }
+
+        var V = cen.v + 2 * ter.v;
+        if (V % 2) { r.err = "Con " + V + " e⁻ de valencia (número impar) es un radical y no se resuelve con una única estructura de Lewis."; return r; }
+
+        var objT = (ter.z <= 2) ? 2 : 8, mejor = null;
+
+        for (var k = 1; k <= 3; k++) {
+            var lt = (objT - 2 * k) / 2, lc = (V - 4 * k - 4 * lt) / 2;
+            if (lt < 0 || lt % 1 !== 0 || lc < 0 || lc % 1 !== 0) { continue; }
+            var ec = 4 * k + 2 * lc;
+            if (cen.n === 2 && ec > 8) { continue; }
+            var ft = ter.v - (2 * lt + k), fc = cen.v - (2 * lc + 2 * k);
+            var s = 2 * Math.abs(ft) + Math.abs(fc), o = Math.abs(ec - 8);
+            if (!mejor || s < mejor.s || (s === mejor.s && o < mejor.o)) {
+                mejor = { k: k, lt: lt, lc: lc, ft: ft, fc: fc, s: s, o: o, ec: ec };
+            }
+        }
+
+        if (!mejor) { r.err = "No encontré una estructura de Lewis simétrica para esta combinación (puede tener resonancia o ser un caso especial)."; return r; }
+
+        r.tipo = "cov";
+        r.cen = cen; r.ter = ter; r.V = V; r.est = mejor;
+        r.geo = GEOM[mejor.lc];
+        r.lineal = (mejor.lc === 0 || mejor.lc === 3);
+        r.dCT = Math.abs(EN[cen.sym] - EN[ter.sym]);
+        return r;
+    }
+
+
+    /* ---------- Dibujos (SVG) ---------- */
+
+    function flecha(x1, y1, x2, y2) {
+
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L;
+        var bx = x2 - ux * 10, by = y2 - uy * 10;
+
+        return '<line class="ar" x1="' + r1(x1) + '" y1="' + r1(y1) + '" x2="' + r1(bx) + '" y2="' + r1(by) + '"/>' +
+            '<polygon class="ar-h" points="' + r1(x2) + "," + r1(y2) + " " + r1(bx - uy * 6) + "," + r1(by + ux * 6) + " " + r1(bx + uy * 6) + "," + r1(by - ux * 6) + '"/>';
+    }
+
+    function burbuja(x, y, rr, txt, cls) {
+        return '<circle class="io ' + cls + '" cx="' + x + '" cy="' + y + '" r="' + rr + '"/><text class="t-i" x="' + x + '" y="' + (y + 5) + '">' + txt + "</text>";
+    }
+
+    /* Iones: el ion que está solo va al centro y las flechas salen (o llegan) a su alrededor */
+    function svgIonico(r) {
+
+        var ct = ionTxt(r.cat.sym, r.c), at = ionTxt(r.ani.sym, -r.a), s = "";
+        var estrella = (r.nc === 1 || r.na === 1) && Math.max(r.nc, r.na) <= 3;
+
+        if (!estrella) {
+            s = burbuja(66, 56, 38, r.nc + " " + ct, "c") + burbuja(264, 56, 38, r.na + " " + at, "a") + flecha(110, 56, 218, 56) +
+                '<text class="t-e" x="164" y="44">' + (r.nc * r.c) + " e⁻</text>";
+            return '<svg viewBox="0 0 330 112" class="tom-cs" role="img" aria-label="Transferencia de electrones">' + s + "</svg>";
+        }
+
+        var cenCat = (r.nc === 1), k = cenCat ? r.na : r.nc, cy = 60;
+        var pos = (k === 1) ? [[275, 60]] : (k === 2 ? [[55, 60], [275, 60]] : [[55, 60], [275, 60], [165, 175]]);
+
+        s = burbuja(165, cy, 30, cenCat ? ct : at, cenCat ? "c" : "a");
+
+        pos.forEach(function (p) {
+            var dx = p[0] - 165, dy = p[1] - cy, L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L;
+            var xi = 165 + ux * 34, yi = cy + uy * 34, xf = p[0] - ux * 26, yf = p[1] - uy * 26;
+            s += burbuja(p[0], p[1], 22, cenCat ? at : ct, cenCat ? "a" : "c");
+            s += cenCat ? flecha(xi, yi, xf, yf) : flecha(xf, yf, xi, yi);
+            s += '<text class="t-e" x="' + Math.round((xi + xf) / 2 + (uy ? 16 : 0)) + '" y="' + Math.round((yi + yf) / 2 - (uy ? 0 : 8)) + '">e⁻</text>';
+        });
+
+        return '<svg viewBox="0 0 330 ' + (k === 3 ? 222 : 120) + '" class="tom-cs" role="img" aria-label="Transferencia de electrones">' + s + "</svg>";
+    }
+
+    /* Covalente: σ recta y π en arco, igual que en Orbitales moleculares */
+    function svgCov(r) {
+
+        var k = r.est.k;
+        var s = '<svg viewBox="0 0 330 104" class="tom-est" role="img" aria-label="Estructura de la molécula">';
+
+        [[98, 143], [187, 232]].forEach(function (b) {
+            var m = (b[0] + b[1]) / 2;
+            s += '<line class="b-s" x1="' + b[0] + '" y1="52" x2="' + b[1] + '" y2="52"/>';
+            if (k > 1) { s += '<path class="b-p" d="M' + (b[0] + 3) + " 44Q" + m + " 35 " + (b[1] - 3) + ' 44"/>'; }
+            if (k > 2) { s += '<path class="b-p" d="M' + (b[0] + 3) + " 60Q" + m + " 69 " + (b[1] - 3) + ' 60"/>'; }
+        });
+
+        [[76, r.ter.sym], [165, r.cen.sym], [254, r.ter.sym]].forEach(function (a) {
+            s += '<circle class="at" cx="' + a[0] + '" cy="52" r="22"/><text class="t-at" x="' + a[0] + '" y="60">' + a[1] + "</text>";
+        });
+
+        return s + "</svg>";
+    }
+
+
+    /* ---------- Resultados del modo Compuesto ---------- */
+
+    function chip(t) { return '<span class="tom-at">' + t + "</span>"; }
+
+    function tarjetaOscura(rx, grafico, tiles) {
+        return '<section class="card tom-dark">' + cab("fa-flask", "Resultados") + '<div class="tom-rx">' + rx + "</div>" + grafico +
+            '<div class="tom-tiles">' + tiles + "</div></section>";
+    }
+
+    function htmlComp(r) {
+
+        if (r.err) { return aviso("<b>No se puede calcular.</b> " + r.err, "err"); }
+
+        if (r.tipo === "dos") {
+            return aviso("<b>Son solo 2 átomos.</b> Para dos átomos se usa Orbitales moleculares: muestra el diagrama y el orden de enlace (ΔEN = " + coma(r.d) + ').' +
+                '<button type="button" class="tom-ir" data-a="modo" data-m="tom">Ir a Orbitales moleculares</button>', "inf");
+        }
+
+        return (r.tipo === "ion") ? htmlIonico(r) : htmlCovalente(r);
+    }
+
+    function htmlIonico(r) {
+
+        var cat = r.cat, ani = r.ani, ct = ionTxt(cat.sym, r.c), at = ionTxt(ani.sym, -r.a);
+        var formula = cat.sym + sub(r.nc) + ani.sym + sub(r.na), out = "";
+
+        if (r.difiere) {
+            out += aviso("Con las cargas " + ct + " y " + at + " la fórmula neutra es <b>" + formula + "</b>; el cálculo usa esa fórmula.", "am");
+        }
+        if (r.ambos) {
+            out += aviso("Con subíndices en ambos elementos el conteo de enlaces puede variar: confirma la convención con tu docente.", "inf");
+        }
+
+        var rx = chip((r.nc > 1 ? r.nc + " " : "") + cat.sym) + "<span>+</span>" + chip((r.na > 1 ? r.na + " " : "") + ani.sym) +
+            '<span>→</span><span class="tom-pr">' + formula + "</span>";
+
+        var iones = (r.nc > 1 ? r.nc + " " : "") + ct + " + " + (r.na > 1 ? r.na + " " : "") + at;
+
+        out += tarjetaOscura(rx, svgIonico(r),
+            tile(String(r.enlaces), "Nº de enlaces", "az") +
+            tile("Iónico<small>ΔEN = " + coma(r.d) + "</small>", "Tipo de enlace", "na") +
+            tile("Diamagnética<small>todos apareados</small>", "Magnetismo", "vd") +
+            tile(iones, "iones formados", "gr"));
+
+        var base = (r.na >= r.nc) ? ani : cat;
+
+        out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
+            paso(1, "Electronegatividad y ΔEN",
+                "<p class=\"tom-p\">" + cat.sym + ": EN = <b>" + coma(EN[cat.sym]) + "</b> · " + ani.sym + ": EN = <b>" + coma(EN[ani.sym]) + "</b></p>" +
+                '<div class="tom-formula">ΔEN = |' + coma(EN[ani.sym]) + " − " + coma(EN[cat.sym]) + "| = <b>" + coma(r.d) + "</b></div>" +
+                '<p class="tom-p">' + coma(r.d) + " es mayor que 1,7 y hay un metal con un no metal: el enlace es <b>iónico</b>.</p>") +
+            paso(2, "Transferencia de electrones",
+                '<div class="tom-formula">' + cat.sym + " → " + ct + " + " + r.c + " e⁻</div>" +
+                '<div class="tom-formula">' + ani.sym + " + " + r.a + " e⁻ → " + at + "</div>" +
+                '<p class="tom-p">El ' + cat.nom.toLowerCase() + " tiene " + r.c + " e⁻ de valencia y los cede; el " + ani.nom.toLowerCase() + " tiene " + ani.v + " y recibe " + r.a + ".</p>" +
+                '<p class="tom-p">Cargas: (+' + r.c + ")×" + r.nc + " + (−" + r.a + ")×" + r.na + " = 0 → <b>" + formula + "</b></p>") +
+            paso(3, "Configuración de los iones", [[ct, cat.z - r.c], [at, ani.z + r.a]].map(function (p) {
+                return '<div class="tom-fila"><b>' + p[0] + '</b> · ' + p[1] + ' e⁻<div class="tom-cfg">' + cfgIon(p[1]) + "</div>igual que el " + (GASES[p[1]] || "gas noble") + "</div>";
+            }).join("")) +
+            paso(4, "Enlaces y magnetismo",
+                '<p class="tom-p"><b>' + r.enlaces + " enlace" + (r.enlaces > 1 ? "s" : "") + "</b>: un enlace " + cat.sym + "–" + ani.sym + " por cada átomo de " + base.nom.toLowerCase() + ".</p>" +
+                '<p class="tom-p">Todos los e⁻ de ambos iones están apareados: es <b>diamagnética</b>.</p>' +
+                '<p class="tom-p tom-suave">Estructura: red iónica (cationes rodeados de aniones), no moléculas discretas.</p>') +
+            "</section>";
+
+        return out;
+    }
+
+    function htmlCovalente(r) {
+
+        var cen = r.cen, ter = r.ter, e = r.est, k = e.k, out = "";
+        var formula = (ter.z <= 1) ? ter.sym + "₂" + cen.sym : cen.sym + ter.sym + "₂";
+        var nombre = ["simple", "doble", "triple"][k - 1];
+
+        if (e.ft !== 0 || e.fc !== 0) {
+            out += aviso("Quedan cargas formales distintas de 0: esta molécula puede tener resonancia. Se muestra una de las estructuras posibles.", "am");
+        }
+        if (e.ec !== 8) {
+            out += aviso("Excepción al octeto: " + cen.sym + " queda con " + e.ec + " e⁻ en su capa.", "inf");
+        }
+
+        var rx = chip(cen.sym) + "<span>+</span>" + chip("2 " + ter.sym) + "<span>→</span><span class=\"tom-pr\">" + formula + "</span>";
+
+        out += tarjetaOscura(rx, svgCov(r) + '<div class="tom-leyenda"><span class="tom-lg s">σ · línea recta</span><span class="tom-lg p">π · arco</span></div>',
+            tile("2", "Nº de enlaces", "az") +
+            tile(nombre.charAt(0).toUpperCase() + nombre.slice(1) + " ×2<small>" + 2 + "σ" + (k > 1 ? " + " + 2 * (k - 1) + "π" : "") + "</small>", "Tipo de enlace", "na") +
+            tile("Diamagnética<small>todos apareados</small>", "Magnetismo", "vd") +
+            tile(r.geo[0] + "<small>" + (r.lineal ? "apolar" : "polar") + " · " + r.geo[1] + "</small>", "Geometría", "gr"));
+
+        out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
+            paso(1, "Cuenta los electrones de valencia",
+                '<p class="tom-p">' + cen.sym + ": <b>" + cen.v + " e⁻</b> · " + ter.sym + ": <b>" + ter.v + " e⁻</b> (hay 2)</p>" +
+                '<div class="tom-formula">' + cen.v + " (" + cen.sym + ") + 2 × " + ter.v + " (" + ter.sym + ") = <b>" + r.V + " e⁻</b></div>") +
+            paso(2, "Dibuja la estructura de Lewis",
+                '<p class="tom-p">Cada átomo busca completar su capa (8 e⁻; el H, 2 e⁻). Con ' + r.V + ' e⁻ la mejor estructura es:</p>' +
+                '<div class="tom-formula">' + cen.sym + " con cada " + ter.sym + ": enlace <b>" + nombre + "</b></div>" +
+                '<p class="tom-p">Pares libres: ' + e.lt + " en cada " + ter.sym + " y " + e.lc + " en " + cen.sym + ". Enlaces: 2σ" + (k > 1 ? " + " + 2 * (k - 1) + "π" : "") + ".</p>") +
+            paso(3, "Calcula las cargas formales",
+                '<p class="tom-p">Carga formal = e⁻ de valencia − (e⁻ de pares libres + enlaces)</p>' +
+                '<div class="tom-formula">' + ter.sym + ": " + ter.v + " − (" + 2 * e.lt + " + " + k + ") = <b>" + e.ft + "</b><br>" +
+                cen.sym + ": " + cen.v + " − (" + 2 * e.lc + " + " + 2 * k + ") = <b>" + e.fc + "</b></div>") +
+            paso(4, "Geometría, polaridad y magnetismo",
+                '<p class="tom-p">Dominios de e⁻ en ' + cen.sym + " = 2 + " + e.lc + " = <b>" + (2 + e.lc) + "</b> → <b>" + r.geo[0] + "</b> (" + r.geo[1] + ").</p>" +
+                '<p class="tom-p">ΔEN (' + cen.sym + "–" + ter.sym + ") = " + coma(r.dCT) + ". " + (r.lineal
+                    ? "Es simétrica: los dipolos se cancelan → molécula <b>apolar</b>."
+                    : "Los dipolos no se cancelan → molécula <b>polar</b>.") + "</p>" +
+                '<p class="tom-p">Todos los e⁻ están apareados: es <b>diamagnética</b>.</p>') +
+            "</section>";
+
+        return out;
+    }
+
+
+    /* =========================================
        7. INTERFAZ Y EVENTOS
        ========================================= */
 
@@ -474,7 +788,7 @@
         { t: "F₂", s: ["F", "F"], c: 0 }
     ];
 
-    var est = { t: ["N", "O"], c: 1, r: null, dopen: false, gopen: false };
+    var est = { t: ["N", "O"], c: 1, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1] };
     var raiz;
 
     function shell() {
@@ -484,6 +798,8 @@
                 '<input type="text" id="tom-e' + i + '" class="tom-input" data-i="' + i + '" placeholder="Toca para elegir" readonly inputmode="none" autocomplete="off">' +
                 '<button type="button" class="tom-dd" data-a="dd" data-i="' + i + '" aria-label="Elegir elemento de la lista" aria-haspopup="dialog">' +
                 '<i class="fa-solid fa-chevron-down"></i></button></div>' +
+                '<div class="tom-cant solo-comp">Cantidad<span><button type="button" data-a="cant" data-i="' + i + '" data-d="-1" aria-label="Menos">−</button>' +
+                '<b id="tom-n' + i + '">1</b><button type="button" data-a="cant" data-i="' + i + '" data-d="1" aria-label="Más">+</button></span></div>' +
                 '<div class="tom-info" id="tom-i' + i + '"></div></div>';
         }).join("");
 
@@ -496,13 +812,34 @@
         }).join("");
 
 
-        return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora TOM</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
-            '<p class="tom-p">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p></section>' +
+        var casosC = CASOS_C.map(function (c, i) {
+            return '<button type="button" class="tom-caso" data-a="casoc" data-i="' + i + '">' + c.t + "</button>";
+        }).join("");
+
+        return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
+            '<p class="tom-p solo-tom">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p>' +
+            '<p class="tom-p solo-comp">Resuelve un compuesto: iónico (MgF₂, CaO…) o covalente de 3 átomos (H₂O, CO₂…).</p>' +
+            '<div class="tom-mod" role="group"><button type="button" data-a="modo" data-m="tom">Orbitales moleculares</button>' +
+            '<button type="button" data-a="modo" data-m="comp">Compuesto</button></div></section>' +
             '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
-            '<div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div>" +
+            '<div class="solo-tom"><div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div></div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
             '<div id="tom-res" aria-live="polite"></div>' +
-            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips">' + casos + "</div></section>" ;
+            '<section class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p><div class="tom-chips solo-tom">' + casos + '</div><div class="tom-chips solo-comp">' + casosC + "</div></section>";
+    }
+
+    function pintarModo() {
+        raiz.dataset.modo = est.modo;
+        raiz.querySelectorAll('.tom-mod [data-a="modo"]').forEach(function (b) {
+            var on = (b.dataset.m === est.modo);
+            b.classList.toggle("act", on);
+            b.setAttribute("aria-pressed", String(on));
+        });
+    }
+
+    function pintarCant() {
+        $("tom-n0").textContent = est.n[0];
+        $("tom-n1").textContent = est.n[1];
     }
 
     function marcarCarga() {
@@ -636,12 +973,16 @@
             return;
         }
 
-        var r = analizar(els[0], els[1], est.c);
-        est.r = r;
-
-        cont.innerHTML = r.err
-            ? aviso("<b>No se puede calcular.</b> " + r.err + '<div class="tom-formula">' + formulaN(r) + "</div>", "err")
-            : htmlResultado(r);
+        if (est.modo === "comp") {
+            est.r = null;
+            cont.innerHTML = htmlComp(analizarComp(els[0], els[1], est.n[0], est.n[1]));
+        } else {
+            var r = analizar(els[0], els[1], est.c);
+            est.r = r;
+            cont.innerHTML = r.err
+                ? aviso("<b>No se puede calcular.</b> " + r.err + '<div class="tom-formula">' + formulaN(r) + "</div>", "err")
+                : htmlResultado(r);
+        }
 
         cont.classList.remove("tom-in");
         void cont.offsetWidth;
@@ -666,7 +1007,25 @@
 
         var a = b.dataset.a;
 
-        if (a === "carga") {
+        if (a === "modo") {
+            est.modo = b.dataset.m;
+            pintarModo();
+            calcular();
+        } else if (a === "cant") {
+            var q = +b.dataset.i;
+            est.n[q] = Math.max(1, Math.min(4, est.n[q] + (+b.dataset.d)));
+            pintarCant();
+            calcular();
+        } else if (a === "casoc") {
+            var cc = CASOS_C[+b.dataset.i];
+            est.t = cc.s.slice();
+            est.n = cc.n.slice();
+            $("tom-e0").value = est.t[0];
+            $("tom-e1").value = est.t[1];
+            pintarCant();
+            calcular();
+            $("tom-e0").closest(".card").scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (a === "carga") {
             est.c = +b.dataset.v;
             marcarCarga();
             calcular();
@@ -719,11 +1078,13 @@
         crearPanel();
 
         marcarCarga();
+        pintarModo();
+        pintarCant();
         calcular();
     }
 
     /* Para probar desde la consola: TOM.analizar(TOM.buscar("N"), TOM.buscar("O"), 1) */
-    window.TOM = { buscar: buscar, analizar: analizar };
+    window.TOM = { buscar: buscar, analizar: analizar, comp: analizarComp };
 
     document.addEventListener("DOMContentLoaded", iniciar);
 
