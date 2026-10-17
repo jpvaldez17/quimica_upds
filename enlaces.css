@@ -553,3 +553,64 @@ body.tom-bloq { overflow: hidden; }
 .tom-op:hover, .tom-op:focus-visible, .tom-op.sel { background: #FFF3E6; outline: none; }
 .tom-op.sel { font-weight: 600; }
 .tom-vacio { padding: 12px; font-size: 13px; color: #6b7280; text-align: center; }
+
+
+/* ---------- Modo Compuesto ---------- */
+
+.tom[data-modo="comp"] .solo-tom, .tom[data-modo="tom"] .solo-comp { display: none; }
+
+.tom-mod { display: flex; gap: 4px; padding: 4px; margin-top: 12px; background: #eceff1; border-radius: 26px; }
+
+.tom-mod button {
+    flex: 1;
+    min-height: 44px;
+    border: none;
+    border-radius: 22px;
+    background: transparent;
+    font: 600 13px "Poppins", Arial, sans-serif;
+    color: #444444;
+    cursor: pointer;
+}
+
+.tom-mod button.act { background: var(--ac); color: #2a1700; font-weight: 700; }
+.tom-mod button:focus-visible, .tom-cant button:focus-visible, .tom-ir:focus-visible { outline: 3px solid var(--az); outline-offset: 2px; }
+
+.tom-cant { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12.5px; color: #4a525c; }
+.tom-cant span { display: flex; align-items: center; gap: 8px; }
+.tom-cant b { min-width: 14px; text-align: center; font-size: 15px; color: #171717; }
+
+.tom-cant button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid #6b7280;
+    background: #ffffff;
+    color: #2b2f36;
+    font: 700 16px "Poppins", Arial, sans-serif;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.tom-cant button:last-child { border-color: var(--ac); background: var(--ac-s); }
+
+.tom-ir {
+    display: block;
+    margin-top: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 20px;
+    border: 2px solid var(--az);
+    background: #ffffff;
+    color: var(--az-o);
+    font: 600 13px "Poppins", Arial, sans-serif;
+    cursor: pointer;
+}
+
+.tom-cs { display: block; width: 100%; max-width: 340px; height: auto; margin: 0 auto; }
+.tom-cs .ar { stroke: var(--ac); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.tom-cs .ar-h { fill: var(--ac); }
+.tom-cs .io { fill: #262626; stroke-width: 3; }
+.tom-cs .io.c { stroke: var(--ac); }
+.tom-cs .io.a { stroke: #7cc7f5; }
+.tom-cs .t-i { font: 700 14px "Poppins", Arial, sans-serif; fill: #ffffff; text-anchor: middle; }
+.tom-cs .t-e { font: 500 12px "Poppins", Arial, sans-serif; fill: var(--ac); text-anchor: middle; }
