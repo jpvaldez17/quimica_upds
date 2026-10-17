@@ -15,7 +15,7 @@
 
 "use strict";
 
-var VERSION = "v3";
+var VERSION = "v4";
 var CACHE = "quimica-upds-" + VERSION;
 
 /* Hojas de estilo externas. Se guardan junto con sus fuentes (.woff2) */
