@@ -1,4 +1,4 @@
-/* =========================================
+   /* =========================================
    QUÍMICA UPDS
    ENLACES · Calculadora de Orbitales Moleculares (TOM)
    Developed by J. Poma · 2026
