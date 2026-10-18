@@ -51,17 +51,42 @@
 #reacciones .rxn-root [hidden] { display: none !important; }
 
 /* ---- Encabezado: título + icono verde ---------------------------------------- */
-#reacciones .rxn-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 2px 14px; }
-#reacciones .rxn-titulo { margin: 0; font-size: 1.4rem; font-weight: 700; line-height: 1.2; }
+#reacciones .rxn-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+#reacciones .rxn-titulo { margin: 0; font-size: 1.05rem; font-weight: 600; line-height: 1.2; }  /* mismo tamaño que "Enlaces · Calculadora" */
 #reacciones .rxn-logo {
   flex: 0 0 auto;
   display: inline-flex; align-items: center; justify-content: center;
-  width: 46px; height: 46px;
+  width: 40px; height: 40px;
   background: var(--rxn-verde-fondo);
   border: 2px solid var(--rxn-verde);
   border-radius: 14px;
 }
-#reacciones .rxn-logo svg { width: 28px; height: 28px; }
+#reacciones .rxn-logo svg { width: 24px; height: 24px; }
+
+/* ---- Introducción y casos de práctica ------------------------------------------ */
+#reacciones .rxn-intro { margin: 0 0 12px; font-size: 0.86rem; color: var(--rxn-texto); }
+#reacciones .rxn-casos { padding: 12px; background: #E2E8F0; border-radius: 14px; }
+#reacciones .rxn-casos-tit { margin: 0 !important; font-size: 1rem; font-weight: 700; }
+#reacciones .rxn-casos-sub { margin: 0 0 10px !important; font-size: 0.76rem; color: var(--rxn-suave); }
+#reacciones .rxn-casos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; }
+#reacciones .rxn-caso {
+  min-height: 36px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: #25282e;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s ease, background-color .15s ease;
+}
+#reacciones .rxn-caso:hover { background: #3a3f48; }
+#reacciones .rxn-caso:active { transform: scale(.95); background: #1d63d6; }
+#reacciones .rxn-caso:focus-visible { outline: 3px solid var(--rxn-flecha-oscuro); outline-offset: 2px; }
 
 /* ---- Tarjetas -------------------------------------------------------------- */
 #reacciones .rxn-card {
@@ -472,7 +497,7 @@
 #reacciones .rxn-eq-esp { display: inline-flex; align-items: baseline; white-space: nowrap; }
 #reacciones .rxn-eq-coef { margin-right: 3px; font-size: 1.45rem; font-weight: 800; color: #0f6b35; }
 #reacciones .rxn-eq-signo { margin: 0 6px; }
-#reacciones .rxn-eq-flecha { margin: 0 8px; font-size: 1.5rem; font-weight: 800; }
+#reacciones .rxn-eq-flecha { margin: 0 8px; font-size: 1.5rem; font-weight: 800; line-height: 1; }
 
 /* ---- Botón ROJO con + : semirreacciones --------------------------------------------------------------- */
 #reacciones .rxn-semi { margin-top: 2px; }
