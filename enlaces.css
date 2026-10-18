@@ -572,7 +572,7 @@ body.tom-bloq { overflow: hidden; }
     cursor: pointer;
 }
 
-.tom-mod button.act { background: #D32F2F; color: #ffffff; font-weight: 700; }
+.tom-mod button.act { background: #d3d7dc; color: #C62828; font-weight: 700; }
 .tom-mod button:focus-visible, .tom-cant button:focus-visible, .tom-ir:focus-visible { outline: 3px solid var(--az); outline-offset: 2px; }
 
 .tom-cant { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12.5px; color: #4a525c; }
@@ -633,3 +633,8 @@ body.tom-bloq { overflow: hidden; }
 .tom-cant button:last-child { border-color: #2E7D32; background: #E8F5E9; color: #1B5E20; }
 
 .tom-ver { margin: 4px 0 12px; text-align: center; font-size: 11px; color: #9aa1a9; }
+
+
+/* ---------- Nombre del elemento junto a la etiqueta ---------- */
+
+.tom-nm { font-weight: 600; color: var(--az-o); }
