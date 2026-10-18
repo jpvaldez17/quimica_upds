@@ -375,16 +375,16 @@
 
 /* ---------- Casos de práctica ---------- */
 
-.tom .tom-casos { background: #1c1f24; border-radius: 20px; padding: 14px 16px; margin-bottom: 14px; }
-.tom-casos h2 { margin: 0; color: #ffffff; font-size: 16px; font-weight: 600; }
-.tom-casos p { margin: 2px 0 10px; font-size: 12.5px; color: #aeb4bc; }
+.tom .tom-casos { background: #e8ebee; border-radius: 20px; padding: 14px 16px; margin-bottom: 14px; }
+.tom-casos h2 { margin: 0; color: #111111; font-size: 16px; font-weight: 600; }
+.tom-casos p { margin: 2px 0 10px; font-size: 12.5px; color: #3a424c; }
 .tom-casos .tom-chips { gap: 6px; }
 
 .tom-caso {
     min-height: 36px;
     padding: 0 12px;
     border-radius: 18px;
-    border: 1.5px solid #3b414a;
+    border: 1.5px solid #8f969f;
     background: #2a2e35;
     color: #ffffff;
     font: 600 13.5px "Poppins", Arial, sans-serif;
@@ -559,20 +559,20 @@ body.tom-bloq { overflow: hidden; }
 
 .tom[data-modo="comp"] .solo-tom, .tom[data-modo="tom"] .solo-comp { display: none; }
 
-.tom-mod { display: flex; gap: 4px; padding: 4px; margin-top: 12px; background: #eceff1; border-radius: 26px; }
+.tom-mod { display: flex; gap: 4px; padding: 4px; margin-top: 12px; background: #121212; border: 2px solid #D32F2F; border-radius: 28px; }
 
 .tom-mod button {
     flex: 1;
     min-height: 44px;
     border: none;
     border-radius: 22px;
-    background: transparent;
+    background: #121212;
     font: 600 13px "Poppins", Arial, sans-serif;
-    color: #444444;
+    color: #ffffff;
     cursor: pointer;
 }
 
-.tom-mod button.act { background: var(--ac); color: #2a1700; font-weight: 700; }
+.tom-mod button.act { background: #D32F2F; color: #ffffff; font-weight: 700; }
 .tom-mod button:focus-visible, .tom-cant button:focus-visible, .tom-ir:focus-visible { outline: 3px solid var(--az); outline-offset: 2px; }
 
 .tom-cant { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12.5px; color: #4a525c; }
@@ -619,7 +619,7 @@ body.tom-bloq { overflow: hidden; }
 /* ---------- Ajustes: casos en el encabezado, modo aparte, colores por signo ---------- */
 
 .tom-top .tom-casos { margin: 12px 0 0; padding: 12px 14px; border-radius: 16px; }
-.tom-modo { padding: 8px; }
+.tom .card.tom-modo { padding: 0; background: transparent; box-shadow: none; }
 .tom-modo .tom-mod { margin-top: 0; }
 
 .tom-chip.pos.act { background: #2E7D32; border-color: #2E7D32; color: #ffffff; }
