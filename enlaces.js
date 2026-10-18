@@ -785,13 +785,13 @@
         { t: "PF⁻", s: ["P", "F"], c: -1 }
     ];
 
-    var est = { t: ["N", "O"], c: 1, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1] };
+    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1] };
     var raiz;
 
     function shell() {
 
         var campos = [0, 1].map(function (i) {
-            return '<div class="tom-campo"><label for="tom-e' + i + '">Elemento ' + (i + 1) + '</label><div class="tom-sel">' +
+            return '<div class="tom-campo"><label for="tom-e' + i + '">Elemento ' + (i + 1) + '<span class="tom-nm" id="tom-nm' + i + '"></span></label><div class="tom-sel">' +
                 '<input type="text" id="tom-e' + i + '" class="tom-input" data-i="' + i + '" placeholder="Toca para elegir" readonly inputmode="none" autocomplete="off">' +
                 '<button type="button" class="tom-dd" data-a="dd" data-i="' + i + '" aria-label="Elegir elemento de la lista" aria-haspopup="dialog">' +
                 '<i class="fa-solid fa-chevron-down"></i></button></div>' +
@@ -852,6 +852,7 @@
 
     function infoElemento(i, e, texto) {
         var d = $("tom-i" + i);
+        $("tom-nm" + i).textContent = e ? " → " + e.nom : "";
         if (e) {
             d.className = "tom-info ok";
             d.innerHTML = '<div class="tom-z"><span>Z = <b class="tom-zv">' + e.z + '</b></span><span class="tom-sep">|</span><span>Valencia: <b class="tom-vv">' + e.v + "</b> e⁻</span></div>" +
