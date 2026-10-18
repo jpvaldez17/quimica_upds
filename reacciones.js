@@ -897,13 +897,52 @@
     return el('span', { class: 'rxn-logo', 'aria-hidden': 'true' }, [svg]);
   }
 
+  /* Casos de práctica: todos existen en el banco de reacciones de formulas.js. */
+  var CASOS_PRACTICA = [
+    ['H2', 'O2'], ['CH4', 'O2'], ['HCl', 'NaOH'], ['H2SO4', 'NaOH'],
+    ['SO3', 'H2O'], ['AgNO3', 'NaCl'], ['Zn', 'HCl'], ['Na', 'H2O'],
+    ['CaCO3', 'HCl'], ['Zn', 'CuSO4'], ['N2', 'H2'], ['Fe2O3', 'CO']
+  ];
+
+  /* Reacciones reversibles (⇌): el banco las marca en la observación o son bien conocidas. */
+  var IDS_REVERSIBLES = [5, 20];
+  function esReversible(r) {
+    if (!r) return false;
+    if (IDS_REVERSIBLES.indexOf(r.id) >= 0) return true;
+    return /equilibrio|reversible|esterificaci|disociaci/i.test((r.nota || '') + ' ' + (r.titulo || ''));
+  }
+
+  function probarCaso(ids) {
+    $.input.value = ids.join(' + ');
+    alEscribir(true);
+    determinarReaccion();
+  }
+
   function construirVista(contenedor) {
     var raiz = el('div', { class: 'rxn-root' });
 
-    /* --- Encabezado: solo título + icono verde de la pestaña --- */
-    raiz.appendChild(el('header', { class: 'rxn-encabezado' }, [
-      el('h2', { class: 'rxn-titulo', text: 'Reacciones y estequiometría' }),
-      iconoMatraz()
+    /* --- Encabezado: tarjeta con título, icono, introducción y casos de práctica --- */
+    $.casos = el('div', { class: 'rxn-casos-grid' });
+    CASOS_PRACTICA.forEach(function (ids) {
+      var etq = ids.map(function (id) { return formulaPlana(sustanciaDeBanco(id)); }).join(' + ');
+      $.casos.appendChild(el('button', {
+        type: 'button', class: 'rxn-caso', 'aria-label': 'Probar ' + etq,
+        onclick: function () { probarCaso(ids); }
+      }, [etq]));
+    });
+    raiz.appendChild(el('section', { class: 'rxn-card rxn-card--intro' }, [
+      el('header', { class: 'rxn-encabezado' }, [
+        el('h2', { class: 'rxn-titulo', text: 'Reacciones y estequiometría' }),
+        iconoMatraz()
+      ]),
+      el('p', { class: 'rxn-intro' }, [
+        'Elige los ', el('b', { text: 'reactivos' }), ' y el simulador te muestra la reacción completa, la ecuación balanceada y los cálculos estequiométricos.'
+      ]),
+      el('div', { class: 'rxn-casos' }, [
+        el('p', { class: 'rxn-casos-tit', text: 'Casos de práctica' }),
+        el('p', { class: 'rxn-casos-sub', text: 'Toca uno y se determina al instante.' }),
+        $.casos
+      ])
     ]));
 
     /* --- 1. Reactivos: campo (borde negro grueso + botón verde +), chips, Determinar / Borrar --- */
@@ -943,8 +982,8 @@
     /* --- 2. Reacción (fondo negro): se revela en secuencia --- */
     $.contadorP = el('span', { class: 'rxn-contador rxn-contador--oscuro' });
     $.msgProductos = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
-    $.etqProductos = el('p', { class: 'rxn-paso-etiqueta', text: 'Productos esperados', hidden: true });
-    $.reaccion = el('div', { class: 'rxn-reaccion rxn-reaccion--vacia', text: 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerán los productos esperados.' });
+    $.etqProductos = el('p', { class: 'rxn-paso-etiqueta', text: 'Reactivos y productos', hidden: true });
+    $.reaccion = el('div', { class: 'rxn-reaccion rxn-reaccion--vacia', text: 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.' });
     $.leyenda = el('div', { class: 'rxn-leyenda', hidden: true });
     $.variantes = el('div', { class: 'rxn-variantes', hidden: true });
     $.clasif = el('div', { class: 'rxn-dato-banco rxn-dato-banco--clasif', hidden: true });
@@ -1040,7 +1079,7 @@
   /* Tarjeta negra, paso 2: productos esperados (sin coeficientes) → clasificación →
      observación → botón Balancear. Todo sale del banco; nada se calcula aquí. */
   function renderReaccion() {
-    var r = estado.reaccion, P = productosActuales();
+    var r = estado.reaccion, P = productosActuales(), R0 = r ? reactivosActuales() : [];
     $.contadorP.textContent = 'Productos ' + P.length + ' / ' + CONFIG.limiteProductos;
     var llave = r ? String(r.id) : '';
     if (estado.llave === llave) return;           // mismo contenido: no se repite la animación
@@ -1049,7 +1088,7 @@
     [$.reaccion, $.leyenda, $.variantes, $.clasif, $.notaBanco].forEach(limpiar);
     if (!r) {
       $.reaccion.className = 'rxn-reaccion rxn-reaccion--vacia';
-      $.reaccion.textContent = 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerán los productos esperados.';
+      $.reaccion.textContent = 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.';
       [$.etqProductos, $.leyenda, $.variantes, $.clasif, $.notaBanco, $.btnBalancear].forEach(function (n) { n.hidden = true; });
       return;
     }
@@ -1058,8 +1097,10 @@
     $.etqProductos.hidden = false;
     if (P.length) {
       $.reaccion.className = 'rxn-reaccion';
-      $.reaccion.appendChild(nodoEcuacion([], null, P, null));
+      $.reaccion.appendChild(nodoEcuacion(R0, null, P, null, esReversible(r)));
+      $.leyenda.appendChild(lineaNombres('Reactivos', R0));
       $.leyenda.appendChild(lineaNombres('Productos', P));
+      if (esReversible(r)) $.leyenda.appendChild(el('p', {}, [el('b', { text: 'Flecha doble (\u21cc): ' }), 'reacción reversible, ocurre en ambos sentidos.']));
       $.leyenda.hidden = false;
     } else {
       $.reaccion.className = 'rxn-reaccion rxn-reaccion--vacia';
@@ -1108,7 +1149,7 @@
   /* ---------- Ecuación ---------- */
   /* Cada especie lleva pegado su "+" (o la flecha, si es el último reactivo):
      así, al saltar de línea en el celular, un "+" nunca queda solo al inicio. */
-  function nodoEcuacion(R, coefR, P, coefP) {
+  function nodoEcuacion(R, coefR, P, coefP, reversible) {
     var frag = document.createDocumentFragment();
     function lado(lista, coefs, cierraConFlecha) {
       lista.forEach(function (s, i) {
@@ -1116,7 +1157,7 @@
         if (coefs && coefs[i] !== 1) grupo.appendChild(el('span', { class: 'rxn-eq-coef', text: String(coefs[i]) }));
         grupo.appendChild(el('span', {}, [formulaNodos(s)]));
         if (i < lista.length - 1) grupo.appendChild(el('span', { class: 'rxn-eq-signo', text: '+' }));
-        else if (cierraConFlecha) grupo.appendChild(el('span', { class: 'rxn-eq-flecha', text: '\u2192' }));
+        else if (cierraConFlecha) grupo.appendChild(el('span', { class: 'rxn-eq-flecha', text: reversible ? '\u21cc' : '\u2192' }));
         frag.appendChild(grupo);
       });
     }
@@ -1131,7 +1172,7 @@
     if (b && b.estado === 'ok' && b.conservacion && b.conservacion.atomos && b.conservacion.carga) {
       var R = reactivosActuales(), P = productosActuales();
       $.ecuacion.className = 'rxn-ecuacion';
-      $.ecuacion.appendChild(nodoEcuacion(R, b.coeficientesReactivos, P, b.coeficientesProductos));
+      $.ecuacion.appendChild(nodoEcuacion(R, b.coeficientesReactivos, P, b.coeficientesProductos, esReversible(estado.reaccion)));
       $.medio.textContent = '\u270f\ufe0f Medio: ' + estado.medio;
       $.medio.hidden = false;
       var hayCarga = R.concat(P).some(function (s) { return s.carga; });
