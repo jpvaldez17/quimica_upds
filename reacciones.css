@@ -1,5 +1,5 @@
 /* =============================================================================
-   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v4.0 (simulador paso a paso)
+   reacciones.css — Pestaña "Reacciones químicas y estequiometría" · QuímicApp v4.1 (simulador paso a paso)
    Todos los selectores empiezan por #reacciones: no afectan a otras pestañas
    ni a style.css. Mobile-first: lo base es para celular; @media amplía.
    Para cambiar colores, edita solo las variables de .rxn-root.
@@ -65,15 +65,15 @@
 
 /* ---- Introducción y casos de práctica ------------------------------------------ */
 #reacciones .rxn-intro { margin: 0 0 12px; font-size: 0.86rem; color: var(--rxn-texto); }
-#reacciones .rxn-casos { padding: 12px; background: #E2E8F0; border-radius: 14px; }
-#reacciones .rxn-casos-tit { margin: 0 !important; font-size: 1rem; font-weight: 700; }
-#reacciones .rxn-casos-sub { margin: 0 0 10px !important; font-size: 0.76rem; color: var(--rxn-suave); }
-#reacciones .rxn-casos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; }
+#reacciones .rxn-casos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 12px; background: #E2E8F0; border-radius: 14px; }
+#reacciones .rxn-casos-cab { flex: 0 0 auto; margin-right: 4px; }
+#reacciones .rxn-casos-tit { margin: 0 !important; font-size: 0.92rem; font-weight: 700; line-height: 1.2; }
+#reacciones .rxn-casos-sub { margin: 0 !important; font-size: 0.7rem; color: var(--rxn-suave); }
 #reacciones .rxn-caso {
-  min-height: 36px;
-  padding: 6px 10px;
+  min-height: 28px;
+  padding: 3px 10px;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #fff;
   background: #25282e;
@@ -136,13 +136,10 @@
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
-  width: 46px; height: 36px;
+  width: 48px; height: 36px;
   margin: 0 4px 0 0;
   padding: 0;
   font: inherit;
-  font-size: 1.6rem;
-  font-weight: 800;
-  line-height: 1;
   color: #fff;
   background: #1e8e4e;
   border: 2px solid #14532d;
@@ -151,6 +148,17 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform .1s ease, background-color .1s ease;
 }
+#reacciones .rxn-campo-mas::before,
+#reacciones .rxn-campo-mas::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  background: currentColor;
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+}
+#reacciones .rxn-campo-mas::before { width: 16px; height: 3px; }
+#reacciones .rxn-campo-mas::after  { width: 3px; height: 16px; }
 #reacciones .rxn-campo-mas:active:not(:disabled) { transform: scale(.94); background: #176f3d; }
 #reacciones .rxn-campo-mas:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
 #reacciones .rxn-campo-mas:disabled { color: #9aa5b4; background: #e6eaf0; border-color: #cdd5df; cursor: not-allowed; }
@@ -238,22 +246,7 @@
 #reacciones .rxn-sug-cab { padding: 6px 10px 4px; font-size: 0.74rem; font-weight: 700; color: var(--rxn-suave); }
 #reacciones .rxn-sug-vacio { padding: 10px; font-size: 0.84rem; color: var(--rxn-ambar-texto); }
 
-/* ---- Barra de entrada rápida: + → Borrar (planos, centrados) ---------------------- */
-#reacciones .rxn-pastillas {
-  position: sticky;
-  bottom: calc(var(--rxn-nav) + 8px);
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  max-width: 420px;
-  margin: 10px auto;
-  padding: 6px;
-  background: #fff;
-  border: 1px solid var(--rxn-borde);
-  border-radius: 999px;
-}
+/* ---- Botón Borrar (pastilla roja) ---------------------------------------------------- */
 #reacciones .rxn-pastilla {
   flex: 1 1 0;
   min-height: 46px;
@@ -270,12 +263,8 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform .1s ease, background-color .1s ease;
 }
-#reacciones .rxn-pastilla--mas    { background-color: #1e8e4e; border-color: #14532d; }   /* = acordeón 1 */
-#reacciones .rxn-pastilla--flecha { background-color: #1d63d6; border-color: #123f8c; font-size: 1.6rem; line-height: 1; }   /* = acordeón 2 */
 #reacciones .rxn-pastilla--borrar { background-color: #D32F2F; border-color: #8f1d1d; font-size: 1rem; }   /* = botón de semirreacciones */
 #reacciones .rxn-pastilla:active { transform: scale(.95); }
-#reacciones .rxn-pastilla--mas:active    { background-color: #176f3d; }
-#reacciones .rxn-pastilla--flecha:active { background-color: #174fab; }
 #reacciones .rxn-pastilla--borrar:active { background-color: #b32323; }
 #reacciones .rxn-pastilla:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
 
@@ -377,6 +366,7 @@
 #reacciones .rxn-btn:focus-visible { outline: 3px solid rgba(39, 174, 96, .4); outline-offset: 2px; }
 #reacciones .rxn-btn:disabled { color: #9aa5b4; background: #e6eaf0; box-shadow: none; cursor: not-allowed; }
 #reacciones .rxn-btn--ancho { width: 100%; margin-top: 12px; }
+#reacciones .rxn-card--oscura .rxn-btn--ancho { margin: 0 0 10px; }
 
 /* Acciones inferiores: Determinar reacción (grande) + Borrar (pequeño) */
 #reacciones .rxn-acciones { display: flex; align-items: stretch; gap: 8px; margin-top: 12px; }
@@ -421,7 +411,7 @@
   text-align: center;
   border-radius: 14px;
 }
-#reacciones .rxn-reaccion { color: #fff; background: #1b1b1b; border: 1px solid #2a2a2a; }
+#reacciones .rxn-reaccion { color: #fff; background: #1b1b1b; border: 1px solid #5b6572; }
 #reacciones .rxn-reaccion--vacia { display: block; font-size: 0.85rem; font-weight: 400; color: #8f98a3; background: transparent; border: 1px dashed #3a3a3a; }
 #reacciones .rxn-reaccion .rxn-eq-signo { color: var(--rxn-signo-oscuro); font-weight: 800; }
 #reacciones .rxn-reaccion .rxn-eq-flecha { color: var(--rxn-flecha-oscuro); }
@@ -431,7 +421,6 @@
 #reacciones .rxn-leyenda b { color: #cfd6de; }
 
 /* Pasos del simulador (productos → clasificación → observación → botón) */
-#reacciones .rxn-paso-etiqueta { margin: 2px 0 6px !important; font-size: 0.78rem; font-weight: 700; color: #9aa5b4; }
 #reacciones .rxn-revela { animation: rxn-aparecer .5s ease both; }
 @keyframes rxn-aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
@@ -448,7 +437,7 @@
   border-radius: 12px;
 }
 #reacciones .rxn-dato-banco--clasif { border-left-color: var(--rxn-flecha-oscuro); }
-#reacciones .rxn-dato-banco--nota { border-left-color: #FFB74D; }
+#reacciones .rxn-dato-nota { margin-top: 2px; font-size: 0.8rem; line-height: 1.35; color: #b7c0cb; }
 #reacciones .rxn-dato-et { font-size: 0.72rem; font-weight: 700; color: #9aa5b4; }
 #reacciones .rxn-dato-val { font-size: 0.92rem; font-weight: 600; line-height: 1.35; color: #fff; }
 
@@ -457,7 +446,10 @@
 #reacciones .rxn-variantes-tit { margin: 0 0 6px !important; font-size: 0.78rem; color: #9aa5b4; }
 #reacciones .rxn-variantes-fila { display: flex; flex-wrap: wrap; gap: 6px; }
 #reacciones .rxn-variante {
-  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 44px;
   padding: 6px 12px;
   font: inherit;
   font-size: 0.8rem;
@@ -470,6 +462,8 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+#reacciones .rxn-variante-cond { font-size: 0.84rem; font-weight: 700; }
+#reacciones .rxn-variante-rel { font-size: 0.7rem; font-weight: 500; opacity: .8; }
 #reacciones .rxn-variante--activa { color: #000; background: var(--rxn-flecha-oscuro); border-color: var(--rxn-flecha-oscuro); }
 #reacciones .rxn-variante:focus-visible { outline: 3px solid var(--rxn-flecha-oscuro); outline-offset: 2px; }
 
@@ -738,7 +732,6 @@
   #reacciones .rxn-chip-nombre { max-width: 170px; }
   #reacciones .rxn-btn--ancho { width: auto; min-width: 260px; }
   #reacciones .rxn-btn--fila { min-width: 0; }
-  #reacciones .rxn-pastillas { position: static; }
   #reacciones .rxn-reaccion,
   #reacciones .rxn-ecuacion { font-size: 1.5rem; }
   #reacciones .rxn-resumen { grid-template-columns: repeat(2, 1fr); }
