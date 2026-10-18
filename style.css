@@ -1601,3 +1601,90 @@ button, input, select, textarea {
     font-weight: 700;
     cursor: pointer;
 }
+
+
+/* =========================================
+   HAZ DE LUZ EN LOS BORDES (suave)
+   Barra de búsqueda y accesos directos.
+   Para apagar el efecto: borra este bloque.
+   ========================================= */
+
+@keyframes haz-respira {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+}
+
+
+/* ---------- BARRA DE BÚSQUEDA: luz blanco-azulada ---------- */
+
+.search-box {
+    position: relative;
+    border-color: rgba(170, 205, 255, 0.5);
+}
+
+.search-box::after {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+        inset 0 0 0 1px rgba(170, 205, 255, 0.45),
+        0 0 14px rgba(120, 175, 255, 0.30);
+    animation: haz-respira 5s ease-in-out infinite;
+}
+
+.search-box:focus-within::after {
+    opacity: 1;
+    animation: none;
+    box-shadow:
+        inset 0 0 0 1px rgba(190, 220, 255, 0.7),
+        0 0 18px rgba(120, 175, 255, 0.45);
+}
+
+
+/* ---------- ACCESOS DIRECTOS: luz del color de cada pestaña ---------- */
+
+.shortcut-card[data-page="enlaces"]    { --haz: 245, 166, 35; }   /* amarillo anaranjado */
+.shortcut-card[data-page="tabla"]      { --haz: 42, 160, 240; }   /* azul */
+.shortcut-card[data-page="reacciones"] { --haz: 34, 192, 111; }   /* verde */
+.shortcut-card[data-page="compuestos"] { --haz: 176, 122, 79; }   /* café */
+
+.shortcut-card[data-page] {
+    border-color: rgba(var(--haz), 0.45);
+}
+
+.shortcut-card[data-page]::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--haz), 0.55),
+        inset 0 1px 14px rgba(var(--haz), 0.10),
+        0 0 14px rgba(var(--haz), 0.28);
+    animation: haz-respira 5s ease-in-out infinite;
+}
+
+.shortcut-card[data-page="tabla"]::after      { animation-delay: -1.2s; }
+.shortcut-card[data-page="reacciones"]::after { animation-delay: -2.5s; }
+.shortcut-card[data-page="compuestos"]::after { animation-delay: -3.7s; }
+
+.shortcut-card[data-page]:hover::after,
+.shortcut-card[data-page]:active::after {
+    opacity: 1;
+    animation: none;
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--haz), 0.8),
+        inset 0 1px 16px rgba(var(--haz), 0.16),
+        0 0 20px rgba(var(--haz), 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .search-box::after,
+    .shortcut-card[data-page]::after {
+        animation: none;
+        opacity: 0.85;
+    }
+}
