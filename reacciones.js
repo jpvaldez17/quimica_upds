@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 4.0 · SIMULADOR PASO A PASO (usa formulas.js v1.2 y su BANCO_REACCIONES).
+   Versión 4.1 · SIMULADOR PASO A PASO (usa formulas.js v1.2 y su BANCO_REACCIONES).
    Flujo: 1) escribir/elegir reactivos con búsqueda encadenada  2) «Determinar reacción»:
    productos esperados + clasificación + observación del banco  3) «Balancear ecuación»:
    ecuación con coeficientes  4) paneles de masas molares, moles y estequiometría.
@@ -21,7 +21,7 @@
     3. Catálogo (índice, búsqueda, verificación)
     4. Fórmulas y lectura de la entrada del usuario
     5. Masas molares
-    6. Reglas de predicción de productos
+    6. Clasificación ácido-base
     7. Balanceo (independiente de la predicción)
     8. Análisis: medio, redox, tipo de reacción
     9. Estequiometría (reactivo limitante)
@@ -359,109 +359,14 @@
   }
 
   /* ===========================================================================
-     6. REGLAS DE PREDICCIÓN
-     Solo se proponen productos cuando una regla los respalda. Nunca se inventan.
-     Forma: { id, nombre, aplica(reactivos), productos(reactivos) → [ids] }.
-     Para añadir una reacción fija, agrega una línea con reglaFija(...).
+     6. CLASIFICACIÓN ÁCIDO-BASE
+     (Los productos ya no se predicen aquí: salen del banco de reacciones de formulas.js.)
      ======================================================================== */
-  function mismosIds(R, ids) {
-    if (R.length !== ids.length) return false;
-    var a = R.map(function (s) { return s.id; }).sort().join('|');
-    return a === ids.slice().sort().join('|');
-  }
-
-  function reglaFija(id, nombre, rIds, pIds) {
-    return { id: id, nombre: nombre,
-             aplica: function (R) { return mismosIds(R, rIds); },
-             productos: function () { return pIds.slice(); } };
-  }
-
-  /* Sal de una neutralización: se busca en el catálogo la sal cuyos elementos
-     son los del catión de la base + los del anión del ácido. */
-  function buscarSal(acido, base) {
-    if (!base.composicion.O || !base.composicion.H || !acido.composicion.H) return null;
-    var cat = Object.keys(base.composicion).filter(function (e) { return e !== 'O' && e !== 'H'; });
-    var an = Object.keys(acido.composicion).filter(function (e) { return e !== 'H'; });
-    if (!cat.length || !an.length) return null;
-    var objetivo = unicos(cat.concat(an)).sort().join(',');
-    var hallados = ORDEN.filter(function (id) {
-      var s = INDICE[id];
-      return s.tipo === 'compuesto' && s.clasificacion === 'sal' &&
-             Object.keys(s.composicion).sort().join(',') === objetivo;
-    });
-    return hallados.length === 1 ? hallados[0] : null;
-  }
-
   function parAcidoBase(R) {
     if (R.length !== 2) return null;
     var ac = R.filter(function (s) { return s.clasificacion === 'acido'; });
     var ba = R.filter(function (s) { return s.clasificacion === 'base'; });
     return (ac.length === 1 && ba.length === 1) ? { acido: ac[0], base: ba[0] } : null;
-  }
-
-  var REGLAS_INTERNAS = [
-    reglaFija('permanganato-yoduro-acido', 'Permanganato + yoduro en medio ácido',
-              ['KMnO4', 'KI', 'H2SO4'], ['MnSO4', 'I2', 'K2SO4', 'H2O']),
-    reglaFija('sintesis-agua', 'Síntesis del agua', ['H2', 'O2'], ['H2O']),
-    reglaFija('sintesis-hcl', 'Síntesis del cloruro de hidrógeno', ['H2', 'Cl2'], ['HCl']),
-    reglaFija('descomposicion-peroxido', 'Descomposición del peróxido de hidrógeno', ['H2O2'], ['H2O', 'O2']),
-    reglaFija('descomposicion-carbonato', 'Descomposición térmica del carbonato de calcio', ['CaCO3'], ['CaO', 'CO2']),
-    reglaFija('electrolisis-agua', 'Electrólisis del agua', ['H2O'], ['H2', 'O2']),
-    reglaFija('oxido-basico-agua', 'Óxido básico + agua', ['CaO', 'H2O'], ['Ca(OH)2']),
-    {
-      id: 'neutralizacion', nombre: 'Neutralización (ácido + base → sal + agua)',
-      aplica: function (R) {
-        var p = parAcidoBase(R);
-        return !!(p && buscarSal(p.acido, p.base) && obtenerSustancia('H2O'));
-      },
-      productos: function (R) {
-        var p = parAcidoBase(R);
-        return [buscarSal(p.acido, p.base), 'H2O'];
-      }
-    },
-    {
-      id: 'combustion-hidrocarburo', nombre: 'Combustión completa de un hidrocarburo',
-      aplica: function (R) {
-        return R.length === 2 && R.some(function (s) { return s.id === 'O2'; }) &&
-               R.some(function (s) { return s.clasificacion === 'hidrocarburo'; }) &&
-               !!obtenerSustancia('CO2') && !!obtenerSustancia('H2O');
-      },
-      productos: function () { return ['CO2', 'H2O']; }
-    }
-  ];
-
-  /* Si formulas.js trae sus propias reglas (catálogo v1.0+), se usan esas;
-     las internas quedan solo como respaldo para catálogos antiguos. */
-  var REGLAS_PREDICCION = (CATALOGO && CATALOGO.reglas && CATALOGO.reglas.length) ? CATALOGO.reglas : REGLAS_INTERNAS;
-
-  function proponerProductos(R) {
-    if (!R.length) return { estado: 'sin-reactivos', productos: [], mensaje: 'Agrega al menos un reactivo.' };
-    var aplicables = REGLAS_PREDICCION.filter(function (r) {
-      try { return !!r.aplica(R); } catch (e) { return false; }
-    });
-    if (!aplicables.length) {
-      return { estado: 'no-reconocida', productos: [],
-        mensaje: 'Reacción no reconocida: todavía no hay una regla para estos reactivos y la app no inventa productos. ' +
-                 'Puedes escribirlos tú: \u201cA + B \u2192 C + D\u201d y balancearla igualmente.' };
-    }
-    var conj = {};
-    aplicables.forEach(function (r) {
-      var ids = r.productos(R) || [];
-      conj[ids.slice().sort().join('|')] = { regla: r, ids: ids };
-    });
-    var claves = Object.keys(conj);
-    if (claves.length > 1) {
-      return { estado: 'ambigua', productos: [],
-        mensaje: 'Caso ambiguo: varias reglas aplican con resultados distintos (' +
-          claves.map(function (k) { return conj[k].regla.nombre; }).join('; ') +
-          '). Escribe los productos tú con la flecha \u2192.' };
-    }
-    var u = conj[claves[0]];
-    var falt = u.ids.filter(function (id) { return !obtenerSustancia(id); });
-    if (falt.length) return { estado: 'error', productos: [], mensaje: 'La regla "' + u.regla.nombre + '" usa sustancias que no están en el catálogo: ' + falt.join(', ') + '.' };
-    if (u.ids.length > CONFIG.limiteProductos) return { estado: 'error', productos: [], mensaje: 'La regla produce más de ' + CONFIG.limiteProductos + ' productos.' };
-    return { estado: 'propuesta', productos: u.ids, regla: u.regla.nombre,
-             mensaje: 'Regla aplicada: ' + u.regla.nombre + '.' };
   }
 
   /* ===========================================================================
@@ -899,9 +804,8 @@
 
   /* Casos de práctica: todos existen en el banco de reacciones de formulas.js. */
   var CASOS_PRACTICA = [
-    ['H2', 'O2'], ['CH4', 'O2'], ['HCl', 'NaOH'], ['H2SO4', 'NaOH'],
-    ['SO3', 'H2O'], ['AgNO3', 'NaCl'], ['Zn', 'HCl'], ['Na', 'H2O'],
-    ['CaCO3', 'HCl'], ['Zn', 'CuSO4'], ['N2', 'H2'], ['Fe2O3', 'CO']
+    ['H2', 'O2'], ['HCl', 'NaOH'], ['Zn', 'CuSO4'], ['AgNO3', 'NaCl'],
+    ['MnO4-', 'Fe^2+', 'H+']
   ];
 
   /* Reacciones reversibles (⇌): el banco las marca en la observación o son bien conocidas. */
@@ -922,13 +826,12 @@
     var raiz = el('div', { class: 'rxn-root' });
 
     /* --- Encabezado: tarjeta con título, icono, introducción y casos de práctica --- */
-    $.casos = el('div', { class: 'rxn-casos-grid' });
-    CASOS_PRACTICA.forEach(function (ids) {
+    var botonesCasos = CASOS_PRACTICA.map(function (ids) {
       var etq = ids.map(function (id) { return formulaPlana(sustanciaDeBanco(id)); }).join(' + ');
-      $.casos.appendChild(el('button', {
+      return el('button', {
         type: 'button', class: 'rxn-caso', 'aria-label': 'Probar ' + etq,
         onclick: function () { probarCaso(ids); }
-      }, [etq]));
+      }, [etq]);
     });
     raiz.appendChild(el('section', { class: 'rxn-card rxn-card--intro' }, [
       el('header', { class: 'rxn-encabezado' }, [
@@ -939,10 +842,11 @@
         'Elige los ', el('b', { text: 'reactivos' }), ' y el simulador te muestra la reacción completa, la ecuación balanceada y los cálculos estequiométricos.'
       ]),
       el('div', { class: 'rxn-casos' }, [
-        el('p', { class: 'rxn-casos-tit', text: 'Casos de práctica' }),
-        el('p', { class: 'rxn-casos-sub', text: 'Toca uno y se determina al instante.' }),
-        $.casos
-      ])
+        el('div', { class: 'rxn-casos-cab' }, [
+          el('p', { class: 'rxn-casos-tit', text: 'Casos de práctica' }),
+          el('p', { class: 'rxn-casos-sub', text: 'Toca uno para probar' })
+        ])
+      ].concat(botonesCasos))
     ]));
 
     /* --- 1. Reactivos: campo (borde negro grueso + botón verde +), chips, Determinar / Borrar --- */
@@ -959,7 +863,7 @@
       type: 'button', class: 'rxn-campo-mas', 'aria-label': 'Agregar reactivo',
       onmousedown: function (ev) { ev.preventDefault(); },
       onclick: agregarReactivo
-    }, ['+']);
+    }, []);
     $.campo = el('div', { class: 'rxn-campo' }, [$.espejo, $.input, $.btnMas]);
     $.sugerencias = el('ul', { class: 'rxn-sugerencias', id: 'rxn-sugerencias', role: 'listbox', hidden: true });
     $.msgEntrada = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
@@ -982,16 +886,14 @@
     /* --- 2. Reacción (fondo negro): se revela en secuencia --- */
     $.contadorP = el('span', { class: 'rxn-contador rxn-contador--oscuro' });
     $.msgProductos = el('div', { class: 'rxn-msg', role: 'status', hidden: true });
-    $.etqProductos = el('p', { class: 'rxn-paso-etiqueta', text: 'Reactivos y productos', hidden: true });
     $.reaccion = el('div', { class: 'rxn-reaccion rxn-reaccion--vacia', text: 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.' });
     $.leyenda = el('div', { class: 'rxn-leyenda', hidden: true });
     $.variantes = el('div', { class: 'rxn-variantes', hidden: true });
     $.clasif = el('div', { class: 'rxn-dato-banco rxn-dato-banco--clasif', hidden: true });
-    $.notaBanco = el('div', { class: 'rxn-dato-banco rxn-dato-banco--nota', hidden: true });
     $.btnBalancear = el('button', { type: 'button', class: 'rxn-btn rxn-btn--balancear rxn-btn--ancho', onclick: balancear, hidden: true }, ['\u2696\ufe0f Balancear ecuación']);
     $.cardReaccion = el('section', { class: 'rxn-card rxn-card--oscura', id: 'rxn-reaccion' }, [
       el('div', { class: 'rxn-card-cab' }, [el('h3', { class: 'rxn-card-titulo', text: 'Reacción completa' }), $.contadorP]),
-      $.msgProductos, $.etqProductos, $.reaccion, $.leyenda, $.variantes, $.clasif, $.notaBanco, $.btnBalancear
+      $.msgProductos, $.reaccion, $.leyenda, $.variantes, $.btnBalancear, $.clasif
     ]);
     raiz.appendChild($.cardReaccion);
 
@@ -1076,25 +978,39 @@
     nodo.classList.add('rxn-revela');
   }
 
-  /* Tarjeta negra, paso 2: productos esperados (sin coeficientes) → clasificación →
-     observación → botón Balancear. Todo sale del banco; nada se calcula aquí. */
+  /* Etiqueta de cada variante: condición (entre paréntesis en el banco) + proporción de reactivos. */
+  function etiquetaVariante(v, V) {
+    var m = /\(([^)]+)\)/.exec(v.titulo), cond = m ? m[1] : '';
+    if (!cond) {
+      var hayParcial = V.some(function (o) { return o !== v && /\((parcial|[^)]*incompleta[^)]*)\)/i.test(o.titulo); });
+      cond = hayParcial ? 'Completa' : 'Principal';
+    }
+    cond = cond.charAt(0).toUpperCase() + cond.slice(1);
+    var rel = v.reactivos.map(function (id, i) { return v.coeficientesR[i] + ' ' + formulaPlana(sustanciaDeBanco(id)); }).join(' : ');
+    return { cond: cond, rel: rel };
+  }
+
+  /* Tarjeta negra, paso 2: reacción completa (reactivos → productos) → nombres → variantes →
+     botón Balancear → clasificación y observación. Todo sale del banco; nada se calcula aquí. */
   function renderReaccion() {
     var r = estado.reaccion, P = productosActuales(), R0 = r ? reactivosActuales() : [];
-    $.contadorP.textContent = 'Productos ' + P.length + ' / ' + CONFIG.limiteProductos;
+    if (r && P.length) {
+      $.contadorP.textContent = esReversible(r) ? '\u21cc Reversible' : '\u2192 Irreversible';
+      $.contadorP.hidden = false;
+    } else $.contadorP.hidden = true;
     var llave = r ? String(r.id) : '';
     if (estado.llave === llave) return;           // mismo contenido: no se repite la animación
     estado.llave = llave;
 
-    [$.reaccion, $.leyenda, $.variantes, $.clasif, $.notaBanco].forEach(limpiar);
+    [$.reaccion, $.leyenda, $.variantes, $.clasif].forEach(limpiar);
     if (!r) {
       $.reaccion.className = 'rxn-reaccion rxn-reaccion--vacia';
       $.reaccion.textContent = 'Pulsa \u201cDeterminar reacción\u201d y aquí aparecerá la reacción completa.';
-      [$.etqProductos, $.leyenda, $.variantes, $.clasif, $.notaBanco, $.btnBalancear].forEach(function (n) { n.hidden = true; });
+      [$.leyenda, $.variantes, $.clasif, $.btnBalancear].forEach(function (n) { n.hidden = true; });
       return;
     }
 
-    /* Productos esperados */
-    $.etqProductos.hidden = false;
+    /* Reacción completa */
     if (P.length) {
       $.reaccion.className = 'rxn-reaccion';
       $.reaccion.appendChild(nodoEcuacion(R0, null, P, null, esReversible(r)));
@@ -1108,42 +1024,37 @@
       $.leyenda.hidden = true;
     }
 
-    /* Variantes (p. ej. combustión completa / incompleta) */
+    /* Variantes (p. ej. completa / parcial, o combustión completa / incompleta) */
     var V = estado.variantes;
     if (V.length > 1) {
-      $.variantes.appendChild(el('p', { class: 'rxn-variantes-tit', text: 'Hay ' + V.length + ' variantes registradas. Elige cuál ver:' }));
+      $.variantes.appendChild(el('p', { class: 'rxn-variantes-tit', text: 'Esta combinación reacciona de ' + V.length + ' formas según la proporción de reactivos. Elige una:' }));
       var fila = el('div', { class: 'rxn-variantes-fila' });
       V.forEach(function (v, i) {
+        var et = etiquetaVariante(v, V);
         fila.appendChild(el('button', {
           type: 'button', class: 'rxn-variante' + (v === r ? ' rxn-variante--activa' : ''),
           'aria-pressed': v === r ? 'true' : 'false', onclick: function () { elegirVariante(i); }
-        }, [v.titulo]));
+        }, [el('span', { class: 'rxn-variante-cond', text: et.cond }), el('span', { class: 'rxn-variante-rel', text: et.rel })]));
       });
       $.variantes.appendChild(fila);
       $.variantes.hidden = false;
     } else $.variantes.hidden = true;
 
-    /* Clasificación y observación del banco */
-    $.clasif.appendChild(el('span', { class: 'rxn-dato-et', text: 'Clasificación' }));
-    $.clasif.appendChild(el('span', { class: 'rxn-dato-val', text: r.categoria }));
-    $.clasif.hidden = false;
-    if (r.nota) {
-      $.notaBanco.appendChild(el('span', { class: 'rxn-dato-et', text: 'Observación' }));
-      $.notaBanco.appendChild(el('span', { class: 'rxn-dato-val', text: r.nota }));
-      $.notaBanco.hidden = false;
-    } else $.notaBanco.hidden = true;
-
-    /* Botón Balancear: aparece al final, solo si hay productos que balancear */
+    /* Botón Balancear: justo debajo, solo si hay productos que balancear */
     $.btnBalancear.hidden = !P.length;
 
+    /* Clasificación + observación del banco, en un solo bloque compacto */
+    $.clasif.appendChild(el('span', { class: 'rxn-dato-et', text: 'Clasificación' }));
+    $.clasif.appendChild(el('span', { class: 'rxn-dato-val', text: r.categoria }));
+    if (r.nota) $.clasif.appendChild(el('span', { class: 'rxn-dato-nota', text: r.nota }));
+    $.clasif.hidden = false;
+
     /* Aparición secuencial */
-    reiniciarAnim($.etqProductos, 0);
     reiniciarAnim($.reaccion, 0);
-    reiniciarAnim($.leyenda, 140);
+    if (!$.leyenda.hidden) reiniciarAnim($.leyenda, 140);
     if (!$.variantes.hidden) reiniciarAnim($.variantes, 240);
-    reiniciarAnim($.clasif, 420);
-    if (!$.notaBanco.hidden) reiniciarAnim($.notaBanco, 640);
-    if (!$.btnBalancear.hidden) reiniciarAnim($.btnBalancear, 880);
+    if (!$.btnBalancear.hidden) reiniciarAnim($.btnBalancear, 340);
+    reiniciarAnim($.clasif, 460);
   }
 
   /* ---------- Ecuación ---------- */
@@ -1287,18 +1198,12 @@
     var t = $['cuerpo-tipo']; limpiar(t);
     var rb = estado.reaccion;
     if (!rb) t.appendChild(parrafo('Se mostrará al determinar la reacción.', 'rxn-pendiente'));
-    else {
-      t.appendChild(el('p', { class: 'rxn-etiqueta', text: 'Categoría de la reacción:' }));
-      t.appendChild(el('p', { class: 'rxn-dato-fuerte', text: rb.categoria }));
-      if (rb.nota) t.appendChild(parrafo(rb.nota, 'rxn-nota'));
-      if (estado.tipo && estado.tipo.nombre !== 'Sin clasificar') {
-        t.appendChild(el('p', { class: 'rxn-etiqueta', text: 'Según sus reactivos y productos:' }));
-        t.appendChild(el('p', { class: 'rxn-dato-fuerte', text: estado.tipo.nombre }));
-        t.appendChild(parrafo(estado.tipo.texto));
-        if (estado.tipo.nota) t.appendChild(parrafo(estado.tipo.nota, 'rxn-nota'));
-      }
-      t.appendChild(parrafo('Datos tomados del banco de reacciones (n.º ' + rb.id + ').', 'rxn-dato-sub'));
-    }
+    else if (estado.tipo && estado.tipo.nombre !== 'Sin clasificar') {
+      t.appendChild(el('p', { class: 'rxn-etiqueta', text: 'Tipo de reacción:' }));
+      t.appendChild(el('p', { class: 'rxn-dato-fuerte', text: estado.tipo.nombre }));
+      t.appendChild(parrafo(estado.tipo.texto));
+      if (estado.tipo.nota) t.appendChild(parrafo(estado.tipo.nota, 'rxn-nota'));
+    } else t.appendChild(parrafo('La clasificación de esta reacción está en la tarjeta negra.', 'rxn-pendiente'));
 
     /* Análisis redox: ahora dentro del bloque 1 (Tipo de reacción) */
     var x = el('div', { class: 'rxn-redox-bloque' });
@@ -1448,7 +1353,15 @@
     $.resEstequio.appendChild(parrafo('Cómo se decide: moles = gramos \u00f7 masa molar. El que tenga el menor valor de (moles \u00f7 coeficiente) es el limitante.', 'rxn-dato-sub'));
   }
 
+  /* La ecuación balanceada aparece al determinar; el análisis, al balancear. */
+  function actualizarVisibilidad() {
+    $.cardResultado.hidden = estado.paso < 1;
+    var ca = $['cuerpo-tipo-det'] && $['cuerpo-tipo-det'].parentNode;
+    if (ca) ca.hidden = estado.paso < 2;
+  }
+
   function renderTodo() {
+    actualizarVisibilidad();
     renderChips(); renderReaccion(); renderEcuacion(); renderAnalisis();
   }
 
@@ -1559,8 +1472,7 @@
     var n = info.exactas.length, c = info.companeros.length, textos = [];
     var esperando = /\s\+\s*$/.test(limpiarEntrada($.input.value));
     if (!n && !c) return { tipo: 'aviso', textos: ['Esta combinación no está en el banco de reacciones. Quita un reactivo o prueba con otro.'] };
-    if (n) textos.push(n === 1 ? 'Hay una reacción registrada con estos reactivos: pulsa \u201cDeterminar reacción\u201d.'
-                               : 'Hay ' + n + ' variantes registradas con estos reactivos: pulsa \u201cDeterminar reacción\u201d.');
+    if (n) textos.push('Listo: pulsa \u201cDeterminar reacción\u201d.' + (n > 1 ? ' Hay ' + n + ' formas de reaccionar según la proporción.' : ''));
     if (c && !esperando) textos.push('También puedes pulsar + para sumar otro reactivo (' + c + (c === 1 ? ' opción' : ' opciones') + ').');
     return { tipo: 'info', textos: textos };
   }
@@ -1670,6 +1582,9 @@
       return;
     }
     estado.variantes = hallazgos.map(function (h) { return CATALOGO.describirReaccion(h); });
+    estado.variantes.sort(function (a, b) {
+      return (/\(/.test(a.titulo) ? 1 : 0) - (/\(/.test(b.titulo) ? 1 : 0) || a.id - b.id;
+    });
     elegirVariante(0);
     desplazarA($.cardReaccion);
   }
@@ -1682,7 +1597,7 @@
     estado.origen = 'banco'; estado.nombreRegla = r.titulo;
     estado.balanceo = null; estado.estequio = null; estado.paso = 1;
     estado.llave = null;
-    mostrarMensajes($.msgProductos, 'info', ['Reacción identificada: ' + r.titulo + '.']);
+    mostrarMensajes($.msgProductos, 'info', []);
     recalcularAnalisis();
     renderTodo();
     pulsarPanel('cuerpo-tipo-det', 700);
@@ -1773,7 +1688,6 @@
     parsearFormula: parsearFormula, validarFormula: validarFormula,
     parsearEntrada: parsearEntrada, resolverToken: resolverToken,
     calcularMasaMolar: calcularMasaMolar,
-    proponerProductos: proponerProductos, reglas: REGLAS_PREDICCION,
     balancearEcuacion: balancearEcuacion, verificarConservacion: verificarConservacion,
     analizarRedox: analizarRedox, clasificarReaccion: clasificarReaccion, detectarMedio: detectarMedio,
     calcularEstequiometria: calcularEstequiometria,
