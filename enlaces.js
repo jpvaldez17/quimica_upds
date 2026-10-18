@@ -72,6 +72,11 @@
         return { z: i + 1, sym: s, nom: NOM[i], cfg: c.lista, n: c.n, v: c.v };
     });
 
+    /* Lista principal del selector (los más usados en clase); «Mostrar todos» abre los 118 */
+    var PRINC = {};
+    ("H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Ti Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Ag Cd " +
+        "In Sn Sb Te I Xe Cs Ba Pt Au Hg Tl Pb Bi").split(" ").forEach(function (s) { PRINC[s] = true; });
+
     function normalizar(t) {
         return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\.$/, "").trim();
     }
@@ -259,7 +264,7 @@
             if (pi > 0) { s += '<path class="b-p" d="M124 44Q150 33 176 44"/>'; }
             if (pi > 1) { s += '<path class="b-p" d="M124 66Q150 77 176 66"/>'; }
         } else {
-            s += '<line class="b-x" x1="120" y1="55" x2="180" y2="55"/>';
+            s += '<text class="t-q" x="150" y="63" text-anchor="middle">✕</text>';
         }
 
         return s + '<circle class="at" cx="92" cy="55" r="28"/><circle class="at" cx="208" cy="55" r="28"/>' +
@@ -333,28 +338,143 @@
        1 Resultados · 2 Notación · 3 Diagrama · 4 Paso a paso
        ========================================= */
 
+    function deltaEN(r) {
+        var xa = EN[r.e1.sym], xb = EN[r.e2.sym];
+        return (xa !== undefined && xb !== undefined) ? Math.abs(xa - xb) : null;
+    }
+
+    /* Gas noble para la forma abreviada: el mayor con Z menor que el del elemento */
+    var GN = [[2, "He"], [10, "Ne"], [18, "Ar"], [36, "Kr"], [54, "Xe"], [86, "Rn"]];
+
+    function nucleoGN(e) {
+        var g = null;
+        GN.forEach(function (x) { if (x[0] < e.z) { g = x; } });
+        return g;
+    }
+
+    function cfgAbrev(e) {
+        var g = nucleoGN(e), acc = 0, partes = [];
+        if (!g) { return cfgHtml(e); }
+        e.cfg.forEach(function (p) {
+            if (acc >= g[0]) {
+                partes.push('<span class="' + (+p[0].charAt(0) === e.n ? "tom-val" : "") + '">' + p[0] + sup(p[1]) + "</span>");
+            }
+            acc += p[1];
+        });
+        return '<span class="cf-nuc">[' + g[1] + "]</span> " + partes.join(" ");
+    }
+
+    function flechas(c) {
+        return (c >= 1 ? "<i>↑</i>" : "") + (c === 2 ? "<i>↓</i>" : "");
+    }
+
+    /* Cajitas con flechas de la capa de valencia (regla de Hund) */
+    function cajasAtomo(e) {
+        return e.cfg.filter(function (p) { return +p[0].charAt(0) === e.n; }).map(function (p) {
+            var t = p[0].charAt(1), k = (t === "s") ? 1 : (t === "p" ? 3 : (t === "d" ? 5 : 7)), cs = [], j;
+            for (j = 0; j < k; j++) { cs.push(0); }
+            for (j = 0; j < p[1]; j++) { cs[j % k]++; }
+            return '<div class="cf-sub"><span class="cf-sn">' + p[0] + "</span>" + cs.map(function (c) {
+                return '<span class="cf-bx' + (c ? "" : " vac") + '">' + flechas(c) + "</span>";
+            }).join("") + '<span class="cf-se">' + p[1] + " e⁻</span></div>";
+        }).join("");
+    }
+
+    function bloqueAtomo(e) {
+        return '<div class="cf-at"><div class="cf-at-h"><span class="tom-at">' + e.sym + '</span><span class="cf-nm">' + e.nom +
+            '</span><span class="cf-z">Z = ' + e.z + "</span></div>" +
+            '<div class="cf-l"><span class="cf-lt">Completa</span><div class="tom-cfg">' + cfgHtml(e) + "</div></div>" +
+            (nucleoGN(e) ? '<div class="cf-l"><span class="cf-lt">Abreviada</span><div class="tom-cfg">' + cfgAbrev(e) + "</div></div>" : "") +
+            '<div class="cf-l"><span class="cf-lt">Capa de valencia (n = ' + e.n + ')</span><div class="cf-cajas">' + cajasAtomo(e) + "</div></div>" +
+            '<div class="cf-cnt"><span class="cf-i">' + (e.z - e.v) + ' e⁻ internos</span><span class="cf-v">' + e.v + " e⁻ de valencia</span></div></div>";
+    }
+
+    function cajasMO(r) {
+        return r.niv.map(function (nv, i) {
+            return '<div class="cf-niv">' + nv.n.map(function (nm, o) {
+                var c = r.oc[i][o];
+                return '<div class="cf-mo ' + nv.k + '"><span class="cf-bx ' + nv.k + (c ? "" : " vac") + '">' + flechas(c) + '</span><span class="cf-mon">' + nm + "</span></div>";
+            }).join("") + "</div>";
+        }).join("");
+    }
+
+    function pasoCf(n, titulo, cuerpo) {
+        return '<div class="cf-s"><div class="cf-s-l"><span class="tom-num">' + n + '</span></div><div class="cf-s-c"><div class="cf-s-t">' +
+            titulo + "</div>" + cuerpo + "</div></div>";
+    }
+
+    function htmlConfig(r, chips) {
+
+        var interno = (r.e1.z - r.e1.v) + (r.e2.z - r.e2.v);
+        var nota = r.c > 0 ? "La carga positiva <b>quita</b> " + r.c + " e⁻." : (r.c < 0 ? "La carga negativa <b>agrega</b> " + (-r.c) + " e⁻." : "La molécula es neutra: no se agregan ni se quitan e⁻.");
+        var simpl = (r.e1.z <= 2 || r.e2.z <= 2);
+
+        var p3 = '<p class="tom-p">Los <b>' + interno + " e⁻ internos</b> (capas llenas) forman <b>KK</b> y no participan en el enlace.</p>" +
+            (simpl
+                ? '<p class="tom-p tom-suave">Con H o He el esquema es una simplificación: solo tienen orbital 1s, pero se trabaja igual con el esquema 2s–2p.</p>'
+                : '<p class="tom-p">De la capa de valencia de cada átomo se usan sus orbitales <b>s</b> (1) y <b>p</b> (3): 4 + 4 = <b>8 orbitales atómicos</b>, que se combinan en <b>8 orbitales moleculares</b>.</p>') +
+            '<div class="cf-tipo"><span class="tom-lg enl">4 enlazantes</span><div>σ2s · π2py · π2pz · σ2px</div></div>' +
+            '<div class="cf-tipo"><span class="tom-lg anti">4 antienlazantes</span><div>σ*2s · π*2py · π*2pz · σ*2px</div></div>';
+
+        var p4 = '<div class="cf-eje"><span>menor energía</span><span>mayor energía →</span></div>' +
+            '<div class="cf-mos">' + cajasMO(r) + "</div>" +
+            '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span></div>' +
+            '<p class="tom-p tom-suave">Se llenan de abajo hacia arriba (Aufbau), máximo 2 e⁻ por caja con flechas opuestas (Pauli) y, en cajas de igual energía, 1 e⁻ en cada una antes de aparear (Hund). Las cajas punteadas están vacías.</p>';
+
+        var p5 = '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
+            '<p class="tom-p tom-suave">Este es el resumen que el programa hace por ti: lo que antes se dibujaba a mano capa por capa.</p>';
+
+        return '<section class="card tom-cardacc"><details class="tom-paso" data-cf="1"' + (est.cfopen ? " open" : "") + "><summary>" +
+            '<span class="tom-num"><i class="fa-solid fa-layer-group"></i></span><span>Del átomo a la molécula: configuración completa</span></summary>' +
+            '<div class="tom-cuerpo"><p class="tom-p tom-suave">Toda la cadena, paso a paso, hasta llegar a la notación KK[…].</p><div class="cf-lin">' +
+            pasoCf(1, "Configuración de cada átomo", '<div class="cf-dos">' + bloqueAtomo(r.e1) + bloqueAtomo(r.e2) + "</div>") +
+            pasoCf(2, "Suma los e⁻ de valencia y ajusta por la carga", '<div class="tom-formula">' + formulaN(r) + '</div><p class="tom-p">' + nota + "</p>") +
+            pasoCf(3, "Separa internos y valencia", p3) +
+            pasoCf(4, "Llena los orbitales moleculares", p4) +
+            pasoCf(5, "Resultado: notación molecular", p5) +
+            "</div></div></details></section>";
+    }
+
+    function pasoConclusion(r) {
+        var t = r.impar
+            ? '<p class="tom-p">N = ' + r.N + " es impar: queda un e⁻ desapareado y el OE es fraccionario (" + fmt(r.OE) + "). Por la regla de clase, <b>no existe</b>.</p>"
+            : '<p class="tom-p">OE = 0: los e⁻ antienlazantes cancelan a los enlazantes, así que <b>no se forma enlace</b>.</p>';
+        t += '<p class="tom-p tom-suave">Como no existe, no corresponde hablar de su tipo de enlace ni de su magnetismo.</p>';
+        var den = deltaEN(r);
+        if (den !== null && den > 1.7) {
+            t += '<p class="tom-p">Esta combinación es iónica: pruébala en <b>Compuesto</b>.</p>';
+        }
+        return t;
+    }
+
     function htmlResultado(r) {
 
         var out = "";
+        var nombres = { 1: "simple", 2: "doble", 3: "triple" };
+        var prod = producto(r);
 
-        if (r.impar) {
-            out += aviso("<b>No existe como molécula.</b> Con " + r.N + " e⁻ (número impar) queda un electrón desapareado y el orden de enlace sale fraccionario (" +
-                fmt(r.OE) + "). En clase se toma como «no existe».", "am");
-        } else if (r.OE <= 0) {
-            out += aviso("<b>No se forma enlace estable:</b> los e⁻ antienlazantes cancelan a los enlazantes (OE = 0).", "am");
+        /* Veredicto: la respuesta en una frase */
+        if (r.existe) {
+            out += '<div class="tom-vd ok"><b>' + prod + " existe.</b> Enlace " + (nombres[r.OE] || "de orden " + fmt(r.OE)) + " (" + desglose(r) +
+                ") · orden de enlace " + fmt(r.OE) + " · " + (r.para ? "paramagnética" : "diamagnética") + ".</div>";
+        } else if (r.impar) {
+            out += '<div class="tom-vd no"><b>' + prod + " no existe como molécula.</b> Con " + r.N + " e⁻ (número impar) queda un electrón desapareado y el orden de enlace sale fraccionario (" +
+                fmt(r.OE) + "). En clase se toma como «no existe».</div>";
+        } else {
+            out += '<div class="tom-vd no"><b>' + prod + " no se forma.</b> Los e⁻ antienlazantes cancelan a los enlazantes (OE = 0): no hay enlace estable.</div>";
         }
 
-        if (r.e1.z <= 2 || r.e2.z <= 2) {
-            out += aviso("Con H o He el esquema 2s–2p es una simplificación: solo tienen orbital 1s.", "inf");
+        /* Un solo aviso con todo lo que conviene saber */
+        var notas = [], den = deltaEN(r), ion = (den !== null && den > 1.7);
+        if (r.e1.z <= 2 || r.e2.z <= 2) { notas.push("Con H o He el esquema 2s–2p es una simplificación: solo tienen orbital 1s."); }
+        if (ion) {
+            notas.push("<b>ΔEN = " + coma(den) + ":</b> el enlace es de carácter <b>iónico</b>, así que esta combinación se resuelve mejor en <b>Compuesto</b>. Aquí la TOM covalente es solo una aproximación.");
+        }
+        if (notas.length) {
+            out += aviso(notas.map(function (n) { return "<div>" + n + "</div>"; }).join("") +
+                (ion ? '<button type="button" class="tom-ir" data-a="modo" data-m="comp">Resolver como compuesto</button>' : ""), "inf");
         }
 
-        var xa = EN[r.e1.sym], xb = EN[r.e2.sym];
-        if (xa !== undefined && xb !== undefined && Math.abs(xa - xb) > 1.7) {
-            out += aviso("ΔEN = " + coma(Math.abs(xa - xb)) + ": el enlace es de carácter <b>iónico</b> y la TOM covalente solo lo aproxima." +
-                '<button type="button" class="tom-ir" data-a="modo" data-m="comp">Resolver como compuesto</button>', "inf");
-        }
-
-        var nombres = { 1: "Simple", 2: "Doble", 3: "Triple" };
         var tipo = r.existe ? (nombres[r.OE] || fmt(r.OE)) : "No existe";
         var det = r.existe ? desglose(r) : (r.impar ? "N impar" : "sin enlace");
         var el = r.c > 0 ? " − " + r.c + " e⁻" : (r.c < 0 ? " + " + (-r.c) + " e⁻" : "");
@@ -363,17 +483,19 @@
         out += '<section class="card tom-dark">' + cab("fa-flask", "Resultados") +
             '<div class="tom-rx"><span class="tom-at">' + r.e1.sym + "</span><span>+</span>" +
             '<span class="tom-at">' + r.e2.sym + "</span>" + (el ? '<span class="tom-el">' + el + "</span>" : "") +
-            '<span>→</span><span class="tom-pr">' + producto(r) + "</span></div>" +
+            '<span>→</span><span class="tom-pr">' + prod + "</span></div>" +
             svgEstructura(r) +
-            '<div class="tom-leyenda"><span class="tom-lg s">σ · línea recta</span><span class="tom-lg p">π · arco</span></div>' +
+            (r.existe ? '<div class="tom-leyenda"><span class="tom-lg s">σ · línea recta</span><span class="tom-lg p">π · arco</span></div>' : "") +
             '<div class="tom-tiles">' +
             tile(fmt(r.OE), "Orden de enlace", r.existe ? "az" : "rj") +
             tile(tipo + "<small>" + det + "</small>", "Tipo de enlace", r.existe ? "na" : "rj") +
-            tile(r.para ? "Paramagnética" : "Diamagnética", r.para ? r.des.length + " e⁻ desapareado" + (r.des.length > 1 ? "s" : "") : "todos apareados", r.para ? "rj" : "vd") +
+            (r.existe
+                ? tile(r.para ? "Paramagnética" : "Diamagnética", r.para ? r.des.length + " e⁻ desapareado" + (r.des.length > 1 ? "s" : "") : "todos apareados", r.para ? "rj" : "vd")
+                : tile("No aplica", "la molécula no existe", "gr")) +
             tile(r.N + " e⁻", "de valencia", "gr") +
             "</div></section>";
 
-        /* 2 · Notación con píldoras */
+        /* Notación con píldoras */
         var chips = "";
         r.niv.forEach(function (nv, i) {
             nv.n.forEach(function (nm, o) {
@@ -382,6 +504,10 @@
             });
         });
 
+        /* 2 · Del átomo a la molécula (desplegable) */
+        out += htmlConfig(r, chips);
+
+        /* 3 · Notación */
         out += '<section class="card">' + cab("fa-atom", "Notación de orbitales moleculares") +
             '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
             '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span><span class="tom-lg des">1 e⁻ solo</span></div>' +
@@ -391,7 +517,7 @@
             "desapareados y la molécula es <b>paramagnética</b>; si todas tienen 2, es <b>diamagnética</b>. <b>KK</b> son las capas internas, que no cuentan." +
             "</div></details></section>";
 
-        /* 3 · Diagrama estático dentro de un acordeón */
+        /* 4 · Diagrama estático dentro de un acordeón */
         out += '<section class="card tom-cardacc"><details class="tom-paso" data-d="1"' + (est.dopen ? " open" : "") + "><summary>" +
             '<span class="tom-num"><i class="fa-solid fa-chart-simple"></i></span><span>Diagrama de niveles de energía</span></summary>' +
             '<div class="tom-cuerpo">' + svgDiagrama(r) +
@@ -400,12 +526,12 @@
             '<p class="tom-p tom-suave">Orden en este diagrama: ' + ordenTexto(r) + ". Los orbitales atómicos están a los lados y los moleculares en el centro. " +
             "Esquema cualitativo, no está a escala.</p></div></details></section>";
 
-        /* 4 · Paso a paso */
+        /* 5 · Paso a paso */
         out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
             paso(1, "Cuenta los electrones de valencia", pasoElectrones(r)) +
             paso(2, "Llena los orbitales moleculares", pasoLlenado(r)) +
             paso(3, "Calcula el orden de enlace", pasoOrden(r)) +
-            paso(4, "Revisa el magnetismo", pasoMagnetismo(r)) + "</section>";
+            (r.existe ? paso(4, "Revisa el magnetismo", pasoMagnetismo(r)) : paso(4, "Conclusión", pasoConclusion(r))) + "</section>";
 
         return out;
     }
@@ -486,9 +612,10 @@
     var GEOM = { 0: ["Lineal", "180°"], 1: ["Angular", "≈120°"], 2: ["Angular", "≈104,5°"], 3: ["Lineal", "180°"] };
 
     var CASOS_C = [
-        { t: "NaCl", s: ["Na", "Cl"], n: [1, 1] }, { t: "MgF₂", s: ["Mg", "F"], n: [1, 2] }, { t: "CaO", s: ["Ca", "O"], n: [1, 1] },
-        { t: "Na₂O", s: ["Na", "O"], n: [2, 1] }, { t: "AlF₃", s: ["Al", "F"], n: [1, 3] },
-        { t: "H₂O", s: ["O", "H"], n: [1, 2] }, { t: "CO₂", s: ["C", "O"], n: [1, 2] }
+        { t: "NaCl", s: ["Na", "Cl"], n: [1, 1] }, { t: "LiF", s: ["Li", "F"], n: [1, 1] }, { t: "MgO", s: ["Mg", "O"], n: [1, 1] },
+        { t: "CaO", s: ["Ca", "O"], n: [1, 1] }, { t: "MgF₂", s: ["Mg", "F"], n: [1, 2] }, { t: "Na₂O", s: ["Na", "O"], n: [2, 1] },
+        { t: "K₂O", s: ["K", "O"], n: [2, 1] }, { t: "AlF₃", s: ["Al", "F"], n: [1, 3] }, { t: "H₂O", s: ["O", "H"], n: [1, 2] },
+        { t: "CO₂", s: ["C", "O"], n: [1, 2] }, { t: "H₂S", s: ["S", "H"], n: [1, 2] }, { t: "SO₂", s: ["S", "O"], n: [1, 2] }
     ];
 
     function coma(x) { return x.toFixed(2).replace(".", ","); }
@@ -780,12 +907,13 @@
        ========================================= */
 
     var CASOS = [
+        { t: "Li₂", s: ["Li", "Li"], c: 0 }, { t: "B₂", s: ["B", "B"], c: 0 }, { t: "C₂", s: ["C", "C"], c: 0 },
         { t: "N₂", s: ["N", "N"], c: 0 }, { t: "O₂", s: ["O", "O"], c: 0 }, { t: "F₂", s: ["F", "F"], c: 0 },
-        { t: "NO⁺", s: ["N", "O"], c: 1 }, { t: "CN⁻", s: ["C", "N"], c: -1 }, { t: "BO⁺", s: ["B", "O"], c: 1 },
-        { t: "PF⁻", s: ["P", "F"], c: -1 }
+        { t: "Ne₂", s: ["Ne", "Ne"], c: 0 }, { t: "CO", s: ["C", "O"], c: 0 }, { t: "NO⁺", s: ["N", "O"], c: 1 },
+        { t: "CN⁻", s: ["C", "N"], c: -1 }, { t: "BO⁺", s: ["B", "O"], c: 1 }, { t: "PF⁻", s: ["P", "F"], c: -1 }
     ];
 
-    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1] };
+    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1], todos: false, cfopen: false };
     var raiz;
 
     function shell() {
@@ -874,6 +1002,7 @@
     function filtrarElementos(t) {
         t = normalizar(t);
         return ELEMENTOS.filter(function (e) {
+            if (!est.todos && !PRINC[e.sym]) { return false; }
             return !t || normalizar(e.sym).indexOf(t) === 0 || normalizar(e.nom).indexOf(t) === 0 || String(e.z).indexOf(t) === 0;
         });
     }
@@ -882,10 +1011,12 @@
 
         var act = buscar(est.t[sel]), ls = $("tom-ls"), items = filtrarElementos(t);
 
+        $("tom-todos").textContent = est.todos ? "Mostrar solo los principales" : "Mostrar todos los elementos";
+
         ls.innerHTML = items.length ? items.map(function (e) {
             return '<button type="button" role="option" class="tom-op' + (act && act.z === e.z ? " sel" : "") + '" data-a="pick" data-s="' + e.sym +
                 '"><b>' + e.sym + "</b><span>" + e.nom + "</span><i>Z = " + e.z + "</i></button>";
-        }).join("") : '<div class="tom-vacio">Sin coincidencias</div>';
+        }).join("") : '<div class="tom-vacio">Sin coincidencias' + (est.todos ? "" : " en la lista principal.<br>Toca «Mostrar todos los elementos».") + "</div>";
 
         var s = ls.querySelector(".sel");
         ls.scrollTop = (centrar && s) ? Math.max(0, s.offsetTop - ls.clientHeight / 2 + 23) : 0;
@@ -931,11 +1062,13 @@
         ov.innerHTML = '<div class="tom-pnl" role="dialog" aria-modal="true" aria-label="Elegir elemento">' +
             '<div class="tom-ph"><b id="tom-pt">Elemento 1</b><button type="button" class="tom-x" data-a="cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>' +
             '<input type="text" id="tom-q" class="tom-q" placeholder="Buscar: símbolo, nombre o Z" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">' +
-            '<div class="tom-ls" id="tom-ls" role="listbox"></div></div>';
+            '<div class="tom-ls" id="tom-ls" role="listbox"></div>' +
+            '<div class="tom-pf"><button type="button" class="tom-todos" id="tom-todos" data-a="todos"></button></div></div>';
         document.body.appendChild(ov);
 
         ov.addEventListener("click", function (ev) {
             if (ev.target === ov || ev.target.closest('[data-a="cerrar"]')) { cerrarPanel(); return; }
+            if (ev.target.closest('[data-a="todos"]')) { est.todos = !est.todos; pintarLista($("tom-q").value, false); return; }
             var b = ev.target.closest('[data-a="pick"]');
             if (b) { elegir(b.dataset.s); }
         });
@@ -1058,6 +1191,7 @@
         if (d.classList && d.classList.contains("tom-mini")) { est.gopen = d.open; return; }
         if (!d.classList || !d.classList.contains("tom-paso")) { return; }
 
+        if (d.dataset.cf) { est.cfopen = d.open; return; }
         if (d.dataset.d) { est.dopen = d.open; return; }
         if (!d.open) { return; }
 
