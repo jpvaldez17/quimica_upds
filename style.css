@@ -1606,14 +1606,8 @@ button, input, select, textarea {
 /* =========================================
    HAZ DE LUZ EN LOS BORDES (suave)
    Barra de búsqueda y accesos directos.
-   Para apagar el efecto: borra este bloque.
+   Efecto permanente (sin depender del mouse). Para apagarlo: borra este bloque.
    ========================================= */
-
-@keyframes haz-respira {
-    0%, 100% { opacity: 0.55; }
-    50%      { opacity: 1; }
-}
-
 
 /* ---------- BARRA DE BÚSQUEDA: luz blanco-azulada ---------- */
 
@@ -1630,13 +1624,10 @@ button, input, select, textarea {
     pointer-events: none;
     box-shadow:
         inset 0 0 0 1px rgba(170, 205, 255, 0.45),
-        0 0 14px rgba(120, 175, 255, 0.30);
-    animation: haz-respira 5s ease-in-out infinite;
+        0 0 14px rgba(120, 175, 255, 0.34);
 }
 
 .search-box:focus-within::after {
-    opacity: 1;
-    animation: none;
     box-shadow:
         inset 0 0 0 1px rgba(190, 220, 255, 0.7),
         0 0 18px rgba(120, 175, 255, 0.45);
@@ -1663,28 +1654,15 @@ button, input, select, textarea {
     box-shadow:
         inset 0 0 0 1px rgba(var(--haz), 0.55),
         inset 0 1px 14px rgba(var(--haz), 0.10),
-        0 0 14px rgba(var(--haz), 0.28);
-    animation: haz-respira 5s ease-in-out infinite;
+        0 0 14px rgba(var(--haz), 0.34);
 }
 
-.shortcut-card[data-page="tabla"]::after      { animation-delay: -1.2s; }
-.shortcut-card[data-page="reacciones"]::after { animation-delay: -2.5s; }
-.shortcut-card[data-page="compuestos"]::after { animation-delay: -3.7s; }
 
 .shortcut-card[data-page]:hover::after,
 .shortcut-card[data-page]:active::after {
-    opacity: 1;
-    animation: none;
     box-shadow:
         inset 0 0 0 1px rgba(var(--haz), 0.8),
         inset 0 1px 16px rgba(var(--haz), 0.16),
         0 0 20px rgba(var(--haz), 0.45);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .search-box::after,
-    .shortcut-card[data-page]::after {
-        animation: none;
-        opacity: 0.85;
-    }
-}
