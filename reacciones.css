@@ -33,12 +33,12 @@
   --rxn-nav: 76px;                 /* alto aproximado de la barra inferior de la app */
 
   box-sizing: border-box;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 12px 12px 24px;
+  max-width: none;                 /* ocupa todo el ancho, como Enlaces */
+  margin: 0;
+  padding: 0;                      /* sin marco gris alrededor de las tarjetas */
   color: var(--rxn-texto);
-  background: var(--rxn-fondo);
-  border-radius: 20px;
+  background: transparent;
+  border-radius: 0;
   line-height: 1.45;
 }
 
@@ -691,7 +691,6 @@
 
 /* ---- Pantallas medianas y grandes ---------------------------------------------------------------------------------------- */
 @media (min-width: 600px) {
-  #reacciones .rxn-root { padding: 18px 18px 28px; }
   #reacciones .rxn-card { padding: 18px; }
   #reacciones .rxn-chip-nombre { max-width: 170px; }
   #reacciones .rxn-btn--ancho { width: auto; min-width: 260px; }
