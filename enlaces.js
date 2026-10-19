@@ -937,7 +937,7 @@
         { t: "OF⁻", s: ["O", "F"], c: -1 }, { t: "ClF", s: ["Cl", "F"], c: 0 }, { t: "PF⁻", s: ["P", "F"], c: -1 }
     ];
 
-    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1], todos: false };
+    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1], todos: false, ayuda: false };
     var raiz;
 
     function shell() {
@@ -965,14 +965,31 @@
             return '<button type="button" class="tom-caso" data-a="casoc" data-i="' + i + '">' + c.t + "</button>";
         }).join("");
 
-        return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces · Calculadora</h2><span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div>' +
-            '<p class="tom-p solo-tom">La <b>Teoría de Orbitales Moleculares</b> combina los orbitales de dos átomos en orbitales de toda la molécula.</p>' +
-            '<p class="tom-p solo-comp">Resuelve un compuesto: iónico (MgF₂, CaO…) o covalente de 3 átomos (H₂O, CO₂…).</p>' +
-            '<div class="tom-casos"><h2>Casos de práctica</h2><p>Toca uno y se calcula al instante.</p>' +
+        var ayuda =
+            '<div class="solo-tom">' +
+            '<h3>¿Qué es?</h3><p>Estudia moléculas de <b>2 átomos</b> (N₂, O₂, CO…). Cuando dos átomos se acercan, sus orbitales se mezclan y forman orbitales de <b>toda la molécula</b>: unos que los unen (<b>enlazantes</b>) y otros que los separan (<b>antienlazantes</b>).</p>' +
+            '<h3>¿Cómo se usa?</h3><ol><li>Toca un caso de práctica o elige los 2 elementos.</li><li>Si es un ion, marca su carga.</li><li>Lee el veredicto y abre el paso a paso.</li></ol>' +
+            '<h3>¿Qué significa el resultado?</h3><ul>' +
+            '<li><b>Orden de enlace</b> = (e⁻ enlazantes − e⁻ antienlazantes) ÷ 2. Sale 1, 2 o 3 para enlace simple, doble o triple; con 0 no hay enlace.</li>' +
+            '<li><b>Paramagnética:</b> tiene electrones solos y un imán la atrae. <b>Diamagnética:</b> todos están en pareja.</li>' +
+            '<li>Con un número impar de electrones se toma como «no existe».</li></ul></div>' +
+            '<div class="solo-comp">' +
+            '<h3>¿Qué es?</h3><p>Resuelve compuestos de <b>2 elementos</b>: <b>iónicos</b> (metal + no metal, como NaCl o MgF₂) y <b>covalentes</b> de 3 átomos (como H₂O o CO₂).</p>' +
+            '<h3>¿Cómo se usa?</h3><ol><li>Toca un caso de práctica o elige los 2 elementos.</li><li>Indica cuántos átomos hay de cada uno (el subíndice, de 1 a 4).</li><li>Mira el dibujo y abre el paso a paso.</li></ol>' +
+            '<h3>¿Qué significa el resultado?</h3><ul>' +
+            '<li><b>ΔEN</b> (diferencia de electronegatividad) mayor que 1,7 → <b>iónico</b>: un átomo cede electrones y el otro los recibe.</li>' +
+            '<li>Menor → <b>covalente</b>: se comparten electrones. En el dibujo, las rayas son enlaces y los puntos, pares libres.</li>' +
+            '<li>Para solo 2 átomos usa Orbitales moleculares.</li></ul></div>';
+
+        return '<section class="card tom-top"><div class="tom-cab"><h2>Enlaces</h2><div class="tom-cab-d">' +
+            '<button type="button" class="tom-ayuda" data-a="ayuda" aria-expanded="false" aria-controls="tom-ay"><i class="fa-solid fa-circle-question"></i> Ayuda</button>' +
+            '<span class="tom-badge"><i class="fa-solid fa-atom"></i></span></div></div>' +
+            '<div class="tom-ay" id="tom-ay" hidden>' + ayuda + '</div>' +
+            '<div class="tom-mod" role="group" aria-label="Modo de cálculo">' +
+            '<button type="button" data-a="modo" data-m="tom"><span>Orbitales moleculares</span><small>2 átomos</small></button>' +
+            '<button type="button" data-a="modo" data-m="comp"><span>Compuesto</span><small>iónico y covalente</small></button></div>' +
+            '<div class="tom-casos"><h2>Casos de práctica <small>(toca uno y se calcula)</small></h2>' +
             '<div class="tom-chips solo-tom">' + casos + '</div><div class="tom-chips solo-comp">' + casosC + "</div></div></section>" +
-            '<section class="card tom-modo"><div class="tom-mod" role="group" aria-label="Modo de cálculo">' +
-            '<button type="button" data-a="modo" data-m="tom">Orbitales moleculares</button>' +
-            '<button type="button" data-a="modo" data-m="comp">Compuesto</button></div></section>' +
             '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
             '<div class="solo-tom"><div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div></div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
@@ -1164,7 +1181,12 @@
 
         var a = b.dataset.a;
 
-        if (a === "modo") {
+        if (a === "ayuda") {
+            est.ayuda = !est.ayuda;
+            $("tom-ay").hidden = !est.ayuda;
+            b.setAttribute("aria-expanded", String(est.ayuda));
+            b.classList.toggle("on", est.ayuda);
+        } else if (a === "modo") {
             est.modo = b.dataset.m;
             pintarModo();
             calcular();
