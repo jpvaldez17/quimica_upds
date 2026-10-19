@@ -857,9 +857,9 @@
   min-height: 34px;
   padding: 0 12px;
   border-radius: 17px;
-  border: 1.5px solid #DD5200;
+  border: 1.5px solid #27AE60;
   background: #ffffff;
-  color: #DD5200;
+  color: #1e8e4e;
   font: 700 12.5px "Poppins", Arial, sans-serif;
   cursor: pointer;
   display: inline-flex;
@@ -868,22 +868,22 @@
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
 }
-#reacciones .rxn-root .rxn-ayuda.on { background: #DD5200; color: #ffffff; }
-#reacciones .rxn-root .rxn-ayuda.on svg path { stroke: #DD5200; }
+#reacciones .rxn-root .rxn-ayuda.on { background: #27AE60; color: #ffffff; }
+#reacciones .rxn-root .rxn-ayuda.on svg path { stroke: #27AE60; }
 #reacciones .rxn-root .rxn-ayuda:focus-visible { outline: 3px solid #1686c9; outline-offset: 2px; }
 
 #reacciones .rxn-root .rxn-ay {
   margin-top: 10px;
   padding: 10px 12px;
-  background: #fff4ec;
-  border-left: 4px solid #DD5200;
+  background: #e8f7ee;
+  border-left: 4px solid #27AE60;
   border-radius: 14px;
   font-size: 13px;
   line-height: 1.5;
   color: #2b2f36;
 }
 #reacciones .rxn-root .rxn-ay[hidden] { display: none; }
-#reacciones .rxn-root .rxn-ay h3 { margin: 10px 0 3px; font-size: 12px; font-weight: 700; color: #B83F00; }
+#reacciones .rxn-root .rxn-ay h3 { margin: 10px 0 3px; font-size: 12px; font-weight: 700; color: #1e8e4e; }
 #reacciones .rxn-root .rxn-ay h3:first-child { margin-top: 0; }
 #reacciones .rxn-root .rxn-ay p { margin: 0; }
 #reacciones .rxn-root .rxn-ay ol, #reacciones .rxn-root .rxn-ay ul { margin: 0; padding-left: 18px; }
