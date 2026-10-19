@@ -376,8 +376,8 @@
 /* ---------- Casos de práctica ---------- */
 
 .tom .tom-casos { background: #e8ebee; border-radius: 20px; padding: 14px 16px; margin-bottom: 14px; }
-.tom-casos h2 { margin: 0; color: #111111; font-size: 16px; font-weight: 600; }
-.tom-casos p { margin: 2px 0 10px; font-size: 12.5px; color: #3a424c; }
+.tom-casos h2 { margin: 0 0 7px; color: #111111; font-size: 14.5px; font-weight: 700; }
+.tom-casos h2 small { font-size: 11.5px; font-weight: 500; color: #4a525c; }
 .tom-casos .tom-chips { gap: 6px; }
 
 .tom-caso {
@@ -401,10 +401,10 @@
 .tom-cab h2 { margin: 0; font-size: 18px; font-weight: 700; color: #2b2f36; text-align: left; }
 
 .tom-badge {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    border-radius: 14px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
     background: var(--ac-s);
     color: var(--ac-o);
     font-size: 20px;
@@ -413,7 +413,6 @@
     justify-content: center;
 }
 
-.tom-top .tom-p { margin: 10px 0 0; }
 
 
 /* ---------- «Cómo leerla» desplegable ---------- */
@@ -559,20 +558,32 @@ body.tom-bloq { overflow: hidden; }
 
 .tom[data-modo="comp"] .solo-tom, .tom[data-modo="tom"] .solo-comp { display: none; }
 
-.tom-mod { display: flex; gap: 4px; padding: 4px; margin-top: 12px; background: #121212; border: 2px solid #D32F2F; border-radius: 28px; }
+.tom-mod { display: flex; gap: 4px; padding: 4px; margin-top: 10px; background: #121212; border: 2px solid #DD5200; border-radius: 28px; }
 
 .tom-mod button {
     flex: 1;
-    min-height: 44px;
+    min-height: 46px;
+    padding: 4px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
     border: none;
     border-radius: 22px;
     background: #121212;
-    font: 600 13px "Poppins", Arial, sans-serif;
+    font: 700 12px "Poppins", Arial, sans-serif;
+    line-height: 1.15;
+    letter-spacing: -0.1px;
+    white-space: nowrap;
     color: #ffffff;
     cursor: pointer;
 }
 
-.tom-mod button.act { background: #d3d7dc; color: #C62828; font-weight: 700; }
+.tom-mod button small { font: 500 10.5px "Poppins", Arial, sans-serif; opacity: 0.8; }
+
+.tom-mod button.act { background: #DD5200; color: #ffffff; }
+.tom-mod button.act small { opacity: 0.95; }
 .tom-mod button:focus-visible, .tom-cant button:focus-visible, .tom-ir:focus-visible { outline: 3px solid var(--az); outline-offset: 2px; }
 
 .tom-cant { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12.5px; color: #4a525c; }
@@ -618,9 +629,7 @@ body.tom-bloq { overflow: hidden; }
 
 /* ---------- Ajustes: casos en el encabezado, modo aparte, colores por signo ---------- */
 
-.tom-top .tom-casos { margin: 12px 0 0; padding: 12px 14px; border-radius: 16px; }
-.tom .card.tom-modo { padding: 0; background: transparent; box-shadow: none; }
-.tom-modo .tom-mod { margin-top: 0; }
+.tom-top .tom-casos { margin: 10px 0 0; padding: 9px 10px 10px; border-radius: 16px; }
 
 .tom-chip.pos.act { background: #2E7D32; border-color: #2E7D32; color: #ffffff; }
 .tom-chip.cero.act { background: #1565C0; border-color: #1565C0; color: #ffffff; }
@@ -642,8 +651,8 @@ body.tom-bloq { overflow: hidden; }
 
 /* ---------- Casos de práctica: 12 en dos filas ---------- */
 
-.tom-casos .tom-chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-.tom-casos .tom-caso { min-width: 0; padding: 0 2px; font-size: 12.5px; white-space: nowrap; }
+.tom-casos .tom-chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+.tom-casos .tom-caso { min-width: 0; min-height: 30px; padding: 0 2px; border-radius: 15px; font-size: 12px; white-space: nowrap; }
 
 /* ---------- Selector de elementos: botón «Mostrar todos» ---------- */
 
@@ -735,3 +744,43 @@ body.tom-bloq { overflow: hidden; }
 .tom-est .b-l { stroke: var(--ac); stroke-width: 3.2; stroke-linecap: round; }
 .tom-est .lp { fill: #7cc7f5; }
 .tom-est .t-fc { font: 700 12px "Poppins", Arial, sans-serif; fill: #ff7a9a; text-anchor: middle; }
+
+
+/* ---------- Encabezado: botón Ayuda y panel ---------- */
+
+.tom-cab-d { display: flex; align-items: center; gap: 8px; }
+
+.tom-ayuda {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
+    border: 1.5px solid #DD5200;
+    background: #ffffff;
+    color: #DD5200;
+    font: 700 12.5px "Poppins", Arial, sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tom-ayuda.on { background: #DD5200; color: #ffffff; }
+.tom-ayuda:focus-visible { outline: 3px solid var(--az); outline-offset: 2px; }
+
+.tom-ay {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #fff4ec;
+    border-left: 4px solid #DD5200;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #2b2f36;
+}
+
+.tom-ay[hidden] { display: none; }
+.tom-ay h3 { margin: 10px 0 3px; font-size: 12px; font-weight: 700; color: #B83F00; }
+.tom-ay .solo-tom > h3:first-child, .tom-ay .solo-comp > h3:first-child { margin-top: 0; }
+.tom-ay p { margin: 0; }
+.tom-ay ol, .tom-ay ul { margin: 0; padding-left: 18px; }
+.tom-ay li { margin: 2px 0; }
