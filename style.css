@@ -1694,13 +1694,13 @@ button, input, select, textarea {
 
 .answer-buttons button {
     min-height: 36px;
-    background: #4a5059;
+    background: #d3d7dc;
     border: 2px solid #ffffff;
-    color: #f8fafc;
+    color: #111111;
 }
 
 .answer-buttons button:hover:not(:disabled) {
-    background: #565d67;
+    background: #e1e4e8;
 }
 
 .answer-buttons button.correcta {
@@ -1716,8 +1716,8 @@ button, input, select, textarea {
 }
 
 .answer-buttons button:disabled:not(.correcta):not(.incorrecta) {
-    opacity: 0.65;
-    color: #e5e7eb;
+    opacity: 0.7;
+    color: #111111;
 }
 
 
@@ -1749,4 +1749,21 @@ button, input, select, textarea {
     width: 32px;
     height: 32px;
     stroke-width: 1.9;
+}
+
+
+/* =========================================
+   ACCESOS DIRECTOS: título azul, ícono negro, línea roja oscura
+   ========================================= */
+
+.section-title {
+    border-bottom: 2px solid #7a0c14;
+}
+
+.section-title h2 {
+    color: #1686c9;
+}
+
+.grid-icon {
+    color: #111111;
 }
