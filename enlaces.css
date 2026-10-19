@@ -682,14 +682,6 @@ body.tom-bloq { overflow: hidden; }
 
 /* ---------- Del átomo a la molécula ---------- */
 
-.cf-lin { margin-top: 10px; }
-.cf-s { display: flex; gap: 12px; }
-.cf-s-l { display: flex; flex-direction: column; align-items: center; }
-.cf-s-l::after { content: ""; flex: 1; width: 2px; margin: 4px 0; background: #e1e5e8; border-radius: 2px; }
-.cf-s:last-child .cf-s-l::after { display: none; }
-.cf-s-c { flex: 1; min-width: 0; padding-bottom: 18px; }
-.cf-s:last-child .cf-s-c { padding-bottom: 0; }
-.cf-s-t { font-size: 14.5px; font-weight: 700; color: #1c2026; margin: 3px 0 8px; }
 
 .cf-dos { display: grid; grid-template-columns: 1fr; gap: 10px; }
 
@@ -724,8 +716,6 @@ body.tom-bloq { overflow: hidden; }
 }
 
 .cf-bx i { font-style: normal; }
-.cf-bx.enl { border-color: var(--az); }
-.cf-bx.anti { border-color: var(--rj); }
 .cf-bx.vac { border-style: dashed; border-color: #cbd1d7; }
 
 .cf-cnt { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
@@ -733,17 +723,15 @@ body.tom-bloq { overflow: hidden; }
 .cf-i { background: #f2f4f6; color: #555d68; }
 .cf-v { background: var(--ac-s); color: var(--ac-o); }
 
-.cf-eje { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: #6b7280; border-bottom: 2px solid #dde1e4; padding-bottom: 4px; }
-.cf-mos { display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 12px 0 4px; }
-.cf-niv { display: flex; gap: 4px; padding: 6px 8px; background: #f7f9fb; border-radius: 12px; }
-.cf-mo { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.cf-mon { font-size: 10.5px; font-weight: 700; white-space: nowrap; }
-.cf-mo.enl .cf-mon { color: var(--az-o); }
-.cf-mo.anti .cf-mon { color: #b01040; }
 
 @media (min-width: 640px) {
     .cf-dos { grid-template-columns: 1fr 1fr; }
 }
 
-.cf-tipo { margin-top: 8px; }
-.cf-tipo div { margin-top: 4px; font-size: 13px; color: #3a424c; }
+
+
+/* ---------- Lewis (modo Compuesto) ---------- */
+
+.tom-est .b-l { stroke: var(--ac); stroke-width: 3.2; stroke-linecap: round; }
+.tom-est .lp { fill: #7cc7f5; }
+.tom-est .t-fc { font: 700 12px "Poppins", Arial, sans-serif; fill: #ff7a9a; text-anchor: middle; }
