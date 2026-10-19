@@ -1695,7 +1695,7 @@ button, input, select, textarea {
 .answer-buttons button {
     min-height: 36px;
     background: #d3d7dc;
-    border: 2px solid #ffffff;
+    border: 2px solid #000000;
     color: #111111;
 }
 
@@ -1705,13 +1705,13 @@ button, input, select, textarea {
 
 .answer-buttons button.correcta {
     background: #1f9d55;
-    border-color: #ffffff;
+    border-color: #000000;
     color: #ffffff;
 }
 
 .answer-buttons button.incorrecta {
     background: #d93025;
-    border-color: #ffffff;
+    border-color: #000000;
     color: #ffffff;
 }
 
@@ -1753,15 +1753,15 @@ button, input, select, textarea {
 
 
 /* =========================================
-   ACCESOS DIRECTOS: título azul, ícono negro, línea roja oscura
+   ACCESOS DIRECTOS: título rojo, ícono negro, línea roja
    ========================================= */
 
 .section-title {
-    border-bottom: 2px solid #7a0c14;
+    border-bottom: 2px solid #c1121f;
 }
 
 .section-title h2 {
-    color: #1686c9;
+    color: #e02424;
 }
 
 .grid-icon {
