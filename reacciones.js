@@ -1,6 +1,6 @@
 /* =============================================================================
    reacciones.js — Pestaña "Reacciones químicas y estequiometría" · QuímicApp
-   Versión 4.1 · SIMULADOR PASO A PASO (usa formulas.js v1.2 y su BANCO_REACCIONES).
+   Versión 4.2 · SIMULADOR PASO A PASO (usa formulas.js v1.2 y su BANCO_REACCIONES).
    Flujo: 1) escribir/elegir reactivos con búsqueda encadenada  2) «Determinar reacción»:
    productos esperados + clasificación + observación del banco  3) «Balancear ecuación»:
    ecuación con coeficientes  4) paneles de masas molares, moles y estequiometría.
@@ -804,8 +804,8 @@
 
   /* Casos de práctica: todos existen en el banco de reacciones de formulas.js. */
   var CASOS_PRACTICA = [
-    ['H2', 'O2'], ['HCl', 'NaOH'], ['Zn', 'CuSO4'], ['AgNO3', 'NaCl'],
-    ['MnO4-', 'Fe^2+', 'H+']
+    ['H2', 'O2'], ['N2', 'H2'], ['Mg', 'O2'], ['Na', 'Cl2'], ['Zn', 'HCl'],
+    ['HCl', 'NaOH'], ['H2SO4', 'NaOH'], ['AgNO3', 'NaCl'], ['Fe', 'CuSO4'], ['MnO4-', 'Fe^2+', 'H+']
   ];
 
   /* Reacciones reversibles (⇌): el banco las marca en la observación o son bien conocidas. */
@@ -825,28 +825,51 @@
   function construirVista(contenedor) {
     var raiz = el('div', { class: 'rxn-root' });
 
-    /* --- Encabezado: tarjeta con título, icono, introducción y casos de práctica --- */
-    var botonesCasos = CASOS_PRACTICA.map(function (ids) {
+    /* --- Encabezado (igual que Enlaces): título + botón Ayuda + icono; casos de práctica en 2 filas de 5 --- */
+    $.botonesCasos = CASOS_PRACTICA.map(function (ids) {
       var etq = ids.map(function (id) { return formulaPlana(sustanciaDeBanco(id)); }).join(' + ');
-      return el('button', {
-        type: 'button', class: 'rxn-caso', 'aria-label': 'Probar ' + etq,
+      var b = el('button', {
+        type: 'button', class: 'rxn-caso', 'aria-label': 'Probar ' + etq, 'aria-pressed': 'false',
         onclick: function () { probarCaso(ids); }
       }, [etq]);
+      b._ids = ids.slice().sort().join('|');
+      return b;
     });
+    $.btnAyuda = el('button', {
+      type: 'button', class: 'rxn-ayuda', 'aria-expanded': 'false', 'aria-controls': 'rxn-ay',
+      onclick: function () {
+        var abierta = $.panelAyuda.hidden;
+        $.panelAyuda.hidden = !abierta;
+        $.btnAyuda.setAttribute('aria-expanded', String(abierta));
+        $.btnAyuda.classList.toggle('on', abierta);
+      }
+    }, [el('i', { class: 'fa-solid fa-circle-question', 'aria-hidden': 'true' }), ' Ayuda']);
+    $.panelAyuda = el('div', { class: 'rxn-ay', id: 'rxn-ay', hidden: true }, [
+      el('h3', { text: '¿Qué es?' }),
+      el('p', {}, ['Un simulador paso a paso: eliges los ', el('b', { text: 'reactivos' }), ' y te muestra la reacción completa, la ecuación balanceada y los cálculos de estequiometría.']),
+      el('h3', { text: '¿Cómo se usa?' }),
+      el('ol', {}, [
+        el('li', { text: 'Toca un caso de práctica o escribe un reactivo y pulsa + (puedes buscar por fórmula o nombre).' }),
+        el('li', { text: 'Pulsa “Determinar reacción” para ver los productos.' }),
+        el('li', { text: 'Pulsa “Balancear ecuación” y abre los paneles de análisis y estequiometría.' })
+      ]),
+      el('h3', { text: '¿Qué significa el resultado?' }),
+      el('ul', {}, [
+        el('li', {}, [el('b', { text: 'Flecha →' }), ': la reacción es irreversible. ', el('b', { text: '⇌' }), ': es reversible (llega a un equilibrio).']),
+        el('li', {}, [el('b', { text: 'Completa / Parcial' }), ': cuando los mismos reactivos pueden reaccionar en distinta proporción, elige la variante.']),
+        el('li', {}, [el('b', { text: 'Reactivo limitante' }), ': el que se acaba primero; define cuánto producto se obtiene.'])
+      ])
+    ]);
     raiz.appendChild(el('section', { class: 'rxn-card rxn-card--intro' }, [
       el('header', { class: 'rxn-encabezado' }, [
-        el('h2', { class: 'rxn-titulo', text: 'Reacciones y estequiometría' }),
-        iconoMatraz()
+        el('h2', { class: 'rxn-titulo', text: 'Reacciones y Estequiometría' }),
+        el('div', { class: 'rxn-cab-d' }, [$.btnAyuda, iconoMatraz()])
       ]),
-      el('p', { class: 'rxn-intro' }, [
-        'Elige los ', el('b', { text: 'reactivos' }), ' y el simulador te muestra la reacción completa, la ecuación balanceada y los cálculos estequiométricos.'
-      ]),
+      $.panelAyuda,
       el('div', { class: 'rxn-casos' }, [
-        el('div', { class: 'rxn-casos-cab' }, [
-          el('p', { class: 'rxn-casos-tit', text: 'Casos de práctica' }),
-          el('p', { class: 'rxn-casos-sub', text: 'Toca uno para probar' })
-        ])
-      ].concat(botonesCasos))
+        el('h2', { class: 'rxn-casos-tit' }, ['Casos de práctica ', el('small', { text: '(toca uno para probar)' })]),
+        el('div', { class: 'rxn-casos-grid' }, $.botonesCasos)
+      ])
     ]));
 
     /* --- 1. Reactivos: campo (borde negro grueso + botón verde +), chips, Determinar / Borrar --- */
@@ -963,6 +986,19 @@
     $.contadorR.className = 'rxn-contador' + (e.reactivos.length > CONFIG.limiteReactivos ? ' rxn-contador--error' : '');
     $.btnDeterminar.disabled = e.estado !== 'ok';
     $.btnMas.disabled = e.reactivos.length >= CONFIG.limiteReactivos;
+    marcarCasoActivo();
+  }
+
+  /* Resalta en verde el caso de práctica cuyos reactivos coinciden con los elegidos. */
+  function marcarCasoActivo() {
+    if (!$.botonesCasos) return;
+    var e = estado.entrada;
+    var clave = e.reactivos.map(function (t) { return t.sustancia.id; }).sort().join('|');
+    $.botonesCasos.forEach(function (b) {
+      var on = !!clave && !e.flecha && b._ids === clave;
+      b.classList.toggle('rxn-caso--activo', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
   }
 
   function lineaNombres(titulo, lista) {
