@@ -368,9 +368,9 @@
         return (c >= 1 ? "<i>↑</i>" : "") + (c === 2 ? "<i>↓</i>" : "");
     }
 
-    /* Cajitas con flechas de la capa de valencia (regla de Hund) */
-    function cajasAtomo(e) {
-        return e.cfg.filter(function (p) { return +p[0].charAt(0) === e.n; }).map(function (p) {
+    /* Cajitas con flechas (regla de Hund) a partir de una lista [subnivel, e⁻] */
+    function cajasDe(piezas) {
+        return piezas.map(function (p) {
             var t = p[0].charAt(1), k = (t === "s") ? 1 : (t === "p" ? 3 : (t === "d" ? 5 : 7)), cs = [], j;
             for (j = 0; j < k; j++) { cs.push(0); }
             for (j = 0; j < p[1]; j++) { cs[j % k]++; }
@@ -380,6 +380,27 @@
         }).join("");
     }
 
+    function cajasAtomo(e) {
+        return cajasDe(e.cfg.filter(function (p) { return +p[0].charAt(0) === e.n; }));
+    }
+
+    /* Piezas de la configuración de un ion con n electrones; su capa externa en cajitas */
+    function cfgPiezas(n) {
+        var r = n, s = [];
+        for (var i = 0; i < ORDEN.length && r > 0; i++) {
+            var e = Math.min(ORDEN[i][1], r);
+            s.push([ORDEN[i][0], e]);
+            r -= e;
+        }
+        return s;
+    }
+
+    function cajasIon(n) {
+        var p = cfgPiezas(n), mx = 0;
+        p.forEach(function (x) { mx = Math.max(mx, +x[0].charAt(0)); });
+        return cajasDe(p.filter(function (x) { return +x[0].charAt(0) === mx; }));
+    }
+
     function bloqueAtomo(e) {
         return '<div class="cf-at"><div class="cf-at-h"><span class="tom-at">' + e.sym + '</span><span class="cf-nm">' + e.nom +
             '</span><span class="cf-z">Z = ' + e.z + "</span></div>" +
@@ -387,52 +408,6 @@
             (nucleoGN(e) ? '<div class="cf-l"><span class="cf-lt">Abreviada</span><div class="tom-cfg">' + cfgAbrev(e) + "</div></div>" : "") +
             '<div class="cf-l"><span class="cf-lt">Capa de valencia (n = ' + e.n + ')</span><div class="cf-cajas">' + cajasAtomo(e) + "</div></div>" +
             '<div class="cf-cnt"><span class="cf-i">' + (e.z - e.v) + ' e⁻ internos</span><span class="cf-v">' + e.v + " e⁻ de valencia</span></div></div>";
-    }
-
-    function cajasMO(r) {
-        return r.niv.map(function (nv, i) {
-            return '<div class="cf-niv">' + nv.n.map(function (nm, o) {
-                var c = r.oc[i][o];
-                return '<div class="cf-mo ' + nv.k + '"><span class="cf-bx ' + nv.k + (c ? "" : " vac") + '">' + flechas(c) + '</span><span class="cf-mon">' + nm + "</span></div>";
-            }).join("") + "</div>";
-        }).join("");
-    }
-
-    function pasoCf(n, titulo, cuerpo) {
-        return '<div class="cf-s"><div class="cf-s-l"><span class="tom-num">' + n + '</span></div><div class="cf-s-c"><div class="cf-s-t">' +
-            titulo + "</div>" + cuerpo + "</div></div>";
-    }
-
-    function htmlConfig(r, chips) {
-
-        var interno = (r.e1.z - r.e1.v) + (r.e2.z - r.e2.v);
-        var nota = r.c > 0 ? "La carga positiva <b>quita</b> " + r.c + " e⁻." : (r.c < 0 ? "La carga negativa <b>agrega</b> " + (-r.c) + " e⁻." : "La molécula es neutra: no se agregan ni se quitan e⁻.");
-        var simpl = (r.e1.z <= 2 || r.e2.z <= 2);
-
-        var p3 = '<p class="tom-p">Los <b>' + interno + " e⁻ internos</b> (capas llenas) forman <b>KK</b> y no participan en el enlace.</p>" +
-            (simpl
-                ? '<p class="tom-p tom-suave">Con H o He el esquema es una simplificación: solo tienen orbital 1s, pero se trabaja igual con el esquema 2s–2p.</p>'
-                : '<p class="tom-p">De la capa de valencia de cada átomo se usan sus orbitales <b>s</b> (1) y <b>p</b> (3): 4 + 4 = <b>8 orbitales atómicos</b>, que se combinan en <b>8 orbitales moleculares</b>.</p>') +
-            '<div class="cf-tipo"><span class="tom-lg enl">4 enlazantes</span><div>σ2s · π2py · π2pz · σ2px</div></div>' +
-            '<div class="cf-tipo"><span class="tom-lg anti">4 antienlazantes</span><div>σ*2s · π*2py · π*2pz · σ*2px</div></div>';
-
-        var p4 = '<div class="cf-eje"><span>menor energía</span><span>mayor energía →</span></div>' +
-            '<div class="cf-mos">' + cajasMO(r) + "</div>" +
-            '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span></div>' +
-            '<p class="tom-p tom-suave">Se llenan de abajo hacia arriba (Aufbau), máximo 2 e⁻ por caja con flechas opuestas (Pauli) y, en cajas de igual energía, 1 e⁻ en cada una antes de aparear (Hund). Las cajas punteadas están vacías.</p>';
-
-        var p5 = '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
-            '<p class="tom-p tom-suave">Este es el resumen que el programa hace por ti: lo que antes se dibujaba a mano capa por capa.</p>';
-
-        return '<section class="card tom-cardacc"><details class="tom-paso" data-cf="1"' + (est.cfopen ? " open" : "") + "><summary>" +
-            '<span class="tom-num"><i class="fa-solid fa-layer-group"></i></span><span>Del átomo a la molécula: configuración completa</span></summary>' +
-            '<div class="tom-cuerpo"><p class="tom-p tom-suave">Toda la cadena, paso a paso, hasta llegar a la notación KK[…].</p><div class="cf-lin">' +
-            pasoCf(1, "Configuración de cada átomo", '<div class="cf-dos">' + bloqueAtomo(r.e1) + bloqueAtomo(r.e2) + "</div>") +
-            pasoCf(2, "Suma los e⁻ de valencia y ajusta por la carga", '<div class="tom-formula">' + formulaN(r) + '</div><p class="tom-p">' + nota + "</p>") +
-            pasoCf(3, "Separa internos y valencia", p3) +
-            pasoCf(4, "Llena los orbitales moleculares", p4) +
-            pasoCf(5, "Resultado: notación molecular", p5) +
-            "</div></div></details></section>";
     }
 
     function pasoConclusion(r) {
@@ -455,8 +430,7 @@
 
         /* Veredicto: la respuesta en una frase */
         if (r.existe) {
-            out += '<div class="tom-vd ok"><b>' + prod + " existe.</b> Enlace " + (nombres[r.OE] || "de orden " + fmt(r.OE)) + " (" + desglose(r) +
-                ") · orden de enlace " + fmt(r.OE) + " · " + (r.para ? "paramagnética" : "diamagnética") + ".</div>";
+            out += '<div class="tom-vd ok"><b>' + prod + "</b> existe como molécula estable.</div>";
         } else if (r.impar) {
             out += '<div class="tom-vd no"><b>' + prod + " no existe como molécula.</b> Con " + r.N + " e⁻ (número impar) queda un electrón desapareado y el orden de enlace sale fraccionario (" +
                 fmt(r.OE) + "). En clase se toma como «no existe».</div>";
@@ -504,18 +478,11 @@
             });
         });
 
-        /* 2 · Del átomo a la molécula (desplegable) */
-        out += htmlConfig(r, chips);
-
         /* 3 · Notación */
         out += '<section class="card">' + cab("fa-atom", "Notación de orbitales moleculares") +
             '<div class="tom-notacion"><span class="tom-kk">KK</span><span class="tom-cor">[</span>' + chips + '<span class="tom-cor">]</span></div>' +
             '<div class="tom-leyenda"><span class="tom-lg enl">enlazante</span><span class="tom-lg anti">antienlazante</span><span class="tom-lg des">1 e⁻ solo</span></div>' +
-            '<details class="tom-mini"' + (est.gopen ? " open" : "") + '><summary>Cómo leerla</summary><div class="tom-guia">' +
-            "Cada píldora es un orbital molecular y el número pequeño son los electrones que tiene (máximo 2). " +
-            "Los <b>azules</b> unen los átomos y los <b>rojos</b> los separan. Si alguna píldora tiene <b>1 solo e⁻</b> (halo naranja), hay electrones " +
-            "desapareados y la molécula es <b>paramagnética</b>; si todas tienen 2, es <b>diamagnética</b>. <b>KK</b> son las capas internas, que no cuentan." +
-            "</div></details></section>";
+            "</section>";
 
         /* 4 · Diagrama estático dentro de un acordeón */
         out += '<section class="card tom-cardacc"><details class="tom-paso" data-d="1"' + (est.dopen ? " open" : "") + "><summary>" +
@@ -538,19 +505,19 @@
 
     function pasoElectrones(r) {
 
-        var filas = [r.e1, r.e2].map(function (e) {
-            return '<div class="tom-fila"><b>' + e.sym + "</b> " + e.nom + " · Z = " + e.z +
-                '<div class="tom-cfg">' + cfgHtml(e) + "</div>Capa de valencia (n = " + e.n + "): <b>" + textoValencia(e) + " = " + e.v + " e⁻</b></div>";
-        }).join("");
-
         var nota = r.c > 0 ? "La carga positiva <b>quita</b> " + r.c + " e⁻." : (r.c < 0 ? "La carga negativa <b>agrega</b> " + (-r.c) + " e⁻." : "La molécula es neutra: no se agregan ni se quitan e⁻.");
 
-        return filas + '<div class="tom-formula">' + formulaN(r) + "</div>" +
-            '<p class="tom-p">' + nota + '</p><p class="tom-p tom-suave">Los electrones internos (capas llenas) no participan en el enlace.</p>';
+        return '<div class="cf-dos">' + bloqueAtomo(r.e1) + bloqueAtomo(r.e2) + "</div>" +
+            '<div class="tom-formula">' + formulaN(r) + '</div><p class="tom-p">' + nota + "</p>" +
+            '<p class="tom-p tom-suave">Los electrones internos (capas llenas) forman <b>KK</b> y no participan en el enlace.</p>';
     }
 
     function pasoLlenado(r) {
-        return '<p class="tom-p">Orden de energía para esta molécula, de menor a mayor:</p>' +
+        var simpl = (r.e1.z <= 2 || r.e2.z <= 2);
+
+        return (simpl ? "" : '<p class="tom-p">Los orbitales <b>s</b> (1) y <b>p</b> (3) de la capa de valencia de cada átomo suman <b>8 orbitales atómicos</b>, ' +
+            "que se combinan en <b>8 orbitales moleculares</b>: 4 enlazantes y 4 antienlazantes.</p>") +
+            '<p class="tom-p">Orden de energía para esta molécula, de menor a mayor:</p>' +
             '<div class="tom-formula">' + ordenTexto(r) + "</div>" +
             '<p class="tom-p tom-suave">' + (r.sigmaPrimero
                 ? "Con N ≥ 12 (como O₂ y F₂) el σ2px queda por debajo de los π2p."
@@ -768,21 +735,60 @@
         return '<svg viewBox="0 0 330 ' + (k === 3 ? 222 : 120) + '" class="tom-cs" role="img" aria-label="Transferencia de electrones">' + s + "</svg>";
     }
 
-    /* Covalente: σ recta y π en arco, igual que en Orbitales moleculares */
-    function svgCov(r) {
+    /* Covalente: estructura de Lewis (enlaces como líneas, pares libres como puntos) */
+    function colocarPares(n, usados) {
+        var res = [], u = usados.slice();
+        for (var i = 0; i < n; i++) {
+            var best = 0, bs = -1;
+            for (var c = 0; c < 360; c += 15) {
+                var m = 360;
+                u.forEach(function (x) { m = Math.min(m, Math.abs(((c - x + 540) % 360) - 180)); });
+                if (m > bs + 0.001) { bs = m; best = c; }
+            }
+            res.push(best); u.push(best);
+        }
+        return res;
+    }
 
-        var k = r.est.k;
-        var s = '<svg viewBox="0 0 330 104" class="tom-est" role="img" aria-label="Estructura de la molécula">';
+    function svgLewis(r) {
 
-        [[98, 143], [187, 232]].forEach(function (b) {
-            var m = (b[0] + b[1]) / 2;
-            s += '<line class="b-s" x1="' + b[0] + '" y1="52" x2="' + b[1] + '" y2="52"/>';
-            if (k > 1) { s += '<path class="b-p" d="M' + (b[0] + 3) + " 44Q" + m + " 35 " + (b[1] - 3) + ' 44"/>'; }
-            if (k > 2) { s += '<path class="b-p" d="M' + (b[0] + 3) + " 60Q" + m + " 69 " + (b[1] - 3) + ' 60"/>'; }
+        var e = r.est, k = e.k, lc = e.lc, rad = (lc === 1 ? 60 : (lc === 2 ? 52.25 : 90)) * Math.PI / 180;
+        var L = 78, cx = 165, cy = (lc === 1 || lc === 2) ? 48 : 75, dx = L * Math.sin(rad), dy = L * Math.cos(rad);
+        var P = [[cx - dx, cy + dy], [cx, cy], [cx + dx, cy + dy]];
+        var S = [r.ter.sym, r.cen.sym, r.ter.sym], FC = [e.ft, e.fc, e.ft];
+        var deg = function (x1, y1, x2, y2) { return (Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 360) % 360; };
+        var s = '<svg viewBox="0 0 330 ' + ((lc === 1 || lc === 2) ? 130 : 150) + '" class="tom-est" role="img" aria-label="Estructura de Lewis">';
+
+        /* enlaces (k líneas paralelas) */
+        [0, 2].forEach(function (i) {
+            var x1 = P[1][0], y1 = P[1][1], x2 = P[i][0], y2 = P[i][1], ex = x2 - x1, ey = y2 - y1, d = Math.sqrt(ex * ex + ey * ey);
+            var ux = ex / d, uy = ey / d, ox = -uy, oy = ux, offs = (k === 1) ? [0] : (k === 2 ? [-3.5, 3.5] : [-6, 0, 6]);
+            offs.forEach(function (o) {
+                s += '<line class="b-l" x1="' + r1(x1 + ux * 17 + ox * o) + '" y1="' + r1(y1 + uy * 17 + oy * o) + '" x2="' + r1(x2 - ux * 17 + ox * o) + '" y2="' + r1(y2 - uy * 17 + oy * o) + '"/>';
+            });
         });
 
-        [[76, r.ter.sym], [165, r.cen.sym], [254, r.ter.sym]].forEach(function (a) {
-            s += '<circle class="at" cx="' + a[0] + '" cy="52" r="22"/><text class="t-at" x="' + a[0] + '" y="60">' + a[1] + "</text>";
+        /* pares libres */
+        var angC = [deg(P[1][0], P[1][1], P[0][0], P[0][1]), deg(P[1][0], P[1][1], P[2][0], P[2][1])];
+        var paresC = (lc === 1) ? [270] : (lc === 2 ? [230, 310] : colocarPares(lc, angC));
+        var opc = [-80, 0, 80];
+        var paresT = function (n, ang) {
+            var o = (n === 1) ? [0] : (n === 2 ? [-50, 50] : opc);
+            return o.slice(0, n).map(function (v) { return (ang + 180 + v + 360) % 360; });
+        };
+        var pares = [paresT(e.lt, deg(P[0][0], P[0][1], P[1][0], P[1][1])), paresC, paresT(e.lt, deg(P[2][0], P[2][1], P[1][0], P[1][1]))];
+
+        pares.forEach(function (lista, i) {
+            lista.forEach(function (a) {
+                var t = a * Math.PI / 180, ux = Math.cos(t), uy = Math.sin(t), bx = P[i][0] + ux * 27, by = P[i][1] + uy * 27;
+                s += '<circle class="lp" cx="' + r1(bx - uy * 4.5) + '" cy="' + r1(by + ux * 4.5) + '" r="2.6"/><circle class="lp" cx="' + r1(bx + uy * 4.5) + '" cy="' + r1(by - ux * 4.5) + '" r="2.6"/>';
+            });
+        });
+
+        /* átomos y cargas formales */
+        P.forEach(function (p, i) {
+            s += '<text class="t-at" x="' + r1(p[0]) + '" y="' + r1(p[1] + 8) + '">' + S[i] + "</text>";
+            if (FC[i] !== 0) { s += '<text class="t-fc" x="' + r1(p[0] + 20) + '" y="' + r1(p[1] - 12) + '">' + (FC[i] > 0 ? "+" + FC[i] : "−" + (-FC[i])) + "</text>"; }
         });
 
         return s + "</svg>";
@@ -810,48 +816,67 @@
         return (r.tipo === "ion") ? htmlIonico(r) : htmlCovalente(r);
     }
 
+    var SIMG = { 2: "He", 10: "Ne", 18: "Ar", 36: "Kr", 54: "Xe" };
+    var HIB = { 0: "sp", 1: "sp²", 2: "sp³", 3: "sp³d" };
+
+    function bloqueIon(txt, etiqueta, n) {
+        return '<div class="cf-at"><div class="cf-at-h"><span class="tom-at">' + txt + '</span><span class="cf-nm">' + etiqueta +
+            '</span><span class="cf-z">' + n + " e⁻</span></div>" +
+            '<div class="cf-l"><span class="cf-lt">Configuración</span><div class="tom-cfg">' + cfgIon(n) + "</div></div>" +
+            '<div class="cf-l"><span class="cf-lt">Capa externa completa</span><div class="cf-cajas">' + cajasIon(n) + "</div></div>" +
+            '<div class="cf-cnt"><span class="cf-v">igual que el ' + (GASES[n] || "gas noble") + "</span></div></div>";
+    }
+
+    function avisoLista(lista, cls) {
+        return lista.length ? aviso(lista.map(function (n) { return "<div>" + n + "</div>"; }).join(""), cls) : "";
+    }
+
     function htmlIonico(r) {
 
         var cat = r.cat, ani = r.ani, ct = ionTxt(cat.sym, r.c), at = ionTxt(ani.sym, -r.a);
         var formula = cat.sym + sub(r.nc) + ani.sym + sub(r.na), out = "";
+        var nCat = cat.z - r.c, nAni = ani.z + r.a, g = r.a / r.nc;
 
-        if (r.difiere) {
-            out += aviso("Con las cargas " + ct + " y " + at + " la fórmula neutra es <b>" + formula + "</b>; el cálculo usa esa fórmula.", "am");
-        }
-        if (r.ambos) {
-            out += aviso("Con subíndices en ambos elementos el conteo de enlaces puede variar: confirma la convención con tu docente.", "inf");
-        }
+        var notas = [];
+        if (r.difiere) { notas.push("Con las cargas " + ct + " y " + at + " la fórmula neutra es <b>" + formula + "</b>; el cálculo usa esa fórmula."); }
+        if (r.ambos) { notas.push("Con subíndices en ambos elementos el conteo de enlaces puede variar: confirma la convención con tu docente."); }
+        out += avisoLista(notas, r.difiere ? "am" : "inf");
 
         var rx = chip((r.nc > 1 ? r.nc + " " : "") + cat.sym) + "<span>+</span>" + chip((r.na > 1 ? r.na + " " : "") + ani.sym) +
             '<span>→</span><span class="tom-pr">' + formula + "</span>";
 
         var iones = (r.nc > 1 ? r.nc + " " : "") + ct + " + " + (r.na > 1 ? r.na + " " : "") + at;
+        var gc = SIMG[nCat] || "gas noble", ga = SIMG[nAni] || "gas noble";
 
         out += tarjetaOscura(rx, svgIonico(r),
             tile(String(r.enlaces), "Nº de enlaces", "az") +
             tile("Iónico<small>ΔEN = " + coma(r.d) + "</small>", "Tipo de enlace", "na") +
-            tile("Diamagnética<small>todos apareados</small>", "Magnetismo", "vd") +
+            tile((gc === ga ? gc : gc + " · " + ga) + "<small>octeto completo</small>", "Isoelectrónicos con", "vd") +
             tile(iones, "iones formados", "gr"));
 
         var base = (r.na >= r.nc) ? ani : cat;
 
         out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
             paso(1, "Electronegatividad y ΔEN",
-                "<p class=\"tom-p\">" + cat.sym + ": EN = <b>" + coma(EN[cat.sym]) + "</b> · " + ani.sym + ": EN = <b>" + coma(EN[ani.sym]) + "</b></p>" +
+                '<p class="tom-p">' + cat.sym + ": EN = <b>" + coma(EN[cat.sym]) + "</b> · " + ani.sym + ": EN = <b>" + coma(EN[ani.sym]) + "</b></p>" +
                 '<div class="tom-formula">ΔEN = |' + coma(EN[ani.sym]) + " − " + coma(EN[cat.sym]) + "| = <b>" + coma(r.d) + "</b></div>" +
                 '<p class="tom-p">' + coma(r.d) + " es mayor que 1,7 y hay un metal con un no metal: el enlace es <b>iónico</b>.</p>") +
-            paso(2, "Transferencia de electrones",
+            paso(2, "Configuración de los átomos",
+                '<div class="cf-dos">' + bloqueAtomo(cat) + bloqueAtomo(ani) + "</div>" +
+                '<p class="tom-p">El ' + cat.nom.toLowerCase() + " tiene <b>" + cat.v + " e⁻</b> de valencia y los cede; el " + ani.nom.toLowerCase() +
+                " tiene <b>" + ani.v + " e⁻</b> y le faltan <b>" + r.a + "</b> para completar su capa.</p>") +
+            paso(3, "Transferencia de electrones y iones",
                 '<div class="tom-formula">' + cat.sym + " → " + ct + " + " + r.c + " e⁻</div>" +
                 '<div class="tom-formula">' + ani.sym + " + " + r.a + " e⁻ → " + at + "</div>" +
-                '<p class="tom-p">El ' + cat.nom.toLowerCase() + " tiene " + r.c + " e⁻ de valencia y los cede; el " + ani.nom.toLowerCase() + " tiene " + ani.v + " y recibe " + r.a + ".</p>" +
-                '<p class="tom-p">Cargas: (+' + r.c + ")×" + r.nc + " + (−" + r.a + ")×" + r.na + " = 0 → <b>" + formula + "</b></p>") +
-            paso(3, "Configuración de los iones", [[ct, cat.z - r.c], [at, ani.z + r.a]].map(function (p) {
-                return '<div class="tom-fila"><b>' + p[0] + '</b> · ' + p[1] + ' e⁻<div class="tom-cfg">' + cfgIon(p[1]) + "</div>igual que el " + (GASES[p[1]] || "gas noble") + "</div>";
-            }).join("")) +
-            paso(4, "Enlaces y magnetismo",
+                '<div class="cf-dos">' + bloqueIon(ct, "Catión", nCat) + bloqueIon(at, "Anión", nAni) + "</div>" +
+                '<p class="tom-p tom-suave">Ambos iones quedan con la capa externa completa (regla del octeto).</p>') +
+            paso(4, "Fórmula y propiedades",
+                '<p class="tom-p">Las cargas se cruzan: la carga de ' + cat.sym + " (+" + r.c + ") pasa a ser el subíndice de " + ani.sym +
+                " y la de " + ani.sym + " (−" + r.a + ") el de " + cat.sym + (g > 1 ? ", y se simplifica entre " + g : "") + ".</p>" +
+                '<div class="tom-formula">(+' + r.c + ")×" + r.nc + " + (−" + r.a + ")×" + r.na + " = 0 → <b>" + formula + "</b></div>" +
                 '<p class="tom-p"><b>' + r.enlaces + " enlace" + (r.enlaces > 1 ? "s" : "") + "</b>: un enlace " + cat.sym + "–" + ani.sym + " por cada átomo de " + base.nom.toLowerCase() + ".</p>" +
-                '<p class="tom-p">Todos los e⁻ de ambos iones están apareados: es <b>diamagnética</b>.</p>' +
-                '<p class="tom-p tom-suave">Estructura: red iónica (cationes rodeados de aniones), no moléculas discretas.</p>') +
+                '<p class="tom-p">Todos los e⁻ están apareados: es <b>diamagnético</b>.</p>' +
+                '<p class="tom-p tom-suave">Forma una red cristalina, no moléculas sueltas. Suele ser un sólido duro y quebradizo, con punto de fusión alto, que conduce la electricidad fundido o disuelto, pero no sólido.</p>') +
             "</section>";
 
         return out;
@@ -862,36 +887,35 @@
         var cen = r.cen, ter = r.ter, e = r.est, k = e.k, out = "";
         var formula = (ter.z <= 1) ? ter.sym + "₂" + cen.sym : cen.sym + ter.sym + "₂";
         var nombre = ["simple", "doble", "triple"][k - 1];
+        var sp = "2σ" + (k > 1 ? " + " + 2 * (k - 1) + "π" : "");
 
-        if (e.ft !== 0 || e.fc !== 0) {
-            out += aviso("Quedan cargas formales distintas de 0: esta molécula puede tener resonancia. Se muestra una de las estructuras posibles.", "am");
-        }
-        if (e.ec !== 8) {
-            out += aviso("Excepción al octeto: " + cen.sym + " queda con " + e.ec + " e⁻ en su capa.", "inf");
-        }
+        var notas = [];
+        if (e.ft !== 0 || e.fc !== 0) { notas.push("Quedan cargas formales distintas de 0: esta molécula puede tener resonancia. Se muestra una de las estructuras posibles."); }
+        if (e.ec !== 8) { notas.push("Excepción al octeto: " + cen.sym + " queda con " + e.ec + " e⁻ en su capa."); }
+        out += avisoLista(notas, "inf");
 
         var rx = chip(cen.sym) + "<span>+</span>" + chip("2 " + ter.sym) + "<span>→</span><span class=\"tom-pr\">" + formula + "</span>";
 
-        out += tarjetaOscura(rx, svgCov(r) + '<div class="tom-leyenda"><span class="tom-lg s">σ · línea recta</span><span class="tom-lg p">π · arco</span></div>',
-            tile("2", "Nº de enlaces", "az") +
-            tile(nombre.charAt(0).toUpperCase() + nombre.slice(1) + " ×2<small>" + 2 + "σ" + (k > 1 ? " + " + 2 * (k - 1) + "π" : "") + "</small>", "Tipo de enlace", "na") +
-            tile("Diamagnética<small>todos apareados</small>", "Magnetismo", "vd") +
-            tile(r.geo[0] + "<small>" + (r.lineal ? "apolar" : "polar") + " · " + r.geo[1] + "</small>", "Geometría", "gr"));
+        out += tarjetaOscura(rx, svgLewis(r),
+            tile(nombre.charAt(0).toUpperCase() + nombre.slice(1) + " ×2<small>" + sp + "</small>", "Tipo de enlace", "na") +
+            tile(r.geo[0] + "<small>" + HIB[e.lc] + " · " + r.geo[1] + "</small>", "Geometría", "az") +
+            tile((r.lineal ? "Apolar" : "Polar") + "<small>ΔEN = " + coma(r.dCT) + "</small>", "Polaridad", "vd") +
+            tile(r.V + " e⁻<small>" + (2 * e.lt + e.lc) + " pares libres</small>", "de valencia", "gr"));
 
         out += '<section class="card">' + cab("fa-list-check", "Paso a paso") +
             paso(1, "Cuenta los electrones de valencia",
-                '<p class="tom-p">' + cen.sym + ": <b>" + cen.v + " e⁻</b> · " + ter.sym + ": <b>" + ter.v + " e⁻</b> (hay 2)</p>" +
-                '<div class="tom-formula">' + cen.v + " (" + cen.sym + ") + 2 × " + ter.v + " (" + ter.sym + ") = <b>" + r.V + " e⁻</b></div>") +
+                '<div class="cf-dos">' + bloqueAtomo(cen) + bloqueAtomo(ter) + "</div>" +
+                '<div class="tom-formula">' + cen.v + " (" + cen.sym + ") + 2 × " + ter.v + " (" + ter.sym + ") = <b>" + r.V + " e⁻</b></div>" +
+                '<p class="tom-p tom-suave">Hay 2 átomos de ' + ter.sym + ".</p>") +
             paso(2, "Dibuja la estructura de Lewis",
-                '<p class="tom-p">Cada átomo busca completar su capa (8 e⁻; el H, 2 e⁻). Con ' + r.V + ' e⁻ la mejor estructura es:</p>' +
-                '<div class="tom-formula">' + cen.sym + " con cada " + ter.sym + ": enlace <b>" + nombre + "</b></div>" +
-                '<p class="tom-p">Pares libres: ' + e.lt + " en cada " + ter.sym + " y " + e.lc + " en " + cen.sym + ". Enlaces: 2σ" + (k > 1 ? " + " + 2 * (k - 1) + "π" : "") + ".</p>") +
+                '<p class="tom-p">Cada átomo busca completar su capa (8 e⁻; el H, 2 e⁻). Con ' + r.V + " e⁻ la mejor estructura es el enlace <b>" + nombre + "</b> de " + cen.sym + " con cada " + ter.sym + ".</p>" +
+                '<p class="tom-p">Pares libres: ' + e.lt + " en cada " + ter.sym + " y " + e.lc + " en " + cen.sym + ". Enlaces: " + sp + ".</p>") +
             paso(3, "Calcula las cargas formales",
                 '<p class="tom-p">Carga formal = e⁻ de valencia − (e⁻ de pares libres + enlaces)</p>' +
                 '<div class="tom-formula">' + ter.sym + ": " + ter.v + " − (" + 2 * e.lt + " + " + k + ") = <b>" + e.ft + "</b><br>" +
                 cen.sym + ": " + cen.v + " − (" + 2 * e.lc + " + " + 2 * k + ") = <b>" + e.fc + "</b></div>") +
-            paso(4, "Geometría, polaridad y magnetismo",
-                '<p class="tom-p">Dominios de e⁻ en ' + cen.sym + " = 2 + " + e.lc + " = <b>" + (2 + e.lc) + "</b> → <b>" + r.geo[0] + "</b> (" + r.geo[1] + ").</p>" +
+            paso(4, "Geometría, hibridación y polaridad",
+                '<p class="tom-p">Dominios de e⁻ en ' + cen.sym + " = 2 + " + e.lc + " = <b>" + (2 + e.lc) + "</b> → <b>" + r.geo[0] + "</b> (" + r.geo[1] + "), hibridación <b>" + HIB[e.lc] + "</b>.</p>" +
                 '<p class="tom-p">ΔEN (' + cen.sym + "–" + ter.sym + ") = " + coma(r.dCT) + ". " + (r.lineal
                     ? "Es simétrica: los dipolos se cancelan → molécula <b>apolar</b>."
                     : "Los dipolos no se cancelan → molécula <b>polar</b>.") + "</p>" +
@@ -907,13 +931,13 @@
        ========================================= */
 
     var CASOS = [
-        { t: "Li₂", s: ["Li", "Li"], c: 0 }, { t: "B₂", s: ["B", "B"], c: 0 }, { t: "C₂", s: ["C", "C"], c: 0 },
-        { t: "N₂", s: ["N", "N"], c: 0 }, { t: "O₂", s: ["O", "O"], c: 0 }, { t: "F₂", s: ["F", "F"], c: 0 },
-        { t: "Ne₂", s: ["Ne", "Ne"], c: 0 }, { t: "CO", s: ["C", "O"], c: 0 }, { t: "NO⁺", s: ["N", "O"], c: 1 },
-        { t: "CN⁻", s: ["C", "N"], c: -1 }, { t: "BO⁺", s: ["B", "O"], c: 1 }, { t: "PF⁻", s: ["P", "F"], c: -1 }
+        { t: "Li₂", s: ["Li", "Li"], c: 0 }, { t: "N₂", s: ["N", "N"], c: 0 }, { t: "F₂", s: ["F", "F"], c: 0 },
+        { t: "CO", s: ["C", "O"], c: 0 }, { t: "NO⁺", s: ["N", "O"], c: 1 }, { t: "CN⁻", s: ["C", "N"], c: -1 },
+        { t: "BO⁺", s: ["B", "O"], c: 1 }, { t: "NO⁻", s: ["N", "O"], c: -1 }, { t: "NF", s: ["N", "F"], c: 0 },
+        { t: "OF⁻", s: ["O", "F"], c: -1 }, { t: "ClF", s: ["Cl", "F"], c: 0 }, { t: "PF⁻", s: ["P", "F"], c: -1 }
     ];
 
-    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1], todos: false, cfopen: false };
+    var est = { t: ["", ""], c: 0, r: null, dopen: false, gopen: false, modo: "tom", n: [1, 1], todos: false };
     var raiz;
 
     function shell() {
@@ -952,8 +976,7 @@
             '<section class="card tom-form"><div class="tom-campos">' + campos + "</div>" +
             '<div class="solo-tom"><div class="tom-sub">Carga de la molécula o ion</div><div class="tom-chips">' + cargas + "</div></div>" +
             '<button type="button" class="tom-borrar" data-a="borrar"><i class="fa-solid fa-eraser"></i> Borrar</button></section>' +
-            '<div id="tom-res" aria-live="polite"></div>' +
-            '<p class="tom-ver">Calculadora TOM · v10</p>';
+            '<div id="tom-res" aria-live="polite"></div>';
     }
 
     function pintarModo() {
@@ -1191,7 +1214,6 @@
         if (d.classList && d.classList.contains("tom-mini")) { est.gopen = d.open; return; }
         if (!d.classList || !d.classList.contains("tom-paso")) { return; }
 
-        if (d.dataset.cf) { est.cfopen = d.open; return; }
         if (d.dataset.d) { est.dopen = d.open; return; }
         if (!d.open) { return; }
 
