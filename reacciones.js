@@ -786,6 +786,21 @@
     return det;
   }
 
+  /* Icono ? de Ayuda (SVG propio: se ve aunque Font Awesome no cargue). Usa el color del texto. */
+  function iconoAyuda() {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '15'); svg.setAttribute('height', '15');
+    svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    var c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', '12'); c.setAttribute('cy', '12'); c.setAttribute('r', '11'); c.setAttribute('fill', 'currentColor');
+    var p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', 'M9.2 9.3a2.9 2.9 0 1 1 4.4 2.5c-.9.6-1.6 1.1-1.6 2.2M12 17.2v.1');
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#fff'); p.setAttribute('stroke-width', '2.4'); p.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(c); svg.appendChild(p);
+    return svg;
+  }
+
   /* Icono del matraz (SVG propio: no depende de Font Awesome ni de Internet). */
   function iconoMatraz() {
     var NS = 'http://www.w3.org/2000/svg';
@@ -822,7 +837,103 @@
     determinarReaccion();
   }
 
+  /* Estilos del encabezado y de los casos de práctica (se inyectan al iniciar; ganan a cualquier CSS antiguo). */
+  var estilosEncabezado = `/* ---- Encabezado (mismo estilo que Enlaces): título + Ayuda + icono -------------- */
+#reacciones .rxn-root .rxn-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0; }
+#reacciones .rxn-root .rxn-titulo { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; color: #2b2f36; text-align: left; }
+#reacciones .rxn-root .rxn-cab-d { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+#reacciones .rxn-root .rxn-logo {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px;
+  background: var(--rxn-verde-fondo);
+  border: 0;
+  border-radius: 12px;
+}
+#reacciones .rxn-root .rxn-logo svg { width: 24px; height: 24px; }
+
+/* Botón Ayuda: idéntico al de Enlaces (naranja) */
+#reacciones .rxn-root .rxn-ayuda {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 17px;
+  border: 1.5px solid #DD5200;
+  background: #ffffff;
+  color: #DD5200;
+  font: 700 12.5px "Poppins", Arial, sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+#reacciones .rxn-root .rxn-ayuda.on { background: #DD5200; color: #ffffff; }
+#reacciones .rxn-root .rxn-ayuda.on svg path { stroke: #DD5200; }
+#reacciones .rxn-root .rxn-ayuda:focus-visible { outline: 3px solid #1686c9; outline-offset: 2px; }
+
+#reacciones .rxn-root .rxn-ay {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fff4ec;
+  border-left: 4px solid #DD5200;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2b2f36;
+}
+#reacciones .rxn-root .rxn-ay[hidden] { display: none; }
+#reacciones .rxn-root .rxn-ay h3 { margin: 10px 0 3px; font-size: 12px; font-weight: 700; color: #B83F00; }
+#reacciones .rxn-root .rxn-ay h3:first-child { margin-top: 0; }
+#reacciones .rxn-root .rxn-ay p { margin: 0; }
+#reacciones .rxn-root .rxn-ay ol, #reacciones .rxn-root .rxn-ay ul { margin: 0; padding-left: 18px; }
+#reacciones .rxn-root .rxn-ay li { margin: 2px 0; }
+
+/* ---- Casos de práctica: 10 botones en 2 filas de 5, todos del mismo ancho ------- */
+#reacciones .rxn-root .rxn-casos { margin: 10px 0 0; padding: 9px 10px 10px; background: #e8ebee; border-radius: 16px; }
+#reacciones .rxn-root .rxn-casos-tit { margin: 0 0 7px; font-size: 14.5px; font-weight: 700; line-height: 1.2; color: #111111; }
+#reacciones .rxn-root .rxn-casos-tit small { font-size: 11.5px; font-weight: 500; color: #4a525c; }
+#reacciones .rxn-root .rxn-casos-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+#reacciones .rxn-root .rxn-caso {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px 2px;
+  font: 600 11px/1.15 "Poppins", Arial, sans-serif;
+  color: #ffffff;
+  background: #2a2e35;
+  border: 1.5px solid #8f969f;
+  border-radius: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .2s, border-color .2s;
+}
+#reacciones .rxn-root .rxn-caso:hover { background: #3a3f48; }
+#reacciones .rxn-root .rxn-caso:active { transform: scale(.96); }
+#reacciones .rxn-root .rxn-caso:focus-visible { outline: 3px solid #1686c9; outline-offset: 2px; }
+/* Caso elegido: verde (en Enlaces es naranja) */
+#reacciones .rxn-root .rxn-caso.rxn-caso--activo,
+#reacciones .rxn-root .rxn-caso.rxn-caso--activo:hover { background: var(--rxn-verde); border-color: var(--rxn-verde); color: #06280f; }
+@media (min-width: 480px) {
+  #reacciones .rxn-root .rxn-caso { font-size: 12.5px; min-height: 34px; border-radius: 17px; }
+}
+
+
+#reacciones .rxn-root .rxn-casos { display: block; margin: 10px 0 0; padding: 9px 10px 10px; background: #e8ebee; border-radius: 16px; }
+#reacciones .rxn-root .rxn-casos-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+#reacciones .rxn-root .rxn-caso { white-space: normal; box-shadow: none; }
+#reacciones .rxn-root .rxn-ayuda svg { flex: 0 0 auto; }
+`;
+  function inyectarEstilos() {
+    if (document.getElementById('rxn-estilos-cab')) return;
+    var st = document.createElement('style');
+    st.id = 'rxn-estilos-cab';
+    st.textContent = estilosEncabezado;
+    document.head.appendChild(st);
+  }
+
   function construirVista(contenedor) {
+    inyectarEstilos();
     var raiz = el('div', { class: 'rxn-root' });
 
     /* --- Encabezado (igual que Enlaces): título + botón Ayuda + icono; casos de práctica en 2 filas de 5 --- */
@@ -843,7 +954,7 @@
         $.btnAyuda.setAttribute('aria-expanded', String(abierta));
         $.btnAyuda.classList.toggle('on', abierta);
       }
-    }, [el('i', { class: 'fa-solid fa-circle-question', 'aria-hidden': 'true' }), ' Ayuda']);
+    }, [iconoAyuda(), ' Ayuda']);
     $.panelAyuda = el('div', { class: 'rxn-ay', id: 'rxn-ay', hidden: true }, [
       el('h3', { text: '¿Qué es?' }),
       el('p', {}, ['Un simulador paso a paso: eliges los ', el('b', { text: 'reactivos' }), ' y te muestra la reacción completa, la ecuación balanceada y los cálculos de estequiometría.']),
