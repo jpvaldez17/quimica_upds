@@ -1666,3 +1666,87 @@ button, input, select, textarea {
         0 0 20px rgba(var(--haz), 0.45);
 }
 
+
+/* =========================================
+   DESAFÍO RÁPIDO: FONDO OSCURO
+   Gris oscuro (no negro, para no confundirse con los accesos
+   directos). Se conservan el borde azul, el ícono azul y los
+   colores del contador.
+   ========================================= */
+
+.challenge-card {
+    background: #2d323a;
+    padding: 10px 12px;
+}
+
+.challenge-card .card-header h2 {
+    color: #f1f5f9;
+}
+
+.challenge-card .question {
+    color: #f8fafc;
+    margin-bottom: 8px;
+}
+
+.answer-buttons {
+    gap: 6px;
+}
+
+.answer-buttons button {
+    min-height: 36px;
+    background: #4a5059;
+    border: 2px solid #ffffff;
+    color: #f8fafc;
+}
+
+.answer-buttons button:hover:not(:disabled) {
+    background: #565d67;
+}
+
+.answer-buttons button.correcta {
+    background: #1f9d55;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.answer-buttons button.incorrecta {
+    background: #d93025;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.answer-buttons button:disabled:not(.correcta):not(.incorrecta) {
+    opacity: 0.65;
+    color: #e5e7eb;
+}
+
+
+/* =========================================
+   BARRA INFERIOR: ÍCONOS NEGROS Y MÁS GRANDES
+   - Tabla, Enlaces, Reacciones y Compuestos: negro; al
+     seleccionarlos toman su color.
+   - Inicio (casita) siempre rojo.
+   ========================================= */
+
+.nav-blue:not(.active) i,
+.nav-orange:not(.active) i,
+.nav-green:not(.active) i,
+.nav-brown:not(.active) i {
+    color: #111111;
+}
+
+.nav-item {
+    padding-top: 7px;
+    gap: 4px;
+}
+
+.nav-item i {
+    height: 34px;
+    transition: color 0.2s ease;
+}
+
+.nav-item i svg {
+    width: 32px;
+    height: 32px;
+    stroke-width: 1.9;
+}
